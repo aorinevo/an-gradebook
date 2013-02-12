@@ -39,9 +39,9 @@ Highlighted features:
 
 == Screenshots ==
 
-1. [Admin View](http://www.aorinevo.com/wp-content/uploads/2013/02/admin_view.png)
-2. [Admin View Course Selected](http://www.aorinevo.com/wp-content/uploads/2013/02/admin_view_course_selected.png)
-3. [Student View Assignment Selected](http://www.aorinevo.com/wp-content/uploads/2013/02/student_view_assignment_selected.png)
+1. Admin view with selected course in orange
+2. Admin view with no selected courses
+3. Student view with course selected and pie chart displayed
 
 == Changelog ==
 
