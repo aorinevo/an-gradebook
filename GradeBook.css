@@ -1,0 +1,69 @@
+.icon_add_course, .icon_delete_course, .icon_add_assignment, .icon_delete_assignment, .icon_add_student, .icon_delete_student {
+	float: left; 
+	padding: 0px 8px 6px 0px; 
+	opacity: 0.5;
+}
+
+.even {
+	background-color: #BFDDF3;
+}
+
+.overlay {
+	background-color: rgba(1,1,1,.5);
+	bottom: 0;
+	left: 0;
+	position: fixed;
+	right: 0;
+	top: 0;
+}
+
+label, input { 
+	display:block; 
+}
+
+input.text { 
+	margin-bottom:12px; 
+	width:95%; 
+	padding: .4em; 
+}
+
+fieldset { 
+	padding:0; 
+	border:0; 
+	margin-top:25px; 
+}
+
+.ui-dialog .ui-state-error { 
+	padding: .3em; 
+}
+
+.validateTips { 
+	border: 1px solid transparent; 
+	padding: 0.3em; 
+}
+
+#GradeBook_courses .ui-selecting { 
+	background: #FECA40; 
+}
+
+#GradeBook_courses .ui-selected { 
+	background: #F39814; color: white; 
+}
+
+.GradeBook_students .ui-selecting { 
+	background: #FECA40; 
+}
+
+.GradeBook_students .ui-selected { 
+	background: #F39814; 
+	color: white; 
+}
+
+.students_GradeBook .ui-selecting { 
+	background: #FECA40; 
+}
+
+.students_GradeBook .ui-selected { 
+	background: #F39814; 
+	color: white; 
+}
