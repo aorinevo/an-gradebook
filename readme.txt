@@ -1,5 +1,5 @@
 === AN_GradeBook ===
-Contributors: Aori Nevo
+Contributors: anevo
 Donate link: 
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
