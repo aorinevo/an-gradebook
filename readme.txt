@@ -53,10 +53,10 @@ Highlighted features:
 
 == Disclaimer ==
 
-I am not a programmer.  I understand that some of the code isn't efficient or elegant but I will work to making it so (as best I can).  Any help would be much appreciated. 
+I am not a programmer.  I will work to make the code as efficient as possible (as best I can).  Any help would be much appreciated. 
 
 
 
 == Misc ==
 
-I am an educator that wanted a nice plugin to record grades.  This plugin is a first attempt at doing just that.  There are still more features that should be added and that I want to add.
+I am an educator.  This plugin is a first attempt at a nice plugin to record grades.  There are still more features that I want to add and will add over time.
