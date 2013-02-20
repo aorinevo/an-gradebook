@@ -97,7 +97,6 @@ $( '#GradeBook_courses tbody td:not(.noteditable)' ).each(function()
 				bValid = bValid && checkRegexp( course_year, /^\d{4}$/, "Year: YYYY" );
  
 				if ( bValid ) {
-				//"../../wp-content/plugins/AN_GradeBook/add_course.php"
 					$.get(ajax_object.ajax_url, { 
 						action: 'add_course',
 						course_name : course_name.val(),
@@ -462,7 +461,11 @@ $("#GradeBook_courses tbody tr:last-child td:first-child").click(function() {
 					},
 					function(data){
       							$( '#wp_GradeBook_' + isselecteddata + ' thead tr' )
-      								.append("<th id='" + data['assign_id'] + "'>" + data['assignment_name'] + "</th>");
+      								.append("<th id='" + data['assign_id'] + "' title=''>" + data['assignment_name'] + "</th>");
+      				       	$( '#wp_GradeBook_' + isselecteddata + ' thead tr th[id='+data['assign_id']+']' )
+       					.tooltip({ content: 
+       							'Date Due: ' + data['assignment_due_date']
+       						});  		
       							$( '#wp_GradeBook_' + isselecteddata + ' tbody tr:nth-child(even)' )
       								.append("<td ></td>");
       							$( '#wp_GradeBook_' + isselecteddata + ' tbody tr:nth-child(odd)' )
@@ -581,14 +584,21 @@ $("#GradeBook_courses tbody tr:last-child td:first-child").click(function() {
 				data:	{ action: 'get_table_data', course_id: isselected[0]}, 
 				success: function(data, textStatus, jqXHR ){
 					var column_names = data['column_names'];
+					var assign_data = data['assign_data'];
 					var column_id = data['column_ids'];
 					var table_data = data['table_data'];
 					var number_of_rows = data['number_of_rows'];													
 					tables_loaded.push(isselected[0]);
 					for(i = 0; i<column_names.length;i++){
 						$( "#wp_GradeBook_" + isselecteddata + " thead tr" ).append(
-			    				"<th id='" + column_id[i]  + "'>" + column_names[i] + "</th>" 						
+			    				"<th id='" + column_id[i]  + "' title=''>" + column_names[i] + "</th>" 						
        						);
+       					if(i>3){	
+       					$( '#wp_GradeBook_' + isselecteddata + ' thead tr th[id^="assign_"][id='+column_id[i]+']' )
+       					.tooltip({ content: 
+       							'Date Due: ' + assign_data[i-4][2]
+       						});
+       					}
        					};
        					for(i = 0; i<number_of_rows;i++){
 						$( "#wp_GradeBook_" + isselecteddata + " tbody" ).append(function(){
@@ -658,13 +668,20 @@ $("#GradeBook_courses tbody tr:last-child td:first-child").click(function() {
 				success: function(data, textStatus, jqXHR ){
 					var column_names = data['column_names'];
 					var column_id = data['column_ids'];
+					var assign_data = data['assign_data'];					
 					var table_data = data['table_data'];
 					var number_of_rows = data['number_of_rows'];													
 					tables_loaded.push(isselected[0]);
 					for(i = 0; i<column_names.length;i++){
 						$( "#wp_GradeBook_" + isselecteddata + " thead tr" ).append(
-			    				"<th id='" + column_id[i]  + "'>" + column_names[i] + "</th>" 						
+			    				"<th id='" + column_id[i]  + "' title=''>" + column_names[i] + "</th>" 						
        						);
+       					if(i>3){	
+       					$( '#wp_GradeBook_' + isselecteddata + ' thead tr th[id^="assign_"][id='+column_id[i]+']' )
+       					.tooltip({ content: 
+       							'Due Date: ' + assign_data[i-4][2] + '<br/> Test'
+       						});
+       					}       						
        					};
        					for(i = 0; i<number_of_rows;i++){
 						$( "#wp_GradeBook_" + isselecteddata + " tbody" ).append(function(){
