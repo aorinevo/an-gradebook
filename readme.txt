@@ -1,9 +1,9 @@
 === AN_GradeBook ===
-Contributors: Aori Nevo
+Contributors: anevo
 Donate link: 
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
-Tested up to: 3.4
+Tested up to: 3.5.1
 Stable tag: 1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -39,9 +39,9 @@ Highlighted features:
 
 == Screenshots ==
 
-1. [Admin View](http://www.aorinevo.com/wp-content/uploads/2013/02/admin_view.png)
-2. [Admin View Course Selected](http://www.aorinevo.com/wp-content/uploads/2013/02/admin_view_course_selected.png)
-3. [Student View Assignment Selected](http://www.aorinevo.com/wp-content/uploads/2013/02/student_view_assignment_selected.png)
+1. Admin view with selected course in orange
+2. Admin view with no selected courses
+3. Student view with course selected and pie chart displayed
 
 == Changelog ==
 
@@ -53,10 +53,10 @@ Highlighted features:
 
 == Disclaimer ==
 
-I am not a programmer.  I understand that some of the code isn't efficient or elegant but I will work to making it so (as best I can).  Any help would be much appreciated. 
+I am not a programmer.  I will work to make the code as efficient as possible (as best I can).  Any help would be much appreciated. 
 
 
 
 == Misc ==
 
-I am an educator that wanted a nice plugin to record grades.  This plugin is a first attempt at doing just that.  There are still more features that should be added and that I want to add.
+I am an educator.  This plugin is a first attempt at a nice plugin to record grades.  There are still more features that I want to add and will add over time.

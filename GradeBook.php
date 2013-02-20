@@ -134,6 +134,7 @@ function get_table_data_callback(){
 	global $wpdb;
 	
 	$assign_id = $wpdb->get_col("SELECT assign_id FROM wp_GradeBook_assignments_". $_GET['course_id']);
+	$assign_data = $wpdb->get_results("SELECT * FROM wp_GradeBook_assignments_". $_GET['course_id'],ARRAY_N);
 	$acolumn_ids = array();
 	for ($i=0; $i < count($assign_id); $i++){
 		$acolumn_ids[$i]= 'assign_'. $assign_id[$i];
@@ -155,7 +156,8 @@ function get_table_data_callback(){
 		"column_ids" => $acolumn_ids,
 		"column_names" => $acolumn_names,
 	        "table_data" => $table_data,
-	        "number_of_rows" => $number_of_rows
+	        "number_of_rows" => $number_of_rows,
+	        "assign_data" => $assign_data
 	);
 
 	echo json_encode($output);
@@ -230,9 +232,7 @@ add_action('wp_ajax_add_course', 'add_course_callback');
 
 function edit_course_callback(){
 	global $wpdb;
-	$wpdb->show_errors();
 
-	/* DB table to use */
 	$sTable = "wp_GradeBook_courses";
 		
 	$aColumns = $wpdb->get_col( 
@@ -258,13 +258,9 @@ function edit_course_callback(){
 add_action('wp_ajax_edit_course', 'edit_course_callback');
 
 function delete_course_callback(){
-global $wpdb;
-	$wpdb->show_errors();
+	global $wpdb;
 	
-		require_once($_SERVER['DOCUMENT_ROOT'].'/wp-admin/includes/user.php');
-
-
-	$wpdb->show_errors();
+	require_once($_SERVER['DOCUMENT_ROOT'].'/wp-admin/includes/user.php');
 	
 	$course_name = 'wp_GradeBook_'. $_GET['course_id'];
 	$ids = $wpdb->get_col("SELECT user_ID FROM $course_name");
@@ -305,8 +301,6 @@ add_action('wp_ajax_delete_course','delete_course_callback');
 
 function add_assignment_callback(){
 	global $wpdb;
-	
-	$wpdb->show_errors();
 
 	$wpdb->query("INSERT 
 		INTO wp_GradeBook_assignments_". 
@@ -330,13 +324,12 @@ function add_assignment_callback(){
 		" ADD $assign_id DECIMAL(5,2) DEFAULT 0"
 	); 
 	
-	echo json_encode( Array( 'assign_id' => $assign_id, 'assignment_name' => $assignment_name ));
+	echo json_encode( Array( 'assign_id' => $assign_id, 'assignment_name' => $assignment_name, 'assignment_due_date'=> $_GET['assignment_due_date'] ));
 	die();
 }
 add_action('wp_ajax_add_assignment','add_assignment_callback');
 
 function delete_assignment_callback(){
-	
 	global $wpdb;
 	
 	$wpdb->show_errors();
@@ -349,7 +342,6 @@ add_action('wp_ajax_delete_assignment','delete_assignment_callback');
 
 function add_student_callback(){
 	global $wpdb;
-	
 	$wpdb->show_errors();
 
 	$x = username_exists($_GET['user_login']);
@@ -502,6 +494,17 @@ function delete_student_callback(){
 }
 add_action('wp_ajax_delete_student','delete_student_callback');
 
+function get_assign_data_callback(){
+	global $wpdb;
+	$wpdb->show_errors();
+
+	/* DB table to use */
+	$sTable = "wp_GradeBook_assignments_". $_GET['course_id'];	
+	$output=$wpdb->get_results('SELECT * FROM '. $sTable, ARRAY_N);
+	echo json_encode(array('data'=>$output,'num_rows' => $wpdb->num_rows));
+	die();
+}
+add_action('wp_ajax_get_assign_data', 'get_assign_data_callback');
 
 function GradeBook_shortcode(){
 	global $wpdb;
@@ -758,7 +761,7 @@ for($i = 0; $i < count($x); $i++){
 				"<tr>".
 				"<th>ID</th><th>USER ID</th><th>First Name</th><th>Last Name</th>";
 	for($j=0;$j<count($column_names[$i]);$j++){
-		echo "<th id=assign_".	$column_assign_ids[$i][$j].">". $column_names[$i][$j] ."</th>";
+		echo "<th id=assign_".	$column_assign_ids[$i][$j]." title=''>". $column_names[$i][$j] ."</th>";
 	}			
 	echo			"</tr>" .
 			"</thead>" .
@@ -772,7 +775,6 @@ for($i = 0; $i < count($x); $i++){
 	"</table>";	
 }
 echo "</div>";
-
 
 ?>
 <head>

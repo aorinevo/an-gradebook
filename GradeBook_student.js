@@ -45,10 +45,25 @@
 		}
 	$('.students_GradeBook thead th').removeClass('ui-selected');
 	$('#chart_div').css('visibility', 'hidden');
+	    $.get(ajax_object.ajax_url,
+		{ action: 'get_assign_data', course_id: isselecteddata}, 
+		function(data){
+			var num_rows = data['num_rows'];
+			var assign_data = data['data'];
+			for(j=0;j<num_rows; j++){
+			$( '#wp_students_GradeBook_' + isselecteddata + ' thead tr th[id=assign_'+assign_data[j][0]+']')
+			.tooltip({content: 'Date Due: '+ assign_data[j][3] });
+			}
+				},
+				"json"	
+			);
 	});
+	
+
+	
 	var yz = $( '#GradeBook_courses tbody tr td:first-child').map(function() {
         		return $(this).text();
-    		}).get();
+    		}).get();    		
     	for(i = 0; i<yz.length; i++){
 	$('#wp_students_GradeBook_'+yz[i]+' thead th:eq(3)').nextAll().click(function() {
     		$(this).toggleClass("ui-selected").siblings().removeClass("ui-selected"); 
