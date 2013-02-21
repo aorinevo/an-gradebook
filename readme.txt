@@ -49,6 +49,8 @@ Highlighted features:
 
 == Upgrade notice ==
 
+Version 1.1:  Added tooltips for assignments that provides due date information
+
 
 
 == Disclaimer ==
