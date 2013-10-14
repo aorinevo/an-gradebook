@@ -1,14 +1,14 @@
 === AN_GradeBook ===
-Contributors: anevo
+Contributors: anevo, jamarparris
 Donate link: 
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
-Tested up to: 3.5.1
+Tested up to: 3.6.1
 Stable tag: 1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-This is a simple gradebook based on jQuery, javascript, mySQL and php.
+This is a simple gradebook based on jQuery, JS, mySQL and php.
 
 == Description ==
 
