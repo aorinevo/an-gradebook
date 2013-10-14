@@ -12,10 +12,33 @@ License: GPL
 
 define( 'GRADEBOOKS_URL', plugin_dir_url(__File__) );
 
-
-
+class GBUser {
+	
+	protected $_id;
+	
+	public function __construct($id) {
+		$this->_id = $id;
+	}
+	
+	public function isAdmin() {
+		if ($this->_id == 1) {
+			return true;
+		}
+		
+		return false;
+	}
+	
+	public function verifyAdmin() {
+		if (!$this->isAdmin()) {
+			$result = array("status" => "Not Allowed.");
+			echo json_encode($result);
+			die();
+		}
+	}
+}
 
 function GradeBook_options_install() {
+	
 	global $wpdb;
   	$db_name = $wpdb->prefix . 'GradeBook_courses';
  
@@ -166,7 +189,11 @@ function get_table_data_callback(){
 add_action('wp_ajax_get_table_data','get_table_data_callback');
 
 function add_course_callback() {
+	
 	global $wpdb;
+	
+	$user = new GBUser(wp_get_current_user()->ID);
+	$user->verifyAdmin();
 	
 	$aColumns = $wpdb->get_col( 
      	"SELECT column_name
@@ -260,6 +287,9 @@ add_action('wp_ajax_edit_course', 'edit_course_callback');
 function delete_course_callback(){
 	global $wpdb;
 	
+	$user = new GBUser(wp_get_current_user()->ID);
+	$user->verifyAdmin();
+	
 	require_once($_SERVER['DOCUMENT_ROOT'].'/wp-admin/includes/user.php');
 	
 	$course_name = 'wp_GradeBook_'. $_GET['course_id'];
@@ -301,6 +331,9 @@ add_action('wp_ajax_delete_course','delete_course_callback');
 
 function add_assignment_callback(){
 	global $wpdb;
+	
+	$user = new GBUser(wp_get_current_user()->ID);
+	$user->verifyAdmin();
 
 	$wpdb->query("INSERT 
 		INTO wp_GradeBook_assignments_". 
@@ -332,6 +365,9 @@ add_action('wp_ajax_add_assignment','add_assignment_callback');
 function delete_assignment_callback(){
 	global $wpdb;
 	
+	$user = new GBUser(wp_get_current_user()->ID);
+	$user->verifyAdmin();
+	
 	$wpdb->show_errors();
 	$wpdb->query("ALTER TABLE wp_GradeBook_". $_GET['course_id'] ." DROP ". $_GET['assignment_name'] );
 	$wpdb->query("DELETE FROM wp_GradeBook_assignments_". $_GET['course_id'] ." WHERE assign_id = ". $_GET['assign_id']);
@@ -342,6 +378,10 @@ add_action('wp_ajax_delete_assignment','delete_assignment_callback');
 
 function add_student_callback(){
 	global $wpdb;
+	
+	$user = new GBUser(wp_get_current_user()->ID);
+	$user->verifyAdmin();
+	
 	$wpdb->show_errors();
 
 	$x = username_exists($_GET['user_login']);
@@ -422,6 +462,10 @@ add_action('wp_ajax_add_student','add_student_callback');
 
 function edit_student_callback(){
 	global $wpdb;
+	
+	$user = new GBUser(wp_get_current_user()->ID);
+	$user->verifyAdmin();
+	
 	$wpdb->show_errors();
 
 	/* DB table to use */
@@ -448,6 +492,9 @@ add_action('wp_ajax_edit_student', 'edit_student_callback');
 
 function delete_student_callback(){
 	global $wpdb;
+	
+	$user = new GBUser(wp_get_current_user()->ID);
+	$user->verifyAdmin();
 	
 	$wpdb->show_errors();
 	
@@ -496,6 +543,10 @@ add_action('wp_ajax_delete_student','delete_student_callback');
 
 function get_assign_data_callback(){
 	global $wpdb;
+	
+	$user = new GBUser(wp_get_current_user()->ID);
+	$user->verifyAdmin();
+	
 	$wpdb->show_errors();
 
 	/* DB table to use */
