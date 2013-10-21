@@ -3,7 +3,7 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 1.1
+Version: 1.3
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
@@ -70,7 +70,14 @@ global $wpdb;
 	wp_register_script( 'GradeBook_jquery_editable_js', plugins_url('jquery.jeditable.js',__File__), false, false);
 	wp_enqueue_script( 'jquery', array('json2') );	
 	wp_enqueue_script( 'GradeBook_jquery_editable_js', array('jquery'));
-	wp_enqueue_script( 'jquery-ui-core', array('jquery') );	
+	wp_enqueue_script( 'jquery-ui-form', array('jquery') );	
+	wp_enqueue_script( 'jquery-ui-core', array('jquery') );
+	wp_enqueue_script( 'jquery-ui-datepicker', array('jquery') );
+	wp_enqueue_script( 'jquery-ui-dialog', array('jquery') );
+	wp_enqueue_script( 'jquery-ui-button', array('jquery') );
+	wp_enqueue_script( 'jquery-ui-selectable', array('jquery') );
+	wp_enqueue_script( 'jquery-effects-core', array('jquery') );
+	wp_enqueue_script( 'jquery-effects-slide', array('jquery-effects-core') );
 	
 	wp_register_style( 'GradeBook_jquery-ui_css', 'http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css', false, false );
 	wp_register_style( 'GradeBook_css', plugins_url('GradeBook.css',__File__), false, false );
