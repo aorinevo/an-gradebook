@@ -45,7 +45,9 @@ Highlighted features:
 
 == Changelog ==
 
-Bug fix - Not enough of the jquery libraries were being loaded preventing users from adding courses, adding students, etc...
+Version 1.3.1: jquery-ui-tooltip.js was missing, breaking the code when new assignments were being added.  Feature added - when deleting a user from the admin panel, the user is removed from any associated gradebooks.
+
+Version 1.3: Bug fix - Not enough of the jquery libraries were being loaded preventing users from adding courses, adding students, etc...
 
 == Upgrade notice ==
 
