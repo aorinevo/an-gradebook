@@ -4,7 +4,7 @@ Donate link:
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
 Tested up to: 3.6.1
-Stable tag: 1.2
+Stable tag: 1.3.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ This is a simple gradebook based on jQuery, JS, mySQL and php.
 
 == Description ==
 
-After the plugin is installed, simply insert the short code [GradeBook] on any page that you would like the gradebook to be displayed.
+After the plugin is installed, simply insert the short code [GradeBook] on any page that you would like the gradebook to appear.
 
 Admin will have access to (almost) full CRUD implementation:
 1) add/delete student,
@@ -21,7 +21,7 @@ Admin will have access to (almost) full CRUD implementation:
 
 Students will have access to:
 1) their grades, and
-2) basic stats for assignments. So far there is a pie chart that will display when a student clicks on an assignment cell. The pie chart is split up over the number of A's, B's, C's, etc...
+2) basic stats for assignments. So far there is a pie chart corresponding to the number of A's, B's, C's, etc... of a particular assignment.  The pie chart appears when a student is logged in and clicks on an assignment cell.
 
 Highlighted features:
 1) No reloading. jQuery allows all the above functionality without reloading the page.
@@ -45,15 +45,17 @@ Highlighted features:
 
 == Changelog ==
 
-
+Bug fix - Not enough of the jquery libraries were being loaded preventing users from adding courses, adding students, etc...
 
 == Upgrade notice ==
 
 
 
+
+
 == Disclaimer ==
 
-I am not a programmer.  I will work to make the code as efficient as possible (as best I can).  Any help would be much appreciated. 
+I am not a programmer. Any help would be much appreciated. 
 
 
 
