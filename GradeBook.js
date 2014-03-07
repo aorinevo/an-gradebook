@@ -635,7 +635,7 @@
         	$('#myModal').show();
             $('#gradebook-interface-buttons-container').children().button('disable');
             var view = new EditStudentView();         
-            $('#gradebook-interface-buttons-container').after(view.render().el);           
+            $('#myModal').append(view.render().el);                
             $('#edit-student-save, #edit-student-cancel').button();
             return false;
         },
@@ -662,7 +662,7 @@
             $('#students-header tr').append(view.render().el);
             return this;
         },
-        editAssignmentPre: function(){
+        editAssignmentPre: function(){       
             var x = students.findWhere({selected: true});
             x && x.set({selected: false});
 			var y = assignments.findWhere({selected: true});
@@ -672,8 +672,8 @@
         editAssignment: function() {
         	$('#myModal').show();       
             $('#gradebook-interface-buttons-container').children().button('disable');
-            var view = new EditAssignmentView();
-            $('#gradebook-interface-buttons-container').after(view.render().el);
+            var view = new EditAssignmentView();          
+            $('#myModal').append(view.render().el);                            
             $('#edit-assignment-save, #edit-assignment-cancel').button();
             $('#assign-date-datepicker, #assign-due-datepicker').datepicker();
             return false;
@@ -764,7 +764,6 @@
         	$('#myModal').show();        
             $('#courses-interface-buttons-container').children().button('disable');
             var view = new EditCourseView();
-            //$('#courses-interface-buttons-container').after(view.render().el);
             $('#myModal').append(view.render().el);
             $('#edit-course-save, #edit-course-cancel').button();
             return false;
