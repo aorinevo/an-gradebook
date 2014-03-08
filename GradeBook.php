@@ -3,7 +3,7 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 2.0.4
+Version: 2.0.5
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
@@ -17,83 +17,82 @@ define( 'GRADEBOOK_URL', plugin_dir_url(__File__) );
 /* Load files */
 /**************/
 
-function register_css_and_js_files(){
-	wp_register_style( 'GradeBook_css', plugins_url('GradeBook.css',__File__), false, false );
-	wp_enqueue_style( 'GradeBook_css');  
+class AN_GradeBook_Scripts{
+	public function __construct(){
+		add_action('wp_enqueue_scripts', array($this,'scripts'));		
+	}
+	public function scripts(){
+		wp_register_style( 'GradeBook_css', plugins_url('GradeBook.css',__File__), false, false );
+		wp_enqueue_style( 'GradeBook_css');  
 	
-    wp_enqueue_script( 'backbone' );
-    wp_enqueue_script( 'underscore' );	
-	wp_enqueue_script( 'jquery1.11.0', plugins_url('jquery-1.11.0.min.js',__File__),array('json2'),false,false); 
-	wp_enqueue_script( 'jquery-ui-button', array('jquery2.0') );			
-	wp_enqueue_script( 'jquery-ui-datepicker', array('jquery2.0') );		
+    	wp_enqueue_script( 'backbone' );
+    	wp_enqueue_script( 'underscore' );	
+		wp_enqueue_script( 'jquery1.11.0', plugins_url('jquery-1.11.0.min.js',__File__),array('json2'),false,false); 
+		wp_enqueue_script( 'jquery-ui-button', array('jquery2.0') );			
+		wp_enqueue_script( 'jquery-ui-datepicker', array('jquery2.0') );		
 	
-if (gradebook_check_user_role('administrator')){	
-	wp_register_script( 'GradeBook_js', plugins_url('GradeBook.js',__File__),array( 'jquery1.11.0', 'backbone','underscore' ), false, true );
-	wp_enqueue_script('GradeBook_js');
-	wp_localize_script( 'GradeBook_js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' )) );	
- }
+		if (gradebook_check_user_role('administrator')){	
+			wp_register_script( 'GradeBook_js', plugins_url('GradeBook.js',__File__),array( 'jquery1.11.0', 'backbone','underscore' ), false, true );
+			wp_enqueue_script('GradeBook_js');
+			wp_localize_script( 'GradeBook_js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' )) );	
+ 		}
+	}
 }
-add_action('wp_enqueue_scripts', 'register_css_and_js_files');
 
-function GradeBook_options_install() {
-	global $wpdb;
-  	$db_name = 'an_gradebooks';
-	if($wpdb->get_var('SHOW TABLES LIKE' . $db_name) != $db_name) 
-	{
-		$sql = 'CREATE TABLE ' . $db_name . ' (
-		id int(11) NOT NULL AUTO_INCREMENT,
-		name mediumtext NOT NULL,
-		school TINYTEXT NOT NULL,
-		semester TINYTEXT NOT NULL,
-		year int(11) NOT NULL,
-		PRIMARY KEY  (id) )';
- 
+class AN_GradeBook_Database{
+	public function __construct(){
+		register_activation_hook(__FILE__,array($this,'database_setup'));		
+	}	
+	public function database_setup() {
+		global $wpdb;
+	  	$db_name = 'an_gradebooks';
+		if($wpdb->get_var('SHOW TABLES LIKE' . $db_name) != $db_name){
+			$sql = 'CREATE TABLE ' . $db_name . ' (
+			id int(11) NOT NULL AUTO_INCREMENT,
+			name mediumtext NOT NULL,
+			school TINYTEXT NOT NULL,
+			semester TINYTEXT NOT NULL,
+			year int(11) NOT NULL,
+			PRIMARY KEY  (id) )';
+			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+			dbDelta($sql);
+		}
+		$db_name1 = 'an_gradebook';
+		if($wpdb->get_var('SHOW TABLES LIKE' . $db_name1) != $db_name1){
+			$sql = 'CREATE TABLE ' . $db_name1 . ' (
+			id int(11) NOT NULL AUTO_INCREMENT,
+			uid int(11) NOT NULL,
+			gbid int(11) NOT NULL,
+			PRIMARY KEY  (id) )';
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 		dbDelta($sql);
-	}
-	$db_name1 = 'an_gradebook';
-	if($wpdb->get_var('SHOW TABLES LIKE' . $db_name1) != $db_name1) 
-	{
-		$sql = 'CREATE TABLE ' . $db_name1 . ' (
-		id int(11) NOT NULL AUTO_INCREMENT,
-		uid int(11) NOT NULL,
-		gbid int(11) NOT NULL,
-		PRIMARY KEY  (id) )';
- 
-		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-		dbDelta($sql);
-	}
-	$db_name2 = 'an_assignments';
-	if($wpdb->get_var('SHOW TABLES LIKE' . $db_name2) != $db_name2) 
-	{
-		$sql = 'CREATE TABLE ' . $db_name2 . ' (
-		id int(11) NOT NULL AUTO_INCREMENT,
-		gbid int(11) NOT NULL,
-		assign_order int(11) NOT NULL,		
-		assign_name mediumtext NOT NULL,
-		PRIMARY KEY  (id) )';
- 
-		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-		dbDelta($sql);
-	}
- 	$db_name3 = 'an_assignment';
-	if($wpdb->get_var('SHOW TABLES LIKE' . $db_name3) != $db_name3) 
-	{
-		$sql = 'CREATE TABLE ' . $db_name3 . ' (
-		id int(11) NOT NULL AUTO_INCREMENT,
-		uid int(11) NOT NULL,
-		gbid int(11) NOT NULL,
-        amid int(11) NOT NULL,
-        assign_order int(11) NOT NULL,
-        assign_points_earned int(11) NOT NULL,
-		PRIMARY KEY  (id) )';
- 
-		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-		dbDelta($sql);
-	}
+		}
+		$db_name2 = 'an_assignments';
+		if($wpdb->get_var('SHOW TABLES LIKE' . $db_name2) != $db_name2){
+			$sql = 'CREATE TABLE ' . $db_name2 . ' (
+			id int(11) NOT NULL AUTO_INCREMENT,
+			gbid int(11) NOT NULL,
+			assign_order int(11) NOT NULL,		
+			assign_name mediumtext NOT NULL,
+			PRIMARY KEY  (id) )';
+			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+			dbDelta($sql);
+		}
+ 		$db_name3 = 'an_assignment';
+		if($wpdb->get_var('SHOW TABLES LIKE' . $db_name3) != $db_name3){
+			$sql = 'CREATE TABLE ' . $db_name3 . ' (
+			id int(11) NOT NULL AUTO_INCREMENT,
+			uid int(11) NOT NULL,
+			gbid int(11) NOT NULL,
+    	    amid int(11) NOT NULL,
+	        assign_order int(11) NOT NULL,
+	        assign_points_earned int(11) NOT NULL,
+			PRIMARY KEY  (id) )';
+			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+			dbDelta($sql);
+		}
+	}	
 }
-// run the install scripts upon plugin activation
-register_activation_hook(__FILE__,'GradeBook_options_install');
 
 function build_sorter($key) {
     return function ($a, $b) use ($key) {
@@ -116,145 +115,138 @@ function gradebook_check_user_role( $role, $user_id = null ) {
     return in_array( $role, (array) $user->roles );
 }
 
-function add_student(){	
-    global $wpdb;
-    $wpdb->show_errors(); 
-if (!gradebook_check_user_role('administrator')){	
-		echo json_encode(array("status" => "Not Allowed."));
-		die();
-	}       
-	$result = wp_insert_user( array(
+class AN_GradeBookAPI{
+	public function __construct(){
+		add_action('wp_ajax_add_student', array($this,'add_student'));
+		add_action('wp_ajax_update_student', array($this, 'update_student'));
+		add_action('wp_ajax_add_course', array($this, 'add_course'));
+		add_action('wp_ajax_update_course', array($this, 'update_course'));
+		add_action('wp_ajax_get_courses', array($this, 'get_courses'));
+		add_action('wp_ajax_delete_course', array($this, 'delete_course'));
+		add_action('wp_ajax_delete_student', array($this, 'delete_student'));
+		add_action('wp_ajax_get_students', array($this, 'get_students'));
+		add_action('wp_ajax_get_assignments',array($this, 'get_assignments'));
+		add_action('wp_ajax_update_assignments', array($this, 'update_assignments'));
+		add_action('wp_ajax_get_assignment', array($this, 'get_assignment'));
+		add_action('wp_ajax_delete_assignment', array($this, 'delete_assignment'));
+		add_action('wp_ajax_update_assignment', array($this, 'update_assignment'));
+		add_action('wp_ajax_add_assignment', array($this,'add_assignment'));	
+	}
+
+	public function add_student(){	
+    	global $wpdb;
+    	$wpdb->show_errors(); 
+		if (!gradebook_check_user_role('administrator')){	
+			echo json_encode(array("status" => "Not Allowed."));
+			die();
+		}       
+		$result = wp_insert_user(array(
 			'user_login' => 'user_login',
 			'first_name' => $_POST['firstname'],
 			'last_name'  => $_POST['lastname'],
 			'user_pass'  => 'password',
-		) 
-	);
-	$wpdb->update($wpdb->users,
-    	array('user_login' => strtolower($_POST['firstname'][1].$_POST['lastname']).$result), 
-    	array('ID'=> $result));	
-    $assignmentDetails = $wpdb->get_results('SELECT * FROM an_assignments WHERE gbid = '. $_POST['gbid'], ARRAY_A);
-    foreach( $assignmentDetails as $assignment){
-       $wpdb->insert('an_assignment', array('gbid'=> $_POST['gbid'], 'amid'=> $assignment['id'], 
-          'uid' => $result, 'assign_order' => $assignment['assign_order']));
-    };
-	$gbid = $_POST["gbid"];
-	if( !is_wp_error($result) ){
-	$studentDetails = get_user_by('id',$result);
-	$studentgbids = $wpdb->get_row('SELECT * FROM an_gradebook WHERE uid = '. $result .' AND gbid = '. $gbid);
-	$wpdb->insert( 
-				'an_gradebook', 
-				array( 
-					'uid' => $result, 
-					'gbid' => $_POST['gbid'],
-				), 
-				array( 
-					'%d', 
-					'%d'
-				) 
+		));
+		$wpdb->update($wpdb->users,
+    		array('user_login' => strtolower($_POST['firstname'][1].$_POST['lastname']).$result), 
+    		array('ID'=> $result));	
+    	$assignmentDetails = $wpdb->get_results('SELECT * FROM an_assignments WHERE gbid = '. $_POST['gbid'], ARRAY_A);
+    	foreach( $assignmentDetails as $assignment){
+       		$wpdb->insert('an_assignment', array('gbid'=> $_POST['gbid'], 'amid'=> $assignment['id'], 
+          		'uid' => $result, 'assign_order' => $assignment['assign_order']));
+    		};
+		$gbid = $_POST["gbid"];
+		if( !is_wp_error($result) ){
+			$studentDetails = get_user_by('id',$result);
+			$studentgbids = $wpdb->get_row('SELECT * FROM an_gradebook WHERE uid = '. $result .' AND gbid = '. $gbid);
+			$wpdb->insert('an_gradebook', 
+				array('uid' => $result,'gbid' => $_POST['gbid']), 
+				array('%d','%d') 
 			);
-	$assignments = $wpdb->get_results('SELECT * FROM an_assignment WHERE uid = '. $result, ARRAY_A);			
-	usort($assignments, build_sorter('assign_order'));
-	echo json_encode(
-		array(
-	      student=> array(firstname => $studentDetails -> first_name,
-	      lastname => $studentDetails -> last_name,
-	      gbid => strval($_POST['gbid']),
-	      id => strval($result)),
-	      assignment => $assignments
-	));
-	die();
-	}else{
-	echo $result->get_error_message();
-	die();
+			$assignments = $wpdb->get_results('SELECT * FROM an_assignment WHERE uid = '. $result, ARRAY_A);			
+			usort($assignments, build_sorter('assign_order'));
+			echo json_encode(array(
+	      		student=> array(firstname => $studentDetails -> first_name,
+	      		lastname => $studentDetails -> last_name,
+	      		gbid => strval($_POST['gbid']),
+	      		id => strval($result)),
+	      		assignment => $assignments
+			));
+			die();
+		}else{
+			echo $result->get_error_message();
+			die();
+		}
 	}
-}
-add_action('wp_ajax_add_student','add_student');
 
-function update_student(){
-   global $wpdb;
-   $wpdb->show_errors();
-if (!gradebook_check_user_role('administrator')){	
-		echo json_encode(array("status" => "Not Allowed."));
-		die();
-	}    
-	$result = wp_update_user( array ( 'ID' => $_POST['id'], 'first_name' => $_POST['firstname'], 'last_name' => $_POST['lastname'] ) ) ;
-	$studentDetails = get_user_by('id',$result);		  
-	
-   echo json_encode(
-		array(
-	      student=> array(firstname => $studentDetails -> first_name,
-	      lastname => $studentDetails -> last_name,
-	      id => strval($result))
-	));
-   die();
-}
-add_action('wp_ajax_update_student', 'update_student');
-
-function add_course(){
-    global $wpdb;
-    $wpdb->show_errors();
-if (!gradebook_check_user_role('administrator')){	
-		echo json_encode(array("status" => "Not Allowed."));
-		die();
-	}     
-    
-	$wpdb->insert('an_gradebooks', 
-				array( 
-					'name' => $_POST['name'], 
-					'school' => $_POST['school'],
-					'semester' => $_POST['semester'],
-					'year' => $_POST['year']
-				), 
-				array( 
-					'%s', 
-					'%s',
-					'%s',
-					'%d' 
-				) 
-	);
-	if( !is_wp_error($wpdb->insert_id) ){
-	$courseDetails = $wpdb->get_row("SELECT * FROM an_gradebooks WHERE id = $wpdb->insert_id", ARRAY_A);
-	echo json_encode($courseDetails);
-	die();
-	}else{
-	echo $result->get_error_message();
-	die();
+	public function update_student(){
+   		global $wpdb;
+	    $wpdb->show_errors();
+		if (!gradebook_check_user_role('administrator')){	
+			echo json_encode(array("status" => "Not Allowed."));
+			die();
+		}    
+		$result = wp_update_user( array ( 'ID' => $_POST['id'], 'first_name' => $_POST['firstname'], 'last_name' => $_POST['lastname'] ) ) ;
+		$studentDetails = get_user_by('id',$result);		  
+	    echo json_encode(array(
+			student=> array(firstname => $studentDetails -> first_name,
+	    	lastname => $studentDetails -> last_name,
+	    	id => strval($result))
+		));
+   		die();
 	}
-}
-add_action('wp_ajax_add_course','add_course');
 
-function update_course(){
-   global $wpdb;
-   $wpdb->show_errors();
-if (!gradebook_check_user_role('administrator')){	
-		echo json_encode(array("status" => "Not Allowed."));
-		die();
-	}    
-   $wpdb->update( 
-	'an_gradebooks', 
-	array( 'name' => $_POST['name'], 'school' => $_POST['school'], 'semester' => $_POST['semester'], 'year' => $_POST['year']),
-	array('id' => $_POST['id'] )
-   );   
-   $courseDetails = $wpdb->get_row('SELECT * FROM an_gradebooks WHERE id = '. $_POST['id'] , ARRAY_A);
-   echo json_encode($courseDetails);
-   die();
-}
-add_action('wp_ajax_update_course', 'update_course');
 
-function get_courses(){
-  global $wpdb;
-if (!gradebook_check_user_role('administrator')){	
-		echo json_encode(array("status" => "Not Allowed."));
-		die();
-	}     
-  $results = $wpdb -> get_results("SELECT * FROM an_gradebooks", ARRAY_A);
-  echo json_encode($results);
-  die();
-}
-add_action('wp_ajax_get_courses', 'get_courses');
+	public function add_course(){
+    	global $wpdb;
+    	$wpdb->show_errors();
+		if (!gradebook_check_user_role('administrator')){	
+			echo json_encode(array("status" => "Not Allowed."));
+			die();
+		}     
+    	$wpdb->insert('an_gradebooks', 
+    		array('name' => $_POST['name'], 'school' => $_POST['school'], 'semester' => $_POST['semester'], 'year' => $_POST['year']), 
+			array('%s', '%s', '%s', '%d') 
+		);
+		if( !is_wp_error($wpdb->insert_id) ){
+			$courseDetails = $wpdb->get_row("SELECT * FROM an_gradebooks WHERE id = $wpdb->insert_id", ARRAY_A);
+			echo json_encode($courseDetails);
+			die();
+		}else{
+			echo $result->get_error_message();
+			die();
+		}
+	}
 
-function delete_course(){
+
+	public function update_course(){
+   		global $wpdb;
+   		$wpdb->show_errors();
+		if (!gradebook_check_user_role('administrator')){	
+			echo json_encode(array("status" => "Not Allowed."));
+			die();
+		}    
+   	$wpdb->update('an_gradebooks', 
+		array( 'name' => $_POST['name'], 'school' => $_POST['school'], 'semester' => $_POST['semester'], 'year' => $_POST['year']),
+		array('id' => $_POST['id'] )
+   	);   
+   	$courseDetails = $wpdb->get_row('SELECT * FROM an_gradebooks WHERE id = '. $_POST['id'] , ARRAY_A);
+   		echo json_encode($courseDetails);
+   		die();
+	}
+
+	public function get_courses(){
+  		global $wpdb;
+		if (!gradebook_check_user_role('administrator')){	
+			echo json_encode(array("status" => "Not Allowed."));
+			die();
+		}     
+  		$results = $wpdb -> get_results("SELECT * FROM an_gradebooks", ARRAY_A);
+  		echo json_encode($results);
+  		die();
+	}
+
+
+public function delete_course(){
   global $wpdb;
 if (!gradebook_check_user_role('administrator')){	
 		echo json_encode(array("status" => "Not Allowed."));
@@ -267,9 +259,9 @@ if (!gradebook_check_user_role('administrator')){
   echo json_encode(array('delete_course'=>'Success'));
   die();
 }
-add_action('wp_ajax_delete_course', 'delete_course');
 
-function delete_student(){
+
+public function delete_student(){
   global $wpdb;
 if (!gradebook_check_user_role('administrator')){	
 		echo json_encode(array("status" => "Not Allowed."));
@@ -286,9 +278,9 @@ if (!gradebook_check_user_role('administrator')){
     die();
   }
 }
-add_action('wp_ajax_delete_student', 'delete_student');
 
-function get_students(){
+
+public function get_students(){
     global $wpdb;
     $wpdb->show_errors();
 if (!gradebook_check_user_role('administrator')){	
@@ -308,9 +300,9 @@ if (!gradebook_check_user_role('administrator')){
     echo json_encode($studentIDs);
     die();
 }
-add_action('wp_ajax_get_students','get_students');
 
-function get_assignments(){
+
+public function get_assignments(){
     global $wpdb;
     $wpdb->show_errors();
 if (!gradebook_check_user_role('administrator')){	
@@ -322,9 +314,9 @@ if (!gradebook_check_user_role('administrator')){
     echo json_encode($assignmentDetails);
     die();
 }
-add_action('wp_ajax_get_assignments','get_assignments');
 
-function update_assignments(){
+
+public function update_assignments(){
    global $wpdb;
    $wpdb->show_errors();
 if (!gradebook_check_user_role('administrator')){	
@@ -340,11 +332,11 @@ if (!gradebook_check_user_role('administrator')){
    echo json_encode($assignmentDetails);
    die();
 }
-add_action('wp_ajax_update_assignments', 'update_assignments');
 
 
 
-function get_assignment(){
+
+public function get_assignment(){
    global $wpdb;
    $wpdb->show_errors();
 if (!gradebook_check_user_role('administrator')){	
@@ -356,10 +348,9 @@ if (!gradebook_check_user_role('administrator')){
    echo json_encode($assignmentDetails);
    die();
 }
-add_action('wp_ajax_get_assignment', 'get_assignment');
 
 
-function delete_assignment(){
+public function delete_assignment(){
 	global $wpdb;
 	$wpdb->show_errors();
 if (!gradebook_check_user_role('administrator')){	
@@ -371,9 +362,8 @@ if (!gradebook_check_user_role('administrator')){
  	echo json_encode(array('id'=> $_POST['id']));
 	die();
 }
-add_action('wp_ajax_delete_assignment', 'delete_assignment');
 
-function update_assignment(){
+public function update_assignment(){
    global $wpdb;
    $wpdb->show_errors();
 if (!gradebook_check_user_role('administrator')){	
@@ -389,9 +379,8 @@ if (!gradebook_check_user_role('administrator')){
    echo json_encode($assign_points_earned);
    die();
 }
-add_action('wp_ajax_update_assignment', 'update_assignment');
 
-function add_assignment(){
+public function add_assignment(){
     global $wpdb;
     $wpdb->show_errors();
 if (!gradebook_check_user_role('administrator')){	
@@ -439,7 +428,11 @@ if (!gradebook_check_user_role('administrator')){
 	echo json_encode($data);
 	die();
 }
-add_action('wp_ajax_add_assignment','add_assignment');
+}
+
+$an_gradebook_scripts = new AN_GradeBook_Scripts();
+$an_gradebook_database = new AN_GradeBook_Database();
+$an_gradebookapi = new AN_GradeBookAPI();
 
 function GradeBook_shortcode(){
 
