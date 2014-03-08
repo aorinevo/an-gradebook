@@ -19,6 +19,8 @@ Administrators will have access to:
 2) add/delete course,
 3) add/delete assignment.
 
+Students user_login is set to the first initial of their first name concatenate with their last name and user_id number, all in lowercase.  Their password is initially set to password.
+
 Students will have access to:
 1) their grades, and
 2) basic stats for assignments. So far there is a pie chart corresponding to the number of A's, B's, C's, etc... of a particular assignment.  The pie chart appears when a student is logged in and clicks on an assignment cell.
