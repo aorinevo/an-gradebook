@@ -3,21 +3,23 @@ Contributors: anevo, jamarparris
 Donate link: 
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
-Tested up to: 3.6.1
-Stable tag: 1.3.1
+Tested up to: 3.8.1
+Stable tag: 2.0.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-This is a simple gradebook based on jQuery, JS, mySQL and php.
+A simple gradebook built on backbone, underscore, jQuery, JS, mySQL, and php.
 
-== Description ==
+== Description == 
 
-After the plugin is installed, simply insert the short code [GradeBook] on any page that you would like the gradebook to appear.
+Insert the shortcode [GradeBook] anywhere you would like GradeBook to appear.
 
-Admin will have access to (almost) full CRUD implementation:
+Administrators will have access to:
 1) add/delete student,
 2) add/delete course,
 3) add/delete assignment.
+
+Students user_login is set to the first initial of their first name concatenate with their last name and user_id number, all in lowercase.  Their password is initially set to password.
 
 Students will have access to:
 1) their grades, and
@@ -33,17 +35,16 @@ Highlighted features:
 2. Activate the plugin in the installed plugins page of the admin panel.
 3. Place shortcode [GradeBook] anywhere you would like the gradebook to appear.
 
-== Frequently asked questions ==
-
-
-
 == Screenshots ==
 
-1. Admin view with selected course in orange
-2. Admin view with no selected courses
-3. Student view with course selected and pie chart displayed
+1. GradeBook with a few courses.
+2. GradeBook with a course selected and corresponding students displayed.
+3. Add student modal.
+4. GradeBook with a course and student selected.
 
 == Changelog ==
+
+Version 2.0: GradeBook code was rebuilt from the ground up. This version is not backwards compatible. You will not have access to gradebooks created in previous versions.
 
 Version 1.3.1: jquery-ui-tooltip.js was missing, breaking the code when new assignments were being added.  Feature added - when deleting a user from the admin panel, the user is removed from any associated gradebooks.
 
@@ -51,16 +52,11 @@ Version 1.3: Bug fix - Not enough of the jquery libraries were being loaded prev
 
 == Upgrade notice ==
 
+This version is not backwards compatible. You will not have access to gradebooks created in previous versions.
 
 
 
 
 == Disclaimer ==
 
-I am not a programmer. Any help would be much appreciated. 
-
-
-
-== Misc ==
-
-I am an educator.  This plugin is a first attempt at a nice plugin to record grades.  There are still more features that I want to add and will add over time.
+GradeBook is still in development.  Version 2.0 is a beta release. 
