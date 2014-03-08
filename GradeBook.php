@@ -27,10 +27,11 @@ function register_css_and_js_files(){
 	wp_enqueue_script( 'jquery-ui-button', array('jquery2.0') );			
 	wp_enqueue_script( 'jquery-ui-datepicker', array('jquery2.0') );		
 	
+if (get_current_user_id() == 1) {
 	wp_register_script( 'GradeBook_js', plugins_url('GradeBook.js',__File__),array( 'jquery1.11.0', 'backbone','underscore' ), false, true );
 	wp_enqueue_script('GradeBook_js');
 	wp_localize_script( 'GradeBook_js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' )) );	
- 
+ }
 }
 add_action('wp_enqueue_scripts', 'register_css_and_js_files');
 
@@ -108,13 +109,15 @@ function add_student(){
 		die();
 	}       
 	$result = wp_insert_user( array(
-			'user_login' => $_POST['firstname'],
-			'user_email' => $_POST['firstname'].'@gmail.com',
+			'user_login' => 'user_login',
 			'first_name' => $_POST['firstname'],
 			'last_name'  => $_POST['lastname'],
-			'user_pass'  => 'Testing',
+			'user_pass'  => 'password',
 		) 
 	);
+	$wpdb->update($wpdb->users,
+    	array('user_login' => strtolower($_POST['firstname'][1].$_POST['lastname']).$result), 
+    	array('ID'=> $result));	
     $assignmentDetails = $wpdb->get_results('SELECT * FROM an_assignments WHERE gbid = '. $_POST['gbid'], ARRAY_A);
     foreach( $assignmentDetails as $assignment){
        $wpdb->insert('an_assignment', array('gbid'=> $_POST['gbid'], 'amid'=> $assignment['id'], 
@@ -424,6 +427,9 @@ function add_assignment(){
 add_action('wp_ajax_add_assignment','add_assignment');
 
 function GradeBook_shortcode(){
+
+if (get_current_user_id() == 1) {
+
 ob_start();
 ?>
     <script id="edit-student-template" type="text/template">
@@ -532,6 +538,9 @@ echo $mytemplates;
 
 echo '<div id="an-gradebooks">
 	</div>';
+	} else {
+echo 'You do not have premissions to view this GradeBook.';
+}	
 }
 add_shortcode( 'GradeBook', 'GradeBook_shortcode' );
 
