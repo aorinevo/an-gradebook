@@ -3,7 +3,7 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 2.0.3
+Version: 2.0.4
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
@@ -27,7 +27,7 @@ function register_css_and_js_files(){
 	wp_enqueue_script( 'jquery-ui-button', array('jquery2.0') );			
 	wp_enqueue_script( 'jquery-ui-datepicker', array('jquery2.0') );		
 	
-if (get_current_user_id() == 1) {
+if (gradebook_check_user_role('administrator')){	
 	wp_register_script( 'GradeBook_js', plugins_url('GradeBook.js',__File__),array( 'jquery1.11.0', 'backbone','underscore' ), false, true );
 	wp_enqueue_script('GradeBook_js');
 	wp_localize_script( 'GradeBook_js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' )) );	
@@ -101,10 +101,25 @@ function build_sorter($key) {
     };
 }
 
+function gradebook_check_user_role( $role, $user_id = null ) {
+ 
+    if ( is_numeric( $user_id ) ){
+	$user = get_userdata( $user_id );
+	}
+    else{
+        $user = wp_get_current_user();
+ 	}
+    if ( empty( $user ) ){
+	return false;
+	}
+ 
+    return in_array( $role, (array) $user->roles );
+}
+
 function add_student(){	
     global $wpdb;
     $wpdb->show_errors(); 
-	if (get_current_user_id()!=1) {
+if (!gradebook_check_user_role('administrator')){	
 		echo json_encode(array("status" => "Not Allowed."));
 		die();
 	}       
@@ -159,7 +174,7 @@ add_action('wp_ajax_add_student','add_student');
 function update_student(){
    global $wpdb;
    $wpdb->show_errors();
-	if (get_current_user_id()!=1) {
+if (!gradebook_check_user_role('administrator')){	
 		echo json_encode(array("status" => "Not Allowed."));
 		die();
 	}    
@@ -179,7 +194,7 @@ add_action('wp_ajax_update_student', 'update_student');
 function add_course(){
     global $wpdb;
     $wpdb->show_errors();
-	if (get_current_user_id()!=1) {
+if (!gradebook_check_user_role('administrator')){	
 		echo json_encode(array("status" => "Not Allowed."));
 		die();
 	}     
@@ -212,7 +227,7 @@ add_action('wp_ajax_add_course','add_course');
 function update_course(){
    global $wpdb;
    $wpdb->show_errors();
-	if (get_current_user_id()!=1) {
+if (!gradebook_check_user_role('administrator')){	
 		echo json_encode(array("status" => "Not Allowed."));
 		die();
 	}    
@@ -229,7 +244,7 @@ add_action('wp_ajax_update_course', 'update_course');
 
 function get_courses(){
   global $wpdb;
-	if (get_current_user_id()!=1) {
+if (!gradebook_check_user_role('administrator')){	
 		echo json_encode(array("status" => "Not Allowed."));
 		die();
 	}     
@@ -241,7 +256,7 @@ add_action('wp_ajax_get_courses', 'get_courses');
 
 function delete_course(){
   global $wpdb;
-	if (get_current_user_id()!=1) {
+if (!gradebook_check_user_role('administrator')){	
 		echo json_encode(array("status" => "Not Allowed."));
 		die();
 	}   
@@ -256,7 +271,7 @@ add_action('wp_ajax_delete_course', 'delete_course');
 
 function delete_student(){
   global $wpdb;
-	if (get_current_user_id()!=1) {
+if (!gradebook_check_user_role('administrator')){	
 		echo json_encode(array("status" => "Not Allowed."));
 		die();
 	}   
@@ -276,7 +291,7 @@ add_action('wp_ajax_delete_student', 'delete_student');
 function get_students(){
     global $wpdb;
     $wpdb->show_errors();
-	if (get_current_user_id()!=1) {
+if (!gradebook_check_user_role('administrator')){	
 		echo json_encode(array("status" => "Not Allowed."));
 		die();
 	} 
@@ -298,7 +313,7 @@ add_action('wp_ajax_get_students','get_students');
 function get_assignments(){
     global $wpdb;
     $wpdb->show_errors();
-	if (get_current_user_id()!=1) {
+if (!gradebook_check_user_role('administrator')){	
 		echo json_encode(array("status" => "Not Allowed."));
 		die();
 	}     
@@ -312,7 +327,7 @@ add_action('wp_ajax_get_assignments','get_assignments');
 function update_assignments(){
    global $wpdb;
    $wpdb->show_errors();
-	if (get_current_user_id()!=1) {
+if (!gradebook_check_user_role('administrator')){	
 		echo json_encode(array("status" => "Not Allowed."));
 		die();
 	}    
@@ -332,7 +347,7 @@ add_action('wp_ajax_update_assignments', 'update_assignments');
 function get_assignment(){
    global $wpdb;
    $wpdb->show_errors();
-	if (get_current_user_id()!=1) {
+if (!gradebook_check_user_role('administrator')){	
 		echo json_encode(array("status" => "Not Allowed."));
 		die();
 	}    
@@ -347,7 +362,7 @@ add_action('wp_ajax_get_assignment', 'get_assignment');
 function delete_assignment(){
 	global $wpdb;
 	$wpdb->show_errors();
-	if (get_current_user_id()!=1) {
+if (!gradebook_check_user_role('administrator')){	
 		echo json_encode(array("status" => "Not Allowed."));
 		die();
 	} 	
@@ -361,7 +376,7 @@ add_action('wp_ajax_delete_assignment', 'delete_assignment');
 function update_assignment(){
    global $wpdb;
    $wpdb->show_errors();
-	if (get_current_user_id()!=1) {
+if (!gradebook_check_user_role('administrator')){	
 		echo json_encode(array("status" => "Not Allowed."));
 		die();
 	}    
@@ -379,7 +394,7 @@ add_action('wp_ajax_update_assignment', 'update_assignment');
 function add_assignment(){
     global $wpdb;
     $wpdb->show_errors();
-	if (get_current_user_id()!=1) {
+if (!gradebook_check_user_role('administrator')){	
 		echo json_encode(array("status" => "Not Allowed."));
 		die();
 	}     
@@ -428,7 +443,7 @@ add_action('wp_ajax_add_assignment','add_assignment');
 
 function GradeBook_shortcode(){
 
-if (get_current_user_id() == 1) {
+if (gradebook_check_user_role('administrator')){	
 
 ob_start();
 ?>
