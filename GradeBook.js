@@ -36,7 +36,7 @@
     var Cells = Backbone.Collection.extend({
         model: Cell
     });
-    var cells = new Cells();
+    var cells = new Cells([]);
     var CellView = Backbone.View.extend({
         tagName: 'td',
         events: {
@@ -202,17 +202,25 @@
             this.listenTo(this.model, 'remove', function() {
                 this.remove()
             });
+            this.listenTo(anGradebooks, 'remove', function(anGradebook) {                
+                if(this.model.get('id')==anGradebook.get('uid')){
+                	this.remove();
+                }
+            });            
             this.listenTo(courses.findWhere({
                 selected: true
             }), 'change:selected', function() {
                 this.remove()
             });
+            
         },
         render: function() {
             this.$el.html('<td class="student">' + this.model.get("firstname") + '</td><td>' + this.model.get("lastname") + '</td><td>' + this.model.get("id") + '</td>');
+            var gbid = courses.findWhere({selected: true}).get('id');
             var x = cells.where({
-                uid: this.model.get('id').toString()
-            });
+            	uid: this.model.get('id').toString(),
+            	gbid: gbid
+            	});
             var self = this;
             _.each(x, function(cell) {
                 var view = new CellView({
@@ -334,6 +342,16 @@
             }
         }
     });
+    
+var ANGradebook = Backbone.Model.extend({
+});
+
+var ANGradebooks = Backbone.Collection.extend({
+  	model: ANGradebook
+});
+
+var anGradebooks = new ANGradebooks([]);
+
     var EditStudentView = Backbone.View.extend({
         id: 'edit-student-form-container-container',
         events: {
@@ -391,7 +409,8 @@
                 	_.each(data['assignment'], function(assignment) {
                   	  cells.add(assignment);
               		});
-                	students.add(data['student']);                
+                	students.add(data['student']);
+                	anGradebooks.add(data['anGradebook']);                            	
                 }                                                        
             }, 'json');
             this.remove();
@@ -527,7 +546,7 @@
         id: 'an-gradebook',
         initialize: function() {
             var self = this;
-            $.when(
+            $.when(            
             $.ajax({
                 url: ajax_object.ajax_url,
                 data: {
@@ -552,19 +571,33 @@
                 },
                 contentType: 'json',
                 dataType: 'json'
-            })).done(function(a1, a2, a3) {
+            }),
+			$.ajax({
+                url: ajax_object.ajax_url,
+                data: {
+                    action: 'get_gradebook',
+                    gbid: this.model.id
+                },
+                contentType: 'json',
+                dataType: 'json'
+            })).done(function(a1, a2, a3, a4) {
                 _.each(a1[0], function(student) {
                     students.add(student);
                 });
-                _.each(a3[0], function(cell) {
-                    cells.add(cell);
+                _.each(a4[0], function(gradebook) {
+                    anGradebooks.add(gradebook);
                 });
-                var x = students.where({
+                var x = anGradebooks.where({
                     gbid: self.model.get('id')
                 });
-                _.each(x, function(student) {
+                x = _.pluck(x, 'attributes'); 
+                var uids = _.pluck(x,'uid');                                                
+                _.each(a3[0], function(cell) {                	
+                    cells.add(cell);
+                });                          
+                _.each(uids, function(studentID) {
                     var view = new StudentView({
-                        model: student
+                        model: students.get(studentID)
                     });
                     $('#students').append(view.render().el);
                 });
@@ -580,7 +613,7 @@
                     });
                     $('#students-header tr').append(view.render().el);
                 });
-                self.listenTo(students, 'add', self.addStudent);
+                self.listenTo(anGradebooks, 'add', self.addStudent);
                 self.listenTo(assignments, 'add', self.addAssignment);
             });
             this.listenTo(this.model, 'change:selected', this.close);
@@ -617,7 +650,8 @@
         close: function() {
             !this.model.get('selected') && this.remove();
         },
-        addStudent: function(student) {
+        addStudent: function(studentgradebook) {
+            student = students.get({id: studentgradebook.get('uid')});
             var view = new StudentView({
                 model: student
             });
@@ -640,18 +674,23 @@
             return false;
         },
         deleteStudent: function() {
-            var todel = students.findWhere({
+            var x = students.findWhere({
                 selected: true
+            });
+            var y = courses.findWhere({
+            	selected: true
             });
             var self = this;
             $.post(ajax_object.ajax_url, {
                 action: 'delete_student',
-                id: todel.id
+                id: x.get('id'),
+                gbid: y.get('id')
             }, function(data, textStatus, jqXHR) {
-                todel.set({
+                x.set({
                     selected: false
                 });
-                students.remove(todel.id);
+                var z = anGradebooks.findWhere({uid: x.get('id').toString(), gbid: y.get('id').toString()});
+                anGradebooks.remove(z.get('id'));
 	            self.toggleEditDelete();                
             }, 'json');
         },

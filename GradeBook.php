@@ -3,7 +3,7 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 2.0.5
+Version: 2.0.6
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
@@ -93,13 +93,12 @@ class AN_GradeBook_Database{
 		}
 	}	
 }
-
-function build_sorter($key) {
-    return function ($a, $b) use ($key) {
-        return strnatcmp($a[$key], $b[$key]);
-    };
-}
-
+	function build_sorter($key) {
+   		return function ($a, $b) use ($key) {
+        	return strnatcmp($a[$key], $b[$key]);
+	    };
+	}	
+	
 function gradebook_check_user_role( $role, $user_id = null ) {
  
     if ( is_numeric( $user_id ) ){
@@ -119,27 +118,28 @@ class AN_GradeBookAPI{
 	public function __construct(){
 		add_action('wp_ajax_add_student', array($this,'add_student'));
 		add_action('wp_ajax_update_student', array($this, 'update_student'));
+		add_action('wp_ajax_delete_student', array($this, 'delete_student'));		
 		add_action('wp_ajax_add_course', array($this, 'add_course'));
 		add_action('wp_ajax_update_course', array($this, 'update_course'));
-		add_action('wp_ajax_get_courses', array($this, 'get_courses'));
 		add_action('wp_ajax_delete_course', array($this, 'delete_course'));
-		add_action('wp_ajax_delete_student', array($this, 'delete_student'));
+		add_action('wp_ajax_add_assignment', array($this,'add_assignment'));
+		add_action('wp_ajax_update_assignments', array($this, 'update_assignments'));					
+		add_action('wp_ajax_update_assignment', array($this, 'update_assignment'));
+		add_action('wp_ajax_delete_assignment', array($this, 'delete_assignment'));					
+		add_action('wp_ajax_get_courses', array($this, 'get_courses'));
 		add_action('wp_ajax_get_students', array($this, 'get_students'));
 		add_action('wp_ajax_get_assignments',array($this, 'get_assignments'));
-		add_action('wp_ajax_update_assignments', array($this, 'update_assignments'));
-		add_action('wp_ajax_get_assignment', array($this, 'get_assignment'));
-		add_action('wp_ajax_delete_assignment', array($this, 'delete_assignment'));
-		add_action('wp_ajax_update_assignment', array($this, 'update_assignment'));
-		add_action('wp_ajax_add_assignment', array($this,'add_assignment'));	
+		add_action('wp_ajax_get_assignment', array($this, 'get_assignment'));	
+		add_action('wp_ajax_get_gradebook', array($this, 'get_gradebook'));		
 	}
-
 	public function add_student(){	
     	global $wpdb;
     	$wpdb->show_errors(); 
 		if (!gradebook_check_user_role('administrator')){	
 			echo json_encode(array("status" => "Not Allowed."));
 			die();
-		}       
+		}   
+		if(!$_POST['id-exists']){ 		   
 		$result = wp_insert_user(array(
 			'user_login' => 'user_login',
 			'first_name' => $_POST['firstname'],
@@ -159,23 +159,50 @@ class AN_GradeBookAPI{
 			$studentDetails = get_user_by('id',$result);
 			$studentgbids = $wpdb->get_row('SELECT * FROM an_gradebook WHERE uid = '. $result .' AND gbid = '. $gbid);
 			$wpdb->insert('an_gradebook', 
-				array('uid' => $result,'gbid' => $_POST['gbid']), 
-				array('%d','%d') 
+				array('uid' => $studentDetails->ID,'gbid' => $gbid)
 			);
-			$assignments = $wpdb->get_results('SELECT * FROM an_assignment WHERE uid = '. $result, ARRAY_A);			
+			$assignments = $wpdb->get_results('SELECT * FROM an_assignment WHERE uid = '. $result, ARRAY_A);	
+			$anGradebook = $wpdb->get_results('SELECT * FROM an_gradebook WHERE id = '. $wpdb->insert_id, ARRAY_A);					
 			usort($assignments, build_sorter('assign_order'));
 			echo json_encode(array(
 	      		student=> array(firstname => $studentDetails -> first_name,
 	      		lastname => $studentDetails -> last_name,
 	      		gbid => strval($_POST['gbid']),
 	      		id => strval($result)),
-	      		assignment => $assignments
+	      		assignment => $assignments,
+	      		anGradebook => $anGradebook
 			));
 			die();
 		}else{
 			echo $result->get_error_message();
 			die();
 		}
+		}else {
+			$studentDetails = get_user_by('id',$_POST['id-exists']);
+			if($studentDetails){
+				$result = $wpdb->insert('an_gradebook', 
+					array('uid' => $_POST['id-exists'],'gbid' => $_POST['gbid']), 
+					array('%d','%d') 
+				);
+    			$assignmentDetails = $wpdb->get_results('SELECT * FROM an_assignments WHERE gbid = '. $_POST['gbid'], ARRAY_A);
+    	foreach( $assignmentDetails as $assignment){
+       		$wpdb->insert('an_assignment', array('gbid'=> $_POST['gbid'], 'amid'=> $assignment['id'], 
+          		'uid' => $studentDetails->ID, 'assign_order' => $assignment['assign_order']));
+    		};    			
+			$anGradebook = $wpdb->get_results('SELECT * FROM an_gradebook WHERE id = '. $wpdb->insert_id, ARRAY_A);	
+			$assignments = $wpdb->get_results('SELECT * FROM an_assignment WHERE uid = '. $studentDetails->ID .' AND gbid = '. $_POST['gbid'], ARRAY_A);										
+				usort($assignments, build_sorter('assign_order'));
+				echo json_encode(array(
+	      			student=> array(firstname => $studentDetails -> first_name,
+	      			lastname => $studentDetails -> last_name,
+	      			gbid => strval($_POST['gbid']),
+	      			id => $studentDetails -> ID),
+	      			assignment => $assignments,
+	      			anGradebook => $anGradebook
+				));
+				die();			
+			}
+		} 
 	}
 
 	public function update_student(){
@@ -261,23 +288,24 @@ if (!gradebook_check_user_role('administrator')){
 }
 
 
-public function delete_student(){
-  global $wpdb;
-if (!gradebook_check_user_role('administrator')){	
-		echo json_encode(array("status" => "Not Allowed."));
-		die();
-	}   
-  $x = $_POST['id'];
-  $results1 = $wpdb->delete('an_gradebook',array('uid'=>$x));
-  $results2 = $wpdb->delete('an_assignment',array('uid'=>$x));
-  if (($results1+$results2)>0){
-    echo json_encode(array('0'=>$results1,'1'=>$results2));
-    die();
-  } else {
-    echo 'failed to delete student!';
-    die();
-  }
-}
+	public function delete_student(){
+		global $wpdb;
+		if (!gradebook_check_user_role('administrator')){	
+			echo json_encode(array("status" => "Not Allowed."));
+			die();
+		}   
+		$x = $_POST['id'];
+		$y = $_POST['gbid'];
+		$results1 = $wpdb->delete('an_gradebook',array('uid'=>$x, 'gbid'=>$y));
+		$results2 = $wpdb->delete('an_assignment',array('uid'=>$x, 'gbid'=>$y));
+		if (($results1+$results2)>0){
+			echo json_encode(array('0'=>$results1,'1'=>$results2));
+			die();
+		} else {
+			echo 'failed to delete student!';
+			die();
+		}
+	}
 
 
 public function get_students(){
@@ -333,6 +361,17 @@ if (!gradebook_check_user_role('administrator')){
    die();
 }
 
+public function get_gradebook(){
+   global $wpdb;
+   $wpdb->show_errors();
+if (!gradebook_check_user_role('administrator')){	
+		echo json_encode(array("status" => "Not Allowed."));
+		die();
+	}    
+   $gradebookDetails = $wpdb->get_results('SELECT * FROM an_gradebook WHERE gbid = '. $_GET['gbid'], ARRAY_A);
+   echo json_encode($gradebookDetails);
+   die();
+}
 
 
 
@@ -451,6 +490,9 @@ ob_start();
         <input type="text" name="firstname" value="<%= student ? student.get('firstname') : '' %> "/>
         <label>Last Name:</label>
         <input type="text" name="lastname" value="<%= student ? student.get('lastname') : '' %> "/>
+        <label>ID<%= student ? ':' : ' (if student exists in the data base, use the students id to add. Otherwise a new record will be created for this student):'%></label>
+        <%= student ? student.get('id') : '<input type="text" name="id-exists"/>' %>
+        <p/>
         <%= student ? 'Update user ' + student.get('id') + ' from course ' + gradebook.get('id')  : 'Add to course ' + gradebook.get('id') %>?
         <input type="hidden" name="gbid" value="<%= gradebook.get('id') %>"/>
     <hr/>       
