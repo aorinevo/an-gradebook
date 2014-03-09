@@ -3,7 +3,7 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 2.0.6
+Version: 2.0.7
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
@@ -46,7 +46,7 @@ class AN_GradeBook_Database{
 	public function database_setup() {
 		global $wpdb;
 	  	$db_name = 'an_gradebooks';
-		if($wpdb->get_var('SHOW TABLES LIKE' . $db_name) != $db_name){
+		if($wpdb->get_var('SHOW TABLES LIKE "'.$db_name.'"') != $db_name){
 			$sql = 'CREATE TABLE ' . $db_name . ' (
 			id int(11) NOT NULL AUTO_INCREMENT,
 			name mediumtext NOT NULL,
@@ -58,7 +58,7 @@ class AN_GradeBook_Database{
 			dbDelta($sql);
 		}
 		$db_name1 = 'an_gradebook';
-		if($wpdb->get_var('SHOW TABLES LIKE' . $db_name1) != $db_name1){
+		if($wpdb->get_var('SHOW TABLES LIKE "'.$db_name1.'"') != $db_name1){
 			$sql = 'CREATE TABLE ' . $db_name1 . ' (
 			id int(11) NOT NULL AUTO_INCREMENT,
 			uid int(11) NOT NULL,
@@ -68,7 +68,7 @@ class AN_GradeBook_Database{
 		dbDelta($sql);
 		}
 		$db_name2 = 'an_assignments';
-		if($wpdb->get_var('SHOW TABLES LIKE' . $db_name2) != $db_name2){
+		if($wpdb->get_var('SHOW TABLES LIKE "'.$db_name2.'"') != $db_name2){
 			$sql = 'CREATE TABLE ' . $db_name2 . ' (
 			id int(11) NOT NULL AUTO_INCREMENT,
 			gbid int(11) NOT NULL,
@@ -79,7 +79,7 @@ class AN_GradeBook_Database{
 			dbDelta($sql);
 		}
  		$db_name3 = 'an_assignment';
-		if($wpdb->get_var('SHOW TABLES LIKE' . $db_name3) != $db_name3){
+		if($wpdb->get_var('SHOW TABLES LIKE "'.$db_name3.'"') != $db_name3){
 			$sql = 'CREATE TABLE ' . $db_name3 . ' (
 			id int(11) NOT NULL AUTO_INCREMENT,
 			uid int(11) NOT NULL,
