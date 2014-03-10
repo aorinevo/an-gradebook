@@ -1,4 +1,30 @@
 (function($) {
+     google.load('visualization', '1.0', {'packages':['corechart']});
+
+
+        function drawChart(data) {
+        // Create the data table.
+        var datag = new google.visualization.DataTable();
+	datag.addColumn('string', 'Grades');
+        datag.addColumn('number', 'Number');
+        datag.addRows([
+          ['A', data['grades'][0]],
+          ['B', data['grades'][1]],
+          ['C', data['grades'][2]],
+          ['D', data['grades'][3]],
+          ['F', data['grades'][4]]
+        ]);
+
+        // Set chart options
+        var optionsg = {'title': data['assign_name'],
+                       'width':500,
+                       'height':400};
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+         chart.draw(datag, optionsg);
+      }
+      
     $.fn.serializeObject = function() {
         var o = {};
         var a = this.serializeArray();
@@ -542,6 +568,34 @@ var anGradebooks = new ANGradebooks([]);
             return false;
         }
     });
+	var PieChartView = Backbone.View.extend({
+		id: 'chart_div',
+		initialize: function(){
+		   $('#an-gradebooks').after(this.$el);
+		   this.listenTo(assignments, 'change', this.toggleChart);
+		   return this;
+		},
+		toggleChart: function(assignment){
+			if(assignment.get('selected')){
+			$.get(ajax_object.ajax_url, { 
+						action: 'get_pie_chart',
+						amid : assignment.get('id'),
+						gbid : assignment.get('gbid')
+					},
+					function(data){
+						drawChart({grades: data['grades'],assign_name: assignment.get('assign_name')});
+						$('#chart_div').show();
+					}, 
+					'json');
+			return this;
+			} else {
+				$('#chart_div').hide();
+			}
+		}
+	});    
+	
+	var pieChart = new PieChartView();
+	
     var Gradebook = Backbone.View.extend({
         id: 'an-gradebook',
         initialize: function() {

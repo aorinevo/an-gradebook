@@ -3,7 +3,7 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 2.0.7
+Version: 2.1
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
@@ -23,8 +23,10 @@ class AN_GradeBook_Scripts{
 	}
 	public function scripts(){
 		wp_register_style( 'GradeBook_css', plugins_url('GradeBook.css',__File__), false, false );
-		wp_enqueue_style( 'GradeBook_css');  
-	
+		wp_enqueue_style( 'GradeBook_css');
+		
+    	wp_register_script('googlejsapi', 'https://www.google.com/jsapi', array(), null, false ); 	
+		wp_enqueue_script('googlejsapi'); 	
     	wp_enqueue_script( 'backbone' );
     	wp_enqueue_script( 'underscore' );	
 		wp_enqueue_script( 'jquery1.11.0', plugins_url('jquery-1.11.0.min.js',__File__),array('json2'),false,false); 
@@ -35,8 +37,12 @@ class AN_GradeBook_Scripts{
 			wp_register_script( 'GradeBook_js', plugins_url('GradeBook.js',__File__),array( 'jquery1.11.0', 'backbone','underscore' ), false, true );
 			wp_enqueue_script('GradeBook_js');
 			wp_localize_script( 'GradeBook_js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' )) );	
+ 		} elseif (gradebook_check_user_role('subscriber')) {
+			wp_register_script( 'GradeBook_student_js', plugins_url('GradeBook_student.js',__File__),array( 'jquery1.11.0', 'backbone','underscore' ), false, true );
+			wp_enqueue_script('GradeBook_student_js');
+			wp_localize_script( 'GradeBook_student_js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' )) ); 			
  		}
-	}
+ 	}	
 }
 
 class AN_GradeBook_Database{
@@ -116,6 +122,7 @@ function gradebook_check_user_role( $role, $user_id = null ) {
 
 class AN_GradeBookAPI{
 	public function __construct(){
+		//admin_gradebook
 		add_action('wp_ajax_add_student', array($this,'add_student'));
 		add_action('wp_ajax_update_student', array($this, 'update_student'));
 		add_action('wp_ajax_delete_student', array($this, 'delete_student'));		
@@ -130,8 +137,71 @@ class AN_GradeBookAPI{
 		add_action('wp_ajax_get_students', array($this, 'get_students'));
 		add_action('wp_ajax_get_assignments',array($this, 'get_assignments'));
 		add_action('wp_ajax_get_assignment', array($this, 'get_assignment'));	
-		add_action('wp_ajax_get_gradebook', array($this, 'get_gradebook'));		
+		add_action('wp_ajax_get_gradebook', array($this, 'get_gradebook'));			
+		add_action('wp_ajax_get_pie_chart', array($this, 'get_pie_chart'));	
+		//student_gradebook
+		add_action('wp_ajax_get_student_courses', array($this, 'get_student_courses'));		
+		add_action('wp_ajax_get_student_assignments', array($this, 'get_student_assignments'));		
+		add_action('wp_ajax_get_student_assignment', array($this, 'get_student_assignment'));			
+		add_action('wp_ajax_get_student_gradebook', array($this, 'get_student_gradebook'));		
+		add_action('wp_ajax_get_student', array($this, 'get_student'));							
 	}
+	
+public function get_pie_chart(){
+	global $wpdb;
+
+	$pie_chart_data = $wpdb->get_col('SELECT assign_points_earned FROM an_assignment WHERE amid = '. $_GET['amid']);	
+	
+	function isA($n){
+		if( $n>=90){
+			return true;
+		} else {
+			return false;
+		}
+	}
+	function isB($n){
+		if( $n>=80 && $n<90){
+			return true;
+		} else {
+			return false;
+		}
+	}
+	function isC($n){
+		if( $n>=70 && $n<80){
+			return true;
+		} else {
+			return false;
+		}
+	}
+	function isD($n){
+		if( $n>=60 && $n<70){
+			return true;
+		} else {
+			return false;
+		}
+	}
+	function isF($n){
+		if( $n<60){
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	$is_A = count(array_filter( $pie_chart_data, 'isA'));
+	$is_B = count(array_filter( $pie_chart_data, 'isB'));
+	$is_C = count(array_filter( $pie_chart_data, 'isC'));
+	$is_D = count(array_filter( $pie_chart_data, 'isD'));	
+	$is_F = count(array_filter( $pie_chart_data, 'isF'));	
+	
+	$output = array(
+		"grades" => array($is_A,$is_B,$is_C,$is_D,$is_F)
+	);
+
+	echo json_encode($output);
+	die();
+}
+	
 	public function add_student(){	
     	global $wpdb;
     	$wpdb->show_errors(); 
@@ -141,7 +211,7 @@ class AN_GradeBookAPI{
 		}   
 		if(!$_POST['id-exists']){ 		   
 		$result = wp_insert_user(array(
-			'user_login' => 'user_login',
+			'user_login' => strtolower($_POST['firstname'][1].$_POST['lastname']),
 			'first_name' => $_POST['firstname'],
 			'last_name'  => $_POST['lastname'],
 			'user_pass'  => 'password',
@@ -165,12 +235,12 @@ class AN_GradeBookAPI{
 			$anGradebook = $wpdb->get_results('SELECT * FROM an_gradebook WHERE id = '. $wpdb->insert_id, ARRAY_A);					
 			usort($assignments, build_sorter('assign_order'));
 			echo json_encode(array(
-	      		student=> array(firstname => $studentDetails -> first_name,
-	      		lastname => $studentDetails -> last_name,
-	      		gbid => strval($_POST['gbid']),
-	      		id => strval($result)),
-	      		assignment => $assignments,
-	      		anGradebook => $anGradebook
+	      		'student'=> array('firstname' => $studentDetails -> first_name,
+	      		'lastname' => $studentDetails -> last_name,
+	      		'gbid' => strval($_POST['gbid']),
+	      		'id' => strval($result)),
+	      		'assignment' => $assignments,
+	      		'anGradebook' => $anGradebook
 			));
 			die();
 		}else{
@@ -193,12 +263,12 @@ class AN_GradeBookAPI{
 			$assignments = $wpdb->get_results('SELECT * FROM an_assignment WHERE uid = '. $studentDetails->ID .' AND gbid = '. $_POST['gbid'], ARRAY_A);										
 				usort($assignments, build_sorter('assign_order'));
 				echo json_encode(array(
-	      			student=> array(firstname => $studentDetails -> first_name,
-	      			lastname => $studentDetails -> last_name,
-	      			gbid => strval($_POST['gbid']),
-	      			id => $studentDetails -> ID),
-	      			assignment => $assignments,
-	      			anGradebook => $anGradebook
+	      			'student'=> array('firstname' => $studentDetails -> first_name,
+	      			'lastname' => $studentDetails -> last_name,
+	      			'gbid' => strval($_POST['gbid']),
+	      			'id' => $studentDetails -> ID),
+	      			'assignment' => $assignments,
+	      			'anGradebook' => $anGradebook
 				));
 				die();			
 			}
@@ -272,6 +342,19 @@ class AN_GradeBookAPI{
   		die();
 	}
 
+	public function get_student_courses(){
+  		global $wpdb;
+		/*if (!gradebook_check_user_role('administrator')){	
+			echo json_encode(array("status" => "Not Allowed."));
+			die();
+		}  */   
+		$current_user = wp_get_current_user();
+  		$results1 = $wpdb -> get_col("SELECT gbid FROM an_gradebook WHERE uid = ". $current_user->ID);
+  		$results2 = $wpdb -> get_results("SELECT * FROM an_gradebooks WHERE id IN (".implode(',', $results1).")", ARRAY_A);  		
+  		echo json_encode($results2);
+  		die();
+	}	
+
 
 public function delete_course(){
   global $wpdb;
@@ -329,6 +412,19 @@ if (!gradebook_check_user_role('administrator')){
     die();
 }
 
+public function get_student(){
+    global $wpdb;
+    $wpdb->show_errors();
+    $current_user = wp_get_current_user();
+    $output = array(array(
+          'firstname'=> $current_user->first_name, 
+          'lastname'=>$current_user->last_name, 
+          'id'=>$current_user->ID
+        ));
+    echo json_encode($output);
+    die();
+}
+
 
 public function get_assignments(){
     global $wpdb;
@@ -337,6 +433,15 @@ if (!gradebook_check_user_role('administrator')){
 		echo json_encode(array("status" => "Not Allowed."));
 		die();
 	}     
+    $assignmentDetails = $wpdb->get_results('SELECT * FROM an_assignments WHERE gbid = '. $_GET['gbid'], ARRAY_A);
+	usort($assignmentDetails, build_sorter('assign_order'));    
+    echo json_encode($assignmentDetails);
+    die();
+}
+
+public function get_student_assignments(){
+    global $wpdb;
+    $wpdb->show_errors();   
     $assignmentDetails = $wpdb->get_results('SELECT * FROM an_assignments WHERE gbid = '. $_GET['gbid'], ARRAY_A);
 	usort($assignmentDetails, build_sorter('assign_order'));    
     echo json_encode($assignmentDetails);
@@ -373,6 +478,15 @@ if (!gradebook_check_user_role('administrator')){
    die();
 }
 
+public function get_student_gradebook(){
+   global $wpdb;
+   $wpdb->show_errors();   
+   $current_user = wp_get_current_user();
+   $gradebookDetails = $wpdb->get_results('SELECT * FROM an_gradebook WHERE gbid = '. $_GET['gbid'] .' AND uid = '. $current_user->ID, ARRAY_A);
+   echo json_encode($gradebookDetails);
+   die();
+}
+
 
 
 public function get_assignment(){
@@ -388,6 +502,15 @@ if (!gradebook_check_user_role('administrator')){
    die();
 }
 
+public function get_student_assignment(){
+   global $wpdb;
+   $wpdb->show_errors();   
+   $current_user = wp_get_current_user();
+   $assignmentDetails = $wpdb->get_results('SELECT * FROM an_assignment WHERE gbid = '. $_GET['gbid'].' AND uid = '. $current_user->ID , ARRAY_A);
+    usort($assignmentDetails, build_sorter('assign_order')); 
+   echo json_encode($assignmentDetails);
+   die();
+}
 
 public function delete_assignment(){
 	global $wpdb;
@@ -562,6 +685,18 @@ ob_start();
     <tbody id="students"></tbody>
     </table>
     </script>
+
+    <script id="student-gradebook-interface-template" type="text/template">   
+    <hr/>
+    <table id="an-gradebook-container">  
+    <thead id="students-header">
+      <tr>
+        <th>First Name</th><th>Last Name</th><th>ID</th>
+      </tr>
+    </thead>
+    <tbody id="students"></tbody>
+    </table>
+    </script>    
     
     <script id="courses-interface-template" type="text/template">
     <div id="courses-interface-buttons-container">
@@ -579,6 +714,20 @@ ob_start();
        </tbody>
       </table>
     </script>
+
+    <script id="student-courses-interface-template" type="text/template">    
+    <table id="an-courses-container">  
+       <thead>
+        <tr>
+            <th>ID</th><th>Course</th><th>School</th><th>Semester</th><th>Year</th>
+        </tr>
+       </thead>
+       <tbody id="courses">
+       </tbody>
+      </table>
+    </script>    
+    
+
 <?php
 
 $mytemplates = ob_get_contents();
@@ -588,9 +737,48 @@ echo $mytemplates;
 
 echo '<div id="an-gradebooks">
 	</div>';
-	} else {
-echo 'You do not have premissions to view this GradeBook.';
-}	
+	} elseif (gradebook_check_user_role('subscriber')){
+ob_start();
+?>
+    <script id="student-gradebook-interface-template" type="text/template">   
+    <hr/>
+    <table id="an-gradebook-container">  
+    <thead id="students-header">
+      <tr>
+      	<th></th>
+      </tr>
+    </thead>
+    <tbody id="students"></tbody>
+    </table>
+    </script>    
+    
+
+
+    <script id="student-courses-interface-template" type="text/template">    
+    <table id="an-courses-container">  
+       <thead>
+        <tr>
+            <th>ID</th><th>Course</th><th>School</th><th>Semester</th><th>Year</th>
+        </tr>
+       </thead>
+       <tbody id="courses">
+       </tbody>
+      </table>
+    </script>    
+    
+
+<?php
+
+$mytemplates = ob_get_contents();
+ob_get_clean();
+
+echo $mytemplates;
+
+echo '<div id="an-gradebooks">
+	</div>';
+	} else {	
+		echo 'You do not have premissions to view this GradeBook.';
+	}	
 }
 add_shortcode( 'GradeBook', 'GradeBook_shortcode' );
 
