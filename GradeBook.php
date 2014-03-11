@@ -3,7 +3,7 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 2.1
+Version: 2.1.1
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
@@ -737,7 +737,7 @@ echo $mytemplates;
 
 echo '<div id="an-gradebooks">
 	</div>';
-	} elseif (gradebook_check_user_role('subscriber')){
+	} elseif (get_current_user_id()>0 && !gradebook_check_user_role('administrator')){
 ob_start();
 ?>
     <script id="student-gradebook-interface-template" type="text/template">   
