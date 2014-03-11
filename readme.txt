@@ -14,26 +14,30 @@ A simple gradebook built on backbone, underscore, jQuery, JS, mySQL, and php.
 
 Insert the shortcode [GradeBook] anywhere you would like GradeBook to appear.
 
-Administrators will have access to:
-1) add/delete student,
-2) add/delete course,
-3) add/delete assignment.
+Administrators will are able to
 
-Students user_login is set to the first initial of their first name concatenate with their last name and user_id number, all in lowercase.  Their password is initially set to password.
+* add/delete student,
+* add/delete course,
+* add/delete assignment
 
-Students will have access to:
-1) their grades, and
-2) basic stats for assignments. So far there is a pie chart corresponding to the number of A's, B's, C's, etc... of a particular assignment.  The pie chart appears when a student is logged in and clicks on an assignment cell.
+**IMPORTANT**
+Any student added through the plugin that is not already in the database will have their user_login set to the first initial of their first name concatenated with their last name and user_id number, all in lowercase; Their password will be set to initially set to password.  Otherwise the students username and password that exists in the database remains the same.
 
-Highlighted features:
-1) No reloading. jQuery allows all the above functionality without reloading the page.
-2) edit course names, semester, year, student names, grades, etc... in place, just hit return or click away to save inputs to the database.
+Students are able to:
+
+* their grades, and
+* view basic statistics for assignments.  So far there is a pie chart corresponding to grade distribution of a particular assignment.  The pie chart appears when a student is logged in and clicks on an assignment cell.
+
+**Highlighted features**
+
+* jQuery allows for all the above functionality without reloading the page.
+* edit student grades n place, just hit return or click away to save inputs to the database.
 
 == Installation ==
 
-1. Download and unzip in the plugins/ directory.
-2. Activate the plugin in the installed plugins page of the admin panel.
-3. Place shortcode [GradeBook] anywhere you would like the gradebook to appear.
+1. Download and unzip in the plugins/ directory,
+2. Activate the plugin in the installed plugins page of the admin panel,
+3. Place shortcode [GradeBook] anywhere you would like the gradebook to appear,
 
 == Screenshots ==
 
@@ -43,6 +47,11 @@ Highlighted features:
 4. GradeBook with a course and student selected.
 
 == Changelog ==
+
+Version 2.1: 
+
+* Added student view.
+* Added statistics to student view. Now when a student is logged in and clicks on a class assignment, he/she will see class performance statistics related to that assignment.  In particular, they will see a pie chart corresponding to the grade distribution for that assignment.
 
 Version 2.0: GradeBook code was rebuilt from the ground up. This version is not backwards compatible. You will not have access to gradebooks created in previous versions.
 
@@ -59,4 +68,4 @@ This version is not backwards compatible. You will not have access to gradebooks
 
 == Disclaimer ==
 
-GradeBook is still in development.  Version 2.0 is a beta release. 
+GradeBook is still in development.  Version 2.1 is a beta release.
