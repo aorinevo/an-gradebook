@@ -31,7 +31,7 @@ Students are able to:
 **Highlighted features**
 
 * jQuery allows for all the above functionality without reloading the page.
-* edit student grades n place, just hit return or click away to save inputs to the database.
+* edit student grades in place, just hit return or click away to save inputs to the database.
 
 == Installation ==
 
