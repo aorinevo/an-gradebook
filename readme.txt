@@ -45,6 +45,8 @@ Students are able to:
 2. GradeBook with a course selected and corresponding students displayed.
 3. Add student modal.
 4. GradeBook with a course and student selected.
+5. Admin view of GradeBook with an assignment selected - pie chart displays automatically.
+6. Student view of GradeBook with an assignment selected - pie chart displays automatically.
 
 == Changelog ==
 
