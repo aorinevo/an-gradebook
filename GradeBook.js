@@ -583,9 +583,11 @@ var anGradebooks = new ANGradebooks([]);
         }
     });
 	var PieChartView = Backbone.View.extend({
-		id: 'chart_div',
+		id: 'chart-container',
 		initialize: function(){
 		   $('#an-gradebooks').after(this.$el);
+		   this.$el.html('<div id="chart_div"></div>');
+		   
 		   this.listenTo(assignments, 'change', this.toggleChart);
 		   return this;
 		},

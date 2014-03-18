@@ -15,6 +15,14 @@ button{
 	padding: 0 !important;
 }
 
+#chart-container{
+	text-align: center;
+}
+
+#chart_div{
+	display: inline-block;
+}
+
 #edit-course-form-container-container, #edit-student-form-container-container,
 #edit-assignment-form-container-container{
    position: fixed;

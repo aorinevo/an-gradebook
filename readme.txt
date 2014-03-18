@@ -4,7 +4,7 @@ Donate link:
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
 Tested up to: 3.8.1
-Stable tag: 2.1.3
+Stable tag: 2.1.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,7 +26,7 @@ Any student added through the plugin, that is not already in the database, will 
 Students are able to:
 
 * view their grades, and
-* view basic statistics for assignments.  So far there is a pie chart corresponding to grade distribution of a particular assignment.  The pie chart appears when a student is logged in and clicks on an assignment cell.
+* view basic statistics for assignments.  So far there is a pie chart corresponding to the grade distribution of a particular assignment.  The pie chart appears when a student is logged in and clicks on an assignment cell.
 
 **Highlighted features**
 
