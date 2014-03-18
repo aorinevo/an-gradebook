@@ -457,9 +457,11 @@ var anGradebooks = new ANGradebooks([]);
             $('#myModal').append(this.render().el);
             $('#edit-assignment-save, #edit-assignment-cancel').button();
             $('#assign-date-datepicker, #assign-due-datepicker').datepicker();
-            $('#assign-date-datepicker, #assign-due-datepicker').datepicker('option','dateFormat','yy-mm-dd');                  
+            $('#assign-date-datepicker, #assign-due-datepicker').datepicker('option','dateFormat','yy-mm-dd');
+            if(assignment){                  
             $('#assign-date-datepicker').datepicker('setDate', assignment.get('assign_date'));                                                            
-            $('#assign-due-datepicker').datepicker('setDate', assignment.get('assign_due'));            	
+            $('#assign-due-datepicker').datepicker('setDate', assignment.get('assign_due'));       
+            }     	
             return this;
         },
         render: function() {
