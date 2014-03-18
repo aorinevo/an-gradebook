@@ -450,6 +450,18 @@ var anGradebooks = new ANGradebooks([]);
             'click button#edit-assignment-cancel': 'editCancel',
             'submit #edit-assignment-form': 'editSave'
         },
+        initialize: function(){
+            var assignment = assignments.findWhere({
+                selected: true
+            });        
+            $('#myModal').append(this.render().el);
+            $('#edit-assignment-save, #edit-assignment-cancel').button();
+            $('#assign-date-datepicker, #assign-due-datepicker').datepicker();
+            $('#assign-date-datepicker, #assign-due-datepicker').datepicker('option','dateFormat','yy-mm-dd');                  
+            $('#assign-date-datepicker').datepicker('setDate', assignment.get('assign_date'));                                                            
+            $('#assign-due-datepicker').datepicker('setDate', assignment.get('assign_due'));            	
+            return this;
+        },
         render: function() {
             var self = this;
             var assignment = assignments.findWhere({
@@ -463,14 +475,14 @@ var anGradebooks = new ANGradebooks([]);
                     assignment: assignment,
                     gradebook: gradebook
                 });
-                self.$el.html(template);
+                self.$el.html(template);             
             } else {
                 var template = _.template($('#edit-assignment-template').html(), {
                     assignment: null,
                     gradebook: gradebook
                 });
                 self.$el.html(template);
-            }
+            }     
             return this;
         },
         toggleEditDelete: function(){
@@ -766,9 +778,10 @@ var anGradebooks = new ANGradebooks([]);
         	$('#myModal').show();       
             $('#gradebook-interface-buttons-container').children().button('disable');
             var view = new EditAssignmentView();          
-            $('#myModal').append(view.render().el);                            
+     /*       $('#myModal').append(view.render().el);                            
             $('#edit-assignment-save, #edit-assignment-cancel').button();
             $('#assign-date-datepicker, #assign-due-datepicker').datepicker();
+            $('#assign-date-datepicker, #assign-due-datepicker').datepicker('option','dateFormat','yy-mm-dd');            */
             return false;
         },
         deleteAssignment: function() {

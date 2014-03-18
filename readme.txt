@@ -14,24 +14,24 @@ A simple gradebook built on backbone, underscore, jQuery, JS, mySQL, and php.
 
 Insert the shortcode [GradeBook] anywhere you would like GradeBook to appear.
 
-Administrators will are able to
+Administrators are able to
 
-* add/delete student,
-* add/delete course,
-* add/delete assignment
+* add/delete students,
+* add/delete courses,
+* add/delete assignments
 
 **IMPORTANT**
-Any student added through the plugin that is not already in the database will have their user_login set to the first initial of their first name concatenated with their last name and user_id number, all in lowercase; Their password will be set to initially set to password.  Otherwise the students username and password that exists in the database remains the same.
+Any student added through the plugin, that is not already in the database, will have their user_login set to the first initial of their first name concatenated with their last name and user_id number, all in lowercase.  The password will be set to password.  If the student is added using their user_id then that students username and password that exists in the database remains unchanged.
 
 Students are able to:
 
-* their grades, and
+* view their grades, and
 * view basic statistics for assignments.  So far there is a pie chart corresponding to grade distribution of a particular assignment.  The pie chart appears when a student is logged in and clicks on an assignment cell.
 
 **Highlighted features**
 
 * jQuery allows for all the above functionality without reloading the page.
-* edit student grades in place, just hit return or click away to save inputs to the database.
+* click on any cell to edit students grades and press return or click away to save grades
 
 == Installation ==
 
@@ -49,6 +49,10 @@ Students are able to:
 6. Student view of GradeBook with an assignment selected - pie chart displays automatically.
 
 == Changelog ==
+
+Version 2.1.2:
+
+* Assignment dates and due dates are save to the database.
 
 Version 2.1: 
 

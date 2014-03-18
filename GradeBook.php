@@ -3,7 +3,7 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 2.1.1
+Version: 2.1.2
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
@@ -80,6 +80,8 @@ class AN_GradeBook_Database{
 			gbid int(11) NOT NULL,
 			assign_order int(11) NOT NULL,		
 			assign_name mediumtext NOT NULL,
+			assign_date DATE NOT NULL DEFAULT "0000-00-00",
+			assign_due DATE NOT NULL DEFAULT "0000-00-00",			
 			PRIMARY KEY  (id) )';
 			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 			dbDelta($sql);
@@ -458,7 +460,7 @@ if (!gradebook_check_user_role('administrator')){
 	}    
    $wpdb->update( 
 	'an_assignments', 
-	array( 'assign_name' => $_POST['assign_name']),
+	array( 'assign_name' => $_POST['assign_name'],'assign_date' => $_POST['assign_date'],'assign_due' => $_POST['assign_due']),
 	array('id' => $_POST['id'] )
    );   
    $assignmentDetails = $wpdb->get_row('SELECT * FROM an_assignments WHERE id = '. $_POST['id'] , ARRAY_A);
@@ -554,10 +556,14 @@ if (!gradebook_check_user_role('administrator')){
 	$wpdb->insert('an_assignments', 
 				array( 
 					'assign_name' => $_POST['assign_name'],
+					'assign_date' => $_POST['assign_date'],					
+					'assign_due' => $_POST['assign_due'],					
 					'gbid' => $_POST['gbid'],
 					'assign_order'=> $assignOrder
 				), 
 				array( 
+					'%s',
+					'%s',
 					'%s', 
 					'%d',
 					'%d'
