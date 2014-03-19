@@ -3,7 +3,7 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 2.2.1
+Version: 2.2.2
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
@@ -12,10 +12,11 @@ License: GPL
 add_action( 'admin_menu', 'register_an_gradebook_menu_page' );
 
 function register_an_gradebook_menu_page(){
+global $page_hook_suffix;
 	if (gradebook_check_user_role('administrator')){	 
-    	add_menu_page( 'GradeBook', 'GradeBooks', 'administrator', 'an_gradebook_page', 'an_gradebook_menu_page', 'dashicons-book-alt', 6 ); 
+    	$page_hook_suffix = add_menu_page( 'GradeBook', 'GradeBooks', 'administrator', 'an_gradebook_page', 'an_gradebook_menu_page', 'dashicons-book-alt', 6 ); 
 	} else {
-    	add_menu_page( 'GradeBook', 'GradeBooks', 'subscriber', 'an_gradebook_page', 'an_gradebook_menu_page', 'dashicons-book-alt', 6 ); 
+    	$page_hook_suffix = add_menu_page( 'GradeBook', 'GradeBooks', 'subscriber', 'an_gradebook_page', 'an_gradebook_menu_page', 'dashicons-book-alt', 6 ); 
 	}
 }
 
@@ -29,26 +30,32 @@ define( 'GRADEBOOK_URL', plugin_dir_url(__File__) );
 
 class AN_GradeBook_Scripts{
 	public function __construct(){
-		add_action('admin_enqueue_scripts', array($this,'scripts'));		
+			add_action('admin_init', array($this,'register_gradebook_scripts'));
+			add_action('admin_enqueue_scripts', array($this,'enqueue_gradebook_scripts'));	
 	}
-	public function scripts(){
+	public function register_gradebook_scripts(){
 		wp_register_style( 'GradeBook_css', plugins_url('GradeBook.css',__File__), false, false );
-		wp_enqueue_style( 'GradeBook_css');
-		
-    	wp_register_script('googlejsapi', 'https://www.google.com/jsapi', array(), null, false ); 	
+		wp_register_script('googlejsapi', 'https://www.google.com/jsapi', array(), null, false ); 
+		wp_register_script( 'GradeBook_js', plugins_url('GradeBook.js',__File__),array( 'jquery1.11.0', 'backbone','underscore' ), false, true );
+		wp_register_script( 'GradeBook_student_js', plugins_url('GradeBook_student.js',__File__),array( 'jquery1.11.0', 'backbone','underscore' ), false, true );
+	}
+	public function enqueue_gradebook_scripts($hook){
+		global $page_hook_suffix;
+        	/* Link our already registered script to a page */
+        	if( $hook != $page_hook_suffix )
+        		return;
+		wp_enqueue_style( 'GradeBook_css');	
 		wp_enqueue_script('googlejsapi'); 	
-    	wp_enqueue_script( 'backbone' );
-    	wp_enqueue_script( 'underscore' );	
+    		wp_enqueue_script( 'backbone' );
+    		wp_enqueue_script( 'underscore' );	
 		wp_enqueue_script( 'jquery1.11.0', plugins_url('jquery-1.11.0.min.js',__File__),array('json2'),false,false); 
 		wp_enqueue_script( 'jquery-ui-button', array('jquery2.0') );			
 		wp_enqueue_script( 'jquery-ui-datepicker', array('jquery2.0') );		
 	
-		if (gradebook_check_user_role('administrator')){	
-			wp_register_script( 'GradeBook_js', plugins_url('GradeBook.js',__File__),array( 'jquery1.11.0', 'backbone','underscore' ), false, true );
+		if (gradebook_check_user_role('administrator')){			
 			wp_enqueue_script('GradeBook_js');
 			wp_localize_script( 'GradeBook_js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' )) );	
  		} elseif (gradebook_check_user_role('subscriber')) {
-			wp_register_script( 'GradeBook_student_js', plugins_url('GradeBook_student.js',__File__),array( 'jquery1.11.0', 'backbone','underscore' ), false, true );
 			wp_enqueue_script('GradeBook_student_js');
 			wp_localize_script( 'GradeBook_student_js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' )) ); 			
  		}
