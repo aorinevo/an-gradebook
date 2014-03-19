@@ -3,7 +3,7 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 2.2
+Version: 2.2.1
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
@@ -12,8 +12,13 @@ License: GPL
 add_action( 'admin_menu', 'register_an_gradebook_menu_page' );
 
 function register_an_gradebook_menu_page(){
-    add_menu_page( 'GradeBook', 'GradeBooks', 'subscriber', 'an_gradebook_page', 'an_gradebook_menu_page', 'dashicons-book-alt', 6 ); 
+	if (gradebook_check_user_role('administrator')){	 
+    	add_menu_page( 'GradeBook', 'GradeBooks', 'administrator', 'an_gradebook_page', 'an_gradebook_menu_page', 'dashicons-book-alt', 6 ); 
+	} else {
+    	add_menu_page( 'GradeBook', 'GradeBooks', 'subscriber', 'an_gradebook_page', 'an_gradebook_menu_page', 'dashicons-book-alt', 6 ); 
+	}
 }
+
 
 define( 'GRADEBOOK_URL', plugin_dir_url(__File__) );
 
