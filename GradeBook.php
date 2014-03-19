@@ -3,12 +3,11 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 2.1.4
+Version: 999
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
 */
-/*icons courtesy Iconic: created and is maintained primarily by P.J. Onori (www.github.com/somerandomdude)*/
 
 define( 'GRADEBOOK_URL', plugin_dir_url(__File__) );
 
