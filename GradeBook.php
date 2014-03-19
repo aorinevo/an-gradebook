@@ -3,11 +3,17 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 999
+Version: 2.2
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
 */
+
+add_action( 'admin_menu', 'register_an_gradebook_menu_page' );
+
+function register_an_gradebook_menu_page(){
+    add_menu_page( 'GradeBook', 'GradeBooks', 'subscriber', 'an_gradebook_page', 'an_gradebook_menu_page', 'dashicons-book-alt', 6 ); 
+}
 
 define( 'GRADEBOOK_URL', plugin_dir_url(__File__) );
 
@@ -18,7 +24,7 @@ define( 'GRADEBOOK_URL', plugin_dir_url(__File__) );
 
 class AN_GradeBook_Scripts{
 	public function __construct(){
-		add_action('wp_enqueue_scripts', array($this,'scripts'));		
+		add_action('admin_enqueue_scripts', array($this,'scripts'));		
 	}
 	public function scripts(){
 		wp_register_style( 'GradeBook_css', plugins_url('GradeBook.css',__File__), false, false );
@@ -625,7 +631,7 @@ $an_gradebook_scripts = new AN_GradeBook_Scripts();
 $an_gradebook_database = new AN_GradeBook_Database();
 $an_gradebookapi = new AN_GradeBookAPI();
 
-function GradeBook_shortcode(){
+function an_gradebook_menu_page(){
 
 if (gradebook_check_user_role('administrator')){	
 
@@ -705,7 +711,7 @@ ob_start();
     <button type="button" id="delete-assignment">Delete Assignment</button>
     </div>    
     <hr/>
-    <table id="an-gradebook-container">  
+    <table id="an-gradebook-container" class="wp-list-table widefat fixed pages">  
     <thead id="students-header">
       <tr>
         <th>First Name</th><th>Last Name</th><th>ID</th>
@@ -717,7 +723,7 @@ ob_start();
 
     <script id="student-gradebook-interface-template" type="text/template">   
     <hr/>
-    <table id="an-gradebook-container">  
+    <table id="an-gradebook-container" class="wp-list-table widefat fixed pages">  
     <thead id="students-header">
       <tr>
         <th>First Name</th><th>Last Name</th><th>ID</th>
@@ -733,7 +739,7 @@ ob_start();
     <button type="button" id="edit-course">Edit Course</button>
     <button type="button" id="delete-course">Delete Course</button>
     </div>    
-    <table id="an-courses-container">  
+    <table id="an-courses-container" class="wp-list-table widefat fixed pages">  
        <thead>
         <tr>
             <th>ID</th><th>Course</th><th>School</th><th>Semester</th><th>Year</th>
@@ -745,7 +751,7 @@ ob_start();
     </script>
 
     <script id="student-courses-interface-template" type="text/template">    
-    <table id="an-courses-container">  
+    <table id="an-courses-container" class="wp-list-table widefat fixed pages">  
        <thead>
         <tr>
             <th>ID</th><th>Course</th><th>School</th><th>Semester</th><th>Year</th>
@@ -764,14 +770,14 @@ ob_get_clean();
 
 echo $mytemplates;
 
-echo '<div id="an-gradebooks">
-	</div>';
+echo '<div class="wrap"><h2>GradeBooks</h2><div id="an-gradebooks">
+	</div></div>';
 	} elseif (get_current_user_id()>0 && !gradebook_check_user_role('administrator')){
 ob_start();
 ?>
     <script id="student-gradebook-interface-template" type="text/template">   
     <hr/>
-    <table id="an-gradebook-container">  
+    <table id="an-gradebook-container" class="wp-list-table widefat fixed pages">  
     <thead id="students-header">
       <tr>
       	<th></th>
@@ -784,7 +790,7 @@ ob_start();
 
 
     <script id="student-courses-interface-template" type="text/template">    
-    <table id="an-courses-container">  
+    <table id="an-courses-container" class="wp-list-table widefat fixed pages">  
        <thead>
         <tr>
             <th>ID</th><th>Course</th><th>School</th><th>Semester</th><th>Year</th>
@@ -803,13 +809,10 @@ ob_get_clean();
 
 echo $mytemplates;
 
-echo '<div id="an-gradebooks">
-	</div>';
+echo '<div class="wrap"><h2>GradeBooks</h2><div id="an-gradebooks">
+	</div></div>';
 	} else {	
 		echo 'You do not have premissions to view this GradeBook.';
 	}	
 }
-add_shortcode( 'GradeBook', 'GradeBook_shortcode' );
-
-
 ?>

@@ -5,7 +5,7 @@
         function drawChart(data) {
         // Create the data table.
         var datag = new google.visualization.DataTable();
-	datag.addColumn('string', 'Grades');
+		datag.addColumn('string', 'Grades');
         datag.addColumn('number', 'Number');
         datag.addRows([
           ['A', data['grades'][0]],
@@ -17,8 +17,9 @@
 
         // Set chart options
         var optionsg = {'title': data['assign_name'],
-                       'width':500,
-                       'height':400};
+                       'width':400,
+                       'height':400,
+                       'backgroundColor': 'none'};
 
         // Instantiate and draw our chart, passing in some options.
         var chart = new google.visualization.PieChart(document.getElementById('chart_div'));

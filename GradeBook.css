@@ -75,19 +75,33 @@ form, input {
 }
 
 #students .selected td, 
-#students-header tr th.selected,
 #students .selected, #courses .selected td{
-   background-color: #e55627;
+   background-color: #f7fcfe;
+}
+
+#students-header tr th.selected{
+	background-color: #f7fcfe;
+	border-top: 4px solid #2ea2cc;
+}
+
+#courses tr.selected > td:first-child{
+   background-color: #f7fcfe;
+	border-left: 4px solid #2ea2cc;
+}
+#students tr.selected > td:first-child{
+   background-color: #f7fcfe;
+	border-left: 4px solid #2ea2cc;
 }
 
 
+
 #courses tr:hover{
-  background-color: rgba(0, 0, 0, 0.15) !important;
+  background-color: #f7fcfe !important;
 }
 
 
 #students tr:hover{
-  background-color: rgba(0, 0, 0, 0.15) !important;
+  background-color: #f7fcfe !important;
 }
 
 /*#students-header th:hover{
@@ -95,7 +109,7 @@ form, input {
 }*/
 
 #students tr:nth-of-type(odd), #courses tr:nth-of-type(odd) {
-background-color: rgba(247, 245, 231, 0.7);
+background-color: #f9f9f9;
 }
 
 #students td.editing .view {

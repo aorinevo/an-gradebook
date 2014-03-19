@@ -4,15 +4,13 @@ Donate link:
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
 Tested up to: 3.8.1
-Stable tag: 2.1.4
+Stable tag: 2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 A simple gradebook built on backbone, underscore, jQuery, JS, mySQL, and php.
 
 == Description == 
-
-Insert the shortcode [GradeBook] anywhere you would like GradeBook to appear.
 
 **IMPORTANT**
 If you are using a version of gradebook < v2.1, deactivate your plugin before updating.
@@ -40,7 +38,7 @@ Students are able to:
 
 1. Download and unzip in the plugins/ directory,
 2. Activate the plugin in the installed plugins page of the admin panel,
-3. Place shortcode [GradeBook] anywhere you would like the gradebook to appear,
+3. A new admin item menu labeled GradeBook should now be present in the admin dashboard menu.
 
 == Screenshots ==
 
@@ -52,6 +50,11 @@ Students are able to:
 6. Student view of GradeBook with an assignment selected - pie chart displays automatically.
 
 == Changelog ==
+
+Version 2.2:
+
+* GradeBook has moved to the dashboard - look for the admin item menu labeled GradeBook.  
+* Restyled to be consistent with wordpress dashboard theme.
 
 Version 2.1.2:
 
