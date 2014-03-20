@@ -12,9 +12,6 @@ A simple gradebook built on backbone, underscore, jQuery, JS, mySQL, and php.
 
 == Description == 
 
-**IMPORTANT**
-If you are using a version of gradebook < v2.1, deactivate your plugin before updating.
-
 Administrators are able to
 
 * add/delete students,
