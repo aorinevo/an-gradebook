@@ -93,7 +93,7 @@
         hideInput: function() { //this gets called twice.
             var value = this.input.val();
             var self = this;
-            $.post(ajax_object.ajax_url, {
+            $.post(ajaxurl, {
                 action: 'update_assignment',
                 uid: this.model.get('uid'),
                 amid: this.model.get('amid'),
@@ -425,7 +425,7 @@ var anGradebooks = new ANGradebooks([]);
         },
         editSave: function(ev) {
             var studentInformation = $(ev.currentTarget).serializeObject(); //action: "add_student" or action: "update_student" is hidden in the edit-student-template 
-            $.post(ajax_object.ajax_url, studentInformation, function(data, textStatus, jqXHR) { 
+            $.post(ajaxurl, studentInformation, function(data, textStatus, jqXHR) { 
                 if(studentInformation['action']=='update_student'){
                 	var x = students.get(data['student']['id']);
                 	_.each(data['student'], function(valz, keyz){
@@ -506,7 +506,7 @@ var anGradebooks = new ANGradebooks([]);
         editSave: function(ev) {
             ev.preventDefault();
             var assignmentInformation = $(ev.currentTarget).serializeObject(); //action: "add_assignment" or action: "update_assignments" is hidden in the edit-course-template 
-            $.post(ajax_object.ajax_url, assignmentInformation, function(data, textStatus, jqXHR) {
+            $.post(ajaxurl, assignmentInformation, function(data, textStatus, jqXHR) {
                 if(assignmentInformation['action']=='update_assignments'){
                 	var x = assignments.get(data['id']);
                 	_.each(data, function(valz, keyz){
@@ -567,7 +567,7 @@ var anGradebooks = new ANGradebooks([]);
         editSave: function(ev) {
             ev.preventDefault();
             var courseInformation = $(ev.currentTarget).serializeObject(); //action: "add_course" or action: "update_course" is hidden in the edit-course-template 
-            $.post(ajax_object.ajax_url, courseInformation, function(data, textStatus, jqXHR) {
+            $.post(ajaxurl, courseInformation, function(data, textStatus, jqXHR) {
                 if(courseInformation['action']=='update_course'){
                 	var x = courses.get(data['id']);
                 	_.each(data, function(valz, keyz){
@@ -594,7 +594,7 @@ var anGradebooks = new ANGradebooks([]);
 		},
 		toggleChart: function(assignment){
 			if(assignment.get('selected')){
-			$.get(ajax_object.ajax_url, { 
+			$.get(ajaxurl, { 
 						action: 'get_pie_chart',
 						amid : assignment.get('id'),
 						gbid : assignment.get('gbid')
@@ -619,7 +619,7 @@ var anGradebooks = new ANGradebooks([]);
             var self = this;
             $.when(            
             $.ajax({
-                url: ajax_object.ajax_url,
+                url: ajaxurl,
                 data: {
                     action: 'get_students',
                     gbid: this.model.id
@@ -627,7 +627,7 @@ var anGradebooks = new ANGradebooks([]);
                 contentType: 'json',
                 dataType: 'json'
             }), $.ajax({
-                url: ajax_object.ajax_url,
+                url: ajaxurl,
                 data: {
                     action: 'get_assignments',
                     gbid: this.model.id
@@ -635,7 +635,7 @@ var anGradebooks = new ANGradebooks([]);
                 contentType: 'json',
                 dataType: 'json'
             }), $.ajax({
-                url: ajax_object.ajax_url,
+                url: ajaxurl,
                 data: {
                     action: 'get_assignment',
                     gbid: this.model.id
@@ -644,7 +644,7 @@ var anGradebooks = new ANGradebooks([]);
                 dataType: 'json'
             }),
 			$.ajax({
-                url: ajax_object.ajax_url,
+                url: ajaxurl,
                 data: {
                     action: 'get_gradebook',
                     gbid: this.model.id
@@ -752,7 +752,7 @@ var anGradebooks = new ANGradebooks([]);
             	selected: true
             });
             var self = this;
-            $.post(ajax_object.ajax_url, {
+            $.post(ajaxurl, {
                 action: 'delete_student',
                 id: x.get('id'),
                 gbid: y.get('id')
@@ -793,7 +793,7 @@ var anGradebooks = new ANGradebooks([]);
             var todel = assignments.findWhere({
                 selected: true
             });
-            $.post(ajax_object.ajax_url, {
+            $.post(ajaxurl, {
                 action: 'delete_assignment',
                 id: todel.get('id')
             }, function(data, textStatus, jqXHR) {
@@ -826,7 +826,7 @@ var anGradebooks = new ANGradebooks([]);
             $('#add-course, #delete-course, #edit-course').button();
             $('#edit-course, #delete-course').button('disable');
             $.ajax({
-                url: ajax_object.ajax_url,
+                url: ajaxurl,
                 data: {
                     action: 'get_courses'
                 },
@@ -890,7 +890,7 @@ var anGradebooks = new ANGradebooks([]);
                 selected: true
             });
             var self = this;
-            $.post(ajax_object.ajax_url, {
+            $.post(ajaxurl, {
                 action: 'delete_course',
                 id: todel.get('id')
             }, function(data, textStatus, jqXHR) {

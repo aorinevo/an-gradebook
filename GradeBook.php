@@ -3,69 +3,67 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 2.2.2
+Version: 2.2.3
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
 */
 
-add_action( 'admin_menu', 'register_an_gradebook_menu_page' );
+define( "AN_GRADEBOOK_VERSION", "2.2.3");
 
-function register_an_gradebook_menu_page(){
-global $page_hook_suffix;
-	if (gradebook_check_user_role('administrator')){	 
-    	$page_hook_suffix = add_menu_page( 'GradeBook', 'GradeBooks', 'administrator', 'an_gradebook_page', 'an_gradebook_menu_page', 'dashicons-book-alt', 6 ); 
-	} else {
-    	$page_hook_suffix = add_menu_page( 'GradeBook', 'GradeBooks', 'subscriber', 'an_gradebook_page', 'an_gradebook_menu_page', 'dashicons-book-alt', 6 ); 
-	}
-}
-
-
-define( 'GRADEBOOK_URL', plugin_dir_url(__File__) );
-
-
-/**************/
-/* Load files */
-/**************/
-
+//Load scripts
 class AN_GradeBook_Scripts{
 	public function __construct(){
 			add_action('admin_init', array($this,'register_gradebook_scripts'));
-			add_action('admin_enqueue_scripts', array($this,'enqueue_gradebook_scripts'));	
+			add_action('admin_enqueue_scripts', array($this,'enqueue_gradebook_scripts'));
+			add_action( 'admin_menu', array($this,'register_an_gradebook_menu_page' ));				
 	}
 	public function register_gradebook_scripts(){
-		wp_register_style( 'GradeBook_css', plugins_url('GradeBook.css',__File__), false, false );
+		wp_register_style( 'GradeBook_css', plugins_url('GradeBook.css',__File__), array(), AN_GRADEBOOK_VERSION, false );
 		wp_register_script('googlejsapi', 'https://www.google.com/jsapi', array(), null, false ); 
-		wp_register_script( 'GradeBook_js', plugins_url('GradeBook.js',__File__),array( 'jquery1.11.0', 'backbone','underscore' ), false, true );
-		wp_register_script( 'GradeBook_student_js', plugins_url('GradeBook_student.js',__File__),array( 'jquery1.11.0', 'backbone','underscore' ), false, true );
+		wp_register_script( 'GradeBook_js', plugins_url('GradeBook.js',__File__),array( 'jquery1_11_0', 'backbone','underscore' ), AN_GRADEBOOK_VERSION, true );
+		wp_register_script( 'GradeBook_student_js', plugins_url('GradeBook_student.js',__File__),array( 'jquery1_11_0', 'backbone','underscore' ), AN_GRADEBOOK_VERSION, true );
+		wp_register_script( 'jquery1_11_0', plugins_url('jquery-1.11.0.min.js',__File__),array('json2'),'1.11.0',false); 		
 	}
 	public function enqueue_gradebook_scripts($hook){
 		global $page_hook_suffix;
-        	/* Link our already registered script to a page */
-        	if( $hook != $page_hook_suffix )
-        		return;
-		wp_enqueue_style( 'GradeBook_css');	
-		wp_enqueue_script('googlejsapi'); 	
-    		wp_enqueue_script( 'backbone' );
-    		wp_enqueue_script( 'underscore' );	
-		wp_enqueue_script( 'jquery1.11.0', plugins_url('jquery-1.11.0.min.js',__File__),array('json2'),false,false); 
-		wp_enqueue_script( 'jquery-ui-button', array('jquery2.0') );			
-		wp_enqueue_script( 'jquery-ui-datepicker', array('jquery2.0') );		
+        if( $hook != $page_hook_suffix ) return;
+		wp_enqueue_style( 'GradeBook_css' );	
+		wp_enqueue_script( 'googlejsapi' ); 	
+    	wp_enqueue_script( 'backbone' );
+    	wp_enqueue_script( 'underscore' );	
+		wp_enqueue_script( 'jquery1_11_0' );
+		wp_enqueue_script( 'jquery-ui-button' );			
+		wp_enqueue_script( 'jquery-ui-datepicker' );		
 	
 		if (gradebook_check_user_role('administrator')){			
 			wp_enqueue_script('GradeBook_js');
-			wp_localize_script( 'GradeBook_js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' )) );	
  		} elseif (gradebook_check_user_role('subscriber')) {
 			wp_enqueue_script('GradeBook_student_js');
-			wp_localize_script( 'GradeBook_student_js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' )) ); 			
  		}
  	}	
+	public function register_an_gradebook_menu_page(){
+		global $page_hook_suffix;
+		if (gradebook_check_user_role('administrator')){	 
+    		$page_hook_suffix = add_menu_page( 'GradeBook', 'GradeBooks', 'administrator', 'an_gradebook_page', 'an_gradebook_menu_page', 'dashicons-book-alt', 6 ); 
+		} else {
+    		$page_hook_suffix = add_menu_page( 'GradeBook', 'GradeBooks', 'subscriber', 'an_gradebook_page', 'an_gradebook_menu_page', 'dashicons-book-alt', 6 ); 
+		}
+	} 	
 }
 
+//Create/Upgrade Database
 class AN_GradeBook_Database{
+	const an_gradebook_db_version = 2;
 	public function __construct(){
-		register_activation_hook(__FILE__,array($this,'database_setup'));		
+		register_activation_hook(__FILE__,array($this,'database_setup'));	
+		add_action('plugins_loaded', array($this,'an_gradebook_upgrade_db'));	
 	}	
+	public function an_gradebook_upgrade_db(){
+		if(!get_site_option( 'an_gradebook_db_version' ) || self::an_gradebook_db_version > get_site_option( 'an_gradebook_db_version' )){
+			$this->database_setup();
+		}
+	}
 	public function database_setup() {
 		global $wpdb;
 	  	$db_name = 'an_gradebooks';
@@ -140,6 +138,7 @@ class AN_GradeBook_Database{
 			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 			dbDelta($sql);
 		}
+		update_option( "an_gradebook_db_version", self::an_gradebook_db_version );
 	}	
 }
 	function build_sorter($key) {
@@ -190,60 +189,30 @@ class AN_GradeBookAPI{
 		add_action('wp_ajax_get_student', array($this, 'get_student'));							
 	}
 	
-public function get_pie_chart(){
-	global $wpdb;
+	public function get_pie_chart(){
+		global $wpdb;
 
-	$pie_chart_data = $wpdb->get_col('SELECT assign_points_earned FROM an_assignment WHERE amid = '. $_GET['amid']);	
+		$pie_chart_data = $wpdb->get_col('SELECT assign_points_earned FROM an_assignment WHERE amid = '. $_GET['amid']);	
 	
-	function isA($n){
-		if( $n>=90){
-			return true;
-		} else {
-			return false;
-		}
-	}
-	function isB($n){
-		if( $n>=80 && $n<90){
-			return true;
-		} else {
-			return false;
-		}
-	}
-	function isC($n){
-		if( $n>=70 && $n<80){
-			return true;
-		} else {
-			return false;
-		}
-	}
-	function isD($n){
-		if( $n>=60 && $n<70){
-			return true;
-		} else {
-			return false;
-		}
-	}
-	function isF($n){
-		if( $n<60){
-			return true;
-		} else {
-			return false;
-		}
-	}
+		function isA($n){ return ($n>=90 ? true : false); }
+		function isB($n){ return ($n>=80 && $n<90 ? true : false); }
+		function isC($n){ return ($n>=70 && $n<80 ? true : false); }
+		function isD($n){ return ($n>=60 && $n<70 ? true : false); }
+		function isF($n){ return ($n<60 ? true : false); }
 	
-	$is_A = count(array_filter( $pie_chart_data, 'isA'));
-	$is_B = count(array_filter( $pie_chart_data, 'isB'));
-	$is_C = count(array_filter( $pie_chart_data, 'isC'));
-	$is_D = count(array_filter( $pie_chart_data, 'isD'));	
-	$is_F = count(array_filter( $pie_chart_data, 'isF'));	
+		$is_A = count(array_filter( $pie_chart_data, 'isA'));
+		$is_B = count(array_filter( $pie_chart_data, 'isB'));
+		$is_C = count(array_filter( $pie_chart_data, 'isC'));
+		$is_D = count(array_filter( $pie_chart_data, 'isD'));	
+		$is_F = count(array_filter( $pie_chart_data, 'isF'));	
 	
-	$output = array(
-		"grades" => array($is_A,$is_B,$is_C,$is_D,$is_F)
-	);
+		$output = array(
+			"grades" => array($is_A,$is_B,$is_C,$is_D,$is_F)
+		);
 
-	echo json_encode($output);
-	die();
-}
+		echo json_encode($output);
+		die();
+	}
 	
 	public function add_student(){	
     	global $wpdb;
@@ -399,19 +368,19 @@ public function get_pie_chart(){
 	}	
 
 
-public function delete_course(){
-  global $wpdb;
-if (!gradebook_check_user_role('administrator')){	
-		echo json_encode(array("status" => "Not Allowed."));
-		die();
-	}   
-  $wpdb->delete('an_gradebooks',array('id'=>$_POST['id']));
-  $wpdb->delete('an_gradebook',array('gbid'=>$_POST['id']));  
-  $wpdb->delete('an_assignments',array('gbid'=>$_POST['id']));
-  $wpdb->delete('an_assignment',array('gbid'=>$_POST['id']));  
-  echo json_encode(array('delete_course'=>'Success'));
-  die();
-}
+	public function delete_course(){
+  		global $wpdb;
+		if (!gradebook_check_user_role('administrator')){	
+			echo json_encode(array("status" => "Not Allowed."));
+			die();
+		}   
+  		$wpdb->delete('an_gradebooks',array('id'=>$_POST['id']));
+  		$wpdb->delete('an_gradebook',array('gbid'=>$_POST['id']));  
+  		$wpdb->delete('an_assignments',array('gbid'=>$_POST['id']));
+  		$wpdb->delete('an_assignment',array('gbid'=>$_POST['id']));  
+  		echo json_encode(array('delete_course'=>'Success'));
+  		die();
+	}
 
 
 	public function delete_student(){
@@ -434,39 +403,39 @@ if (!gradebook_check_user_role('administrator')){
 	}
 
 
-public function get_students(){
-    global $wpdb;
-    $wpdb->show_errors();
-if (!gradebook_check_user_role('administrator')){	
-		echo json_encode(array("status" => "Not Allowed."));
-		die();
-	} 
-    $studentIDs = $wpdb->get_results('SELECT uid FROM an_gradebook WHERE gbid = '. $_GET['gbid'], ARRAY_N);
-   foreach($studentIDs as &$value){
-        $studentData = get_userdata($value[0]);
-        $value = array(
-          'firstname'=> $studentData->first_name, 
-          'lastname'=>$studentData->last_name, 
-          'id'=>$studentData->ID,
-          'gbid' => $_GET['gbid']
-        );
-    }
-    echo json_encode($studentIDs);
-    die();
-}
+	public function get_students(){
+    	global $wpdb;
+    	$wpdb->show_errors();
+		if (!gradebook_check_user_role('administrator')){	
+			echo json_encode(array("status" => "Not Allowed."));
+			die();
+		} 
+    	$studentIDs = $wpdb->get_results('SELECT uid FROM an_gradebook WHERE gbid = '. $_GET['gbid'], ARRAY_N);
+   		foreach($studentIDs as &$value){
+        	$studentData = get_userdata($value[0]);
+        	$value = array(
+          		'firstname'=> $studentData->first_name, 
+          		'lastname'=>$studentData->last_name, 
+          		'id'=>$studentData->ID,
+          		'gbid' => $_GET['gbid']
+          		);
+    	}
+    	echo json_encode($studentIDs);
+    	die();
+	}
 
-public function get_student(){
-    global $wpdb;
-    $wpdb->show_errors();
-    $current_user = wp_get_current_user();
-    $output = array(array(
+	public function get_student(){
+    	global $wpdb;
+    	$wpdb->show_errors();
+    	$current_user = wp_get_current_user();
+    	$output = array(array(
           'firstname'=> $current_user->first_name, 
           'lastname'=>$current_user->last_name, 
           'id'=>$current_user->ID
         ));
-    echo json_encode($output);
-    die();
-}
+    	echo json_encode($output);
+    	die();
+	}
 
 
 public function get_assignments(){

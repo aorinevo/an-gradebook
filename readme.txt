@@ -4,7 +4,7 @@ Donate link:
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
 Tested up to: 3.8.1
-Stable tag: 2.2.2
+Stable tag: 2.2.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -50,6 +50,10 @@ Students are able to:
 6. Student view of GradeBook with an assignment selected - pie chart displays automatically.
 
 == Changelog ==
+
+Version 2.2.3:
+* Added DB Versioning to fire any upgrades to the db on future updates.
+* Cleaned up code.
 
 Version 2.2:
 

@@ -307,7 +307,7 @@ var anGradebooks = new ANGradebooks([]);
 		},
 		toggleChart: function(assignment){
 			if(assignment.get('selected')){
-			$.get(ajax_object.ajax_url, { 
+			$.get(ajaxurl, { 
 						action: 'get_pie_chart',
 						amid : assignment.get('id'),
 						gbid : assignment.get('gbid')
@@ -332,7 +332,7 @@ var anGradebooks = new ANGradebooks([]);
             var self = this;
             $.when( 
             $.ajax({
-                url: ajax_object.ajax_url,
+                url: ajaxurl,
                 data: {
                     action: 'get_student',
                     gbid: this.model.id
@@ -341,7 +341,7 @@ var anGradebooks = new ANGradebooks([]);
                 dataType: 'json'
             }),           
         	$.ajax({
-                url: ajax_object.ajax_url,
+                url: ajaxurl,
                 data: {
                     action: 'get_student_assignments',
                     gbid: this.model.id
@@ -349,7 +349,7 @@ var anGradebooks = new ANGradebooks([]);
                 contentType: 'json',
                 dataType: 'json'
             }), $.ajax({
-                url: ajax_object.ajax_url,
+                url: ajaxurl,
                 data: {
                     action: 'get_student_assignment',
                     gbid: this.model.id
@@ -358,7 +358,7 @@ var anGradebooks = new ANGradebooks([]);
                 dataType: 'json'
             }),
 			$.ajax({
-                url: ajax_object.ajax_url,
+                url: ajaxurl,
                 data: {
                     action: 'get_student_gradebook',
                     gbid: this.model.id
@@ -420,7 +420,7 @@ var anGradebooks = new ANGradebooks([]);
             template = _.template($('#student-courses-interface-template').html(), {});
             this.$el.html(template);
             $.ajax({
-                url: ajax_object.ajax_url,
+                url: ajaxurl,
                 data: {
                     action: 'get_student_courses'
                 },
