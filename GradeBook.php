@@ -3,13 +3,13 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 2.2.3
+Version: 2.2.4
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
 */
 
-define( "AN_GRADEBOOK_VERSION", "2.2.3");
+define( "AN_GRADEBOOK_VERSION", "2.2.4");
 
 //Load scripts
 class AN_GradeBook_Scripts{
@@ -38,7 +38,7 @@ class AN_GradeBook_Scripts{
 	
 		if (gradebook_check_user_role('administrator')){			
 			wp_enqueue_script('GradeBook_js');
- 		} elseif (gradebook_check_user_role('subscriber')) {
+ 		} else {
 			wp_enqueue_script('GradeBook_student_js');
  		}
  	}	
@@ -355,11 +355,7 @@ class AN_GradeBookAPI{
 	}
 
 	public function get_student_courses(){
-  		global $wpdb;
-		/*if (!gradebook_check_user_role('administrator')){	
-			echo json_encode(array("status" => "Not Allowed."));
-			die();
-		}  */   
+  		global $wpdb;  
 		$current_user = wp_get_current_user();
   		$results1 = $wpdb -> get_col("SELECT gbid FROM an_gradebook WHERE uid = ". $current_user->ID);
   		$results2 = $wpdb -> get_results("SELECT * FROM an_gradebooks WHERE id IN (".implode(',', $results1).")", ARRAY_A);  		
@@ -635,7 +631,7 @@ ob_start();
         <%= student ? 'Update user ' + student.get('id') + ' from course ' + gradebook.get('id')  : 'Add to course ' + gradebook.get('id') %>?
         <input type="hidden" name="gbid" value="<%= gradebook.get('id') %>"/>
     <hr/>       
-     <button type="submit" id="edit-student-save">Save</button><button type="submit" id="edit-student-cancel">Cancel</button>          
+     <button type="submit" id="edit-student-save" class="wp-core-ui button">Save</button><button type="submit" id="edit-student-cancel" class="wp-core-ui button">Cancel</button>          
     </form>
     </div>    
     </script>
@@ -656,7 +652,7 @@ ob_start();
         <%= assignment ? 'Update assignment ' + assignment.get('id') + ' from course ' + gradebook.get('id')  : 'Add to course ' + gradebook.get('id') %>?        
         <input type="hidden" name="gbid" value="<%= gradebook.get('id')%>"/>
     <hr/>       
-     <button type="submit" id="edit-assignment-save">Save</button><button type="submit" id="edit-assignment-cancel">Cancel</button>     
+     <button type="submit" id="edit-assignment-save" class="wp-core-ui button">Save</button><button type="submit" id="edit-assignment-cancel" class="wp-core-ui button">Cancel</button>     
     </form>
     </div>    
     </script>
@@ -676,20 +672,20 @@ ob_start();
         <input type="text" name="semester" value="<%= course ? course.get('semester') : '' %>"/>
         <label>Year:</label>
         <input type="text" name="year" value="<%= course ? course.get('year') : '' %>"/>
-    <hr/>       
-     <button type="submit" id="edit-course-save">Save</button><button type="submit" id="edit-course-cancel">Cancel</button>     
+    <hr/>           
+     <button type="submit" id="edit-course-save" class="wp-core-ui button">Save</button><button type="submit" id="edit-course-cancel" class="wp-core-ui button">Cancel</button>     
     </form>
     </div>
     </script>
     
     <script id="gradebook-interface-template" type="text/template">
     <div id="gradebook-interface-buttons-container">
-    <button type="button" id="add-student">Add Student</button>
-    <button type="button" id="edit-student">Edit Student</button>  
-    <button type="button" id="delete-student">Delete Student</button>
-    <button type="button" id="add-assignment">Add Assignment</button>
-    <button type="button" id="edit-assignment">Edit Assignment</button>  
-    <button type="button" id="delete-assignment">Delete Assignment</button>
+    <button type="button" id="add-student" class="wp-core-ui button">Add Student</button>
+    <button type="button" id="edit-student" class="wp-core-ui button">Edit Student</button>  
+    <button type="button" id="delete-student" class="wp-core-ui button">Delete Student</button>
+    <button type="button" id="add-assignment" class="wp-core-ui button">Add Assignment</button>
+    <button type="button" id="edit-assignment" class="wp-core-ui button">Edit Assignment</button>  
+    <button type="button" id="delete-assignment" class="wp-core-ui button">Delete Assignment</button>
     </div>    
     <hr/>
     <table id="an-gradebook-container" class="wp-list-table widefat fixed pages">  
@@ -716,9 +712,9 @@ ob_start();
     
     <script id="courses-interface-template" type="text/template">
     <div id="courses-interface-buttons-container">
-    <button type="button" id="add-course">Add Course</button>
-    <button type="button" id="edit-course">Edit Course</button>
-    <button type="button" id="delete-course">Delete Course</button>
+    <button id="add-course" class="wp-core-ui button">Add Course</button>        
+    <button id="edit-course" class="wp-core-ui button">Edit Course</button>    
+    <button id="delete-course" class="wp-core-ui button">Delete Course</button>         
     </div>    
     <table id="an-courses-container" class="wp-list-table widefat fixed pages">  
        <thead>

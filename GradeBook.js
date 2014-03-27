@@ -63,6 +63,7 @@
     var Cells = Backbone.Collection.extend({
         model: Cell
     });
+    
     var cells = new Cells([]);
     var CellView = Backbone.View.extend({
         tagName: 'td',
@@ -385,6 +386,13 @@ var anGradebooks = new ANGradebooks([]);
             'click button#edit-student-cancel': 'editCancel',
             'submit #edit-student-form': 'editSave'
         },
+        initialize: function(){
+            var student = students.findWhere({
+                selected: true
+            });       
+            $('#myModal').append(this.render().el);     	
+            return this;
+        },        
         render: function() {
             var self = this;
             var student = students.findWhere({
@@ -412,11 +420,11 @@ var anGradebooks = new ANGradebooks([]);
         	$('#myModal').hide();         
             var x = students.findWhere({selected: true});
             if(x){
-              $('#add-student, #edit-student, #delete-student, #add-assignment').button('enable');
+              $('#add-student, #edit-student, #delete-student, #add-assignment').attr('disabled',false);
             }else{           
-              $('#edit-student, #delete-student').button('disable'); 
+              $('#edit-student, #delete-student').attr('disabled',true);
             }     
-            $('#add-student, #add-assignment').button('enable');                
+            $('#add-student, #add-assignment').attr('disabled',false);
         },        
         editCancel: function() {
             this.remove();           
@@ -456,7 +464,6 @@ var anGradebooks = new ANGradebooks([]);
                 selected: true
             });        
             $('#myModal').append(this.render().el);
-            $('#edit-assignment-save, #edit-assignment-cancel').button();
             $('#assign-date-datepicker, #assign-due-datepicker').datepicker();
             $('#assign-date-datepicker, #assign-due-datepicker').datepicker('option','dateFormat','yy-mm-dd');
             if(assignment){                  
@@ -492,11 +499,11 @@ var anGradebooks = new ANGradebooks([]);
             $('#myModal').hide();        
             var y = assignments.findWhere({selected: true});
             if(y){
-              $('#add-assignment, #edit-assignment, #delete-assignment, #add-student').button('enable');
+              $('#add-assignment, #edit-assignment, #delete-assignment, #add-student').attr('disabled',false);
             }else{          
-              $('#edit-assignment, #delete-assignment').button('disable'); 
+              $('#edit-assignment, #delete-assignment').attr('disabled',true); 
             }    
-            $('#add-assignment, #add-student').button('enable');            
+            $('#add-assignment, #add-student').attr('disabled',false);            
         },        
         editCancel: function() {
             this.remove();
@@ -531,6 +538,13 @@ var anGradebooks = new ANGradebooks([]);
             'click button#edit-course-cancel': 'editCancel',
             'submit #edit-course-form': 'editSave'
         },
+        initialize: function(){  
+            var course = courses.findWhere({
+                selected: true
+            });      
+            $('#myModal').append(this.render().el);    	
+            return this;                
+        },
         render: function() {
             var self = this;
             var course = courses.findWhere({
@@ -553,11 +567,11 @@ var anGradebooks = new ANGradebooks([]);
 			$('#myModal').hide();        
             var x = courses.findWhere({selected: true});
             if(x){
-              $('#edit-course, #delete-course').button('enable');
+              $('#edit-course, #delete-course').attr('disabled', false);
             }else{
-              $('#edit-course, #delete-course').button('disable'); 
+              $('#edit-course, #delete-course').attr('disabled', true); 
             }         
-            $('#add-course').button('enable');            
+            $('#add-course').attr('disabled', false);            
         },          
         editCancel: function() {
             this.remove();            
@@ -617,8 +631,7 @@ var anGradebooks = new ANGradebooks([]);
         id: 'an-gradebook',
         initialize: function() {
             var self = this;
-            $.when(            
-            $.ajax({
+			var aj1 = $.ajax({
                 url: ajaxurl,
                 data: {
                     action: 'get_students',
@@ -626,7 +639,8 @@ var anGradebooks = new ANGradebooks([]);
                 },
                 contentType: 'json',
                 dataType: 'json'
-            }), $.ajax({
+            });
+            var aj2 = $.ajax({
                 url: ajaxurl,
                 data: {
                     action: 'get_assignments',
@@ -634,7 +648,8 @@ var anGradebooks = new ANGradebooks([]);
                 },
                 contentType: 'json',
                 dataType: 'json'
-            }), $.ajax({
+            });
+            var aj3 = $.ajax({
                 url: ajaxurl,
                 data: {
                     action: 'get_assignment',
@@ -642,8 +657,8 @@ var anGradebooks = new ANGradebooks([]);
                 },
                 contentType: 'json',
                 dataType: 'json'
-            }),
-			$.ajax({
+            });
+			var aj4 = $.ajax({
                 url: ajaxurl,
                 data: {
                     action: 'get_gradebook',
@@ -651,7 +666,9 @@ var anGradebooks = new ANGradebooks([]);
                 },
                 contentType: 'json',
                 dataType: 'json'
-            })).done(function(a1, a2, a3, a4) {
+            });   
+            this.AjaxRequests = [aj1,aj2,aj3,aj4];                           
+            $.when(aj1,aj2,aj3,aj4).done(function(a1, a2, a3, a4) {    
                 _.each(a1[0], function(student) {
                     students.add(student);
                 });
@@ -707,18 +724,20 @@ var anGradebooks = new ANGradebooks([]);
         toggleEditDelete: function(){
             var x = students.findWhere({selected: true});
             if(x){
-              $('#edit-student, #delete-student').button('enable');
+              $('#edit-student, #delete-student').attr('disabled',false);
             }else{
-              $('#edit-student, #delete-student').button('disable'); 
+              $('#edit-student, #delete-student').attr('disabled',true);
             }
             var y = assignments.findWhere({selected: true});
             if(y){
-              $('#edit-assignment, #delete-assignment').button('enable');
+              $('#edit-assignment, #delete-assignment').attr('disabled',false);
             }else{
-              $('#edit-assignment, #delete-assignment').button('disable'); 
+              $('#edit-assignment, #delete-assignment').attr('disabled',true);
             }            
         },
         close: function() {
+            for(var i = 0; i < this.AjaxRequests.length; i++)
+    			this.AjaxRequests[i].abort();	        
             !this.model.get('selected') && this.remove();
         },
         addStudent: function(studentgradebook) {
@@ -738,10 +757,8 @@ var anGradebooks = new ANGradebooks([]);
         },          
         editStudent: function() {
         	$('#myModal').show();
-            $('#gradebook-interface-buttons-container').children().button('disable');
+            $('#gradebook-interface-buttons-container').children().attr('disabled',true);
             var view = new EditStudentView();         
-            $('#myModal').append(view.render().el);                
-            $('#edit-student-save, #edit-student-cancel').button();
             return false;
         },
         deleteStudent: function() {
@@ -781,12 +798,8 @@ var anGradebooks = new ANGradebooks([]);
         },          
         editAssignment: function() {
         	$('#myModal').show();       
-            $('#gradebook-interface-buttons-container').children().button('disable');
-            var view = new EditAssignmentView();          
-     /*       $('#myModal').append(view.render().el);                            
-            $('#edit-assignment-save, #edit-assignment-cancel').button();
-            $('#assign-date-datepicker, #assign-due-datepicker').datepicker();
-            $('#assign-date-datepicker, #assign-due-datepicker').datepicker('option','dateFormat','yy-mm-dd');            */
+            $('#gradebook-interface-buttons-container').children().attr('disabled',true);
+            var view = new EditAssignmentView();         
             return false;
         },
         deleteAssignment: function() {
@@ -823,8 +836,7 @@ var anGradebooks = new ANGradebooks([]);
 		    $('body').prepend('<div id="myModal"></div>');	        
             template = _.template($('#courses-interface-template').html(), {});
             this.$el.html(template);
-            $('#add-course, #delete-course, #edit-course').button();
-            $('#edit-course, #delete-course').button('disable');
+            $('#edit-course, #delete-course').attr('disabled',true);
             $.ajax({
                 url: ajaxurl,
                 data: {
@@ -849,7 +861,6 @@ var anGradebooks = new ANGradebooks([]);
                     model: x
                 });
                 $('#an-gradebooks').append(gradebook.render().el);
-             	$('#gradebook-interface-buttons-container').children().button();
             	gradebook.toggleEditDelete();
             } else {
 				this.toggleEditDelete();           
@@ -859,9 +870,9 @@ var anGradebooks = new ANGradebooks([]);
         toggleEditDelete: function(){
             var x = courses.findWhere({selected: true});
             if(x){
-              $('#edit-course, #delete-course').button('enable');
+              $('#edit-course, #delete-course').attr('disabled',false);
             }else{
-              $('#edit-course, #delete-course').button('disable'); 
+              $('#edit-course, #delete-course').attr('disabled', true); 
             }         
         },    
         editCoursePre: function(){
@@ -873,10 +884,8 @@ var anGradebooks = new ANGradebooks([]);
         },    
         editCourse: function() {
         	$('#myModal').show();        
-            $('#courses-interface-buttons-container').children().button('disable');
+            $('#courses-interface-buttons-container').children().attr('disabled', true);
             var view = new EditCourseView();
-            $('#myModal').append(view.render().el);
-            $('#edit-course-save, #edit-course-cancel').button();
             return false;
         },
         addCourse: function(course) {

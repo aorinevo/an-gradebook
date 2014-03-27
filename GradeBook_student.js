@@ -17,8 +17,9 @@
 
         // Set chart options
         var optionsg = {'title': data['assign_name'],
-                       'width':500,
-                       'height':400};
+                       'width':400,
+                       'height':400,
+                       'backgroundColor': 'none'};
 
         // Instantiate and draw our chart, passing in some options.
         var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
@@ -299,9 +300,11 @@ var ANGradebooks = Backbone.Collection.extend({
 var anGradebooks = new ANGradebooks([]);
 
 	var PieChartView = Backbone.View.extend({
-		id: 'chart_div',
+		id: 'chart-container',
 		initialize: function(){
 		   $('#an-gradebooks').after(this.$el);
+		   this.$el.html('<div id="chart_div"></div>');
+		   
 		   this.listenTo(assignments, 'change', this.toggleChart);
 		   return this;
 		},

@@ -11,9 +11,6 @@
     z-index: 900;
 }
 
-button{
-	padding: 0 !important;
-}
 
 #chart-container{
 	text-align: center;
@@ -104,9 +101,6 @@ form, input {
   background-color: #f7fcfe !important;
 }
 
-/*#students-header th:hover{
-  background-color: #efe !important;
-}*/
 
 #students tr:nth-of-type(odd), #courses tr:nth-of-type(odd) {
 background-color: #f9f9f9;

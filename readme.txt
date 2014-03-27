@@ -4,7 +4,7 @@ Donate link:
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
 Tested up to: 3.8.1
-Stable tag: 2.2.3
+Stable tag: 2.2.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -48,8 +48,16 @@ Students are able to:
 
 == Changelog ==
 
+Version 2.2.4:
+
+* Changed CSS for GradeBook buttons to match wp-core-ui. 
+* Fixed a bug where cells multiple copies of rows and columns were being displayed.
+* Changed CSS for chart view on students gradebook to match that of the admin view.
+
+
 Version 2.2.3:
-* Added DB Versioning to fire any upgrades to the db on future updates.
+
+* Added DB Versioning to fire any upgrades to the db on future updates.  
 * Cleaned up code.
 
 Version 2.2:
