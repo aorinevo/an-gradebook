@@ -384,13 +384,15 @@ var anGradebooks = new ANGradebooks([]);
         id: 'edit-student-form-container-container',
         events: {
             'click button#edit-student-cancel': 'editCancel',
+            'click a.media-modal-close' : 'editCancel',            
+            'click #edit-student-save': 'submitForm',            
             'submit #edit-student-form': 'editSave'
         },
         initialize: function(){
             var student = students.findWhere({
                 selected: true
             });       
-            $('#myModal').append(this.render().el);     	
+            $('body').append(this.render().el);     	
             return this;
         },        
         render: function() {
@@ -413,11 +415,11 @@ var anGradebooks = new ANGradebooks([]);
                     gradebook: gradebook
                 });
                 self.$el.html(template);
-            }                         
+            }     
+            this.$el.append('<div class="media-modal-backdrop"></div>');                                    
             return this;
         },
-        toggleEditDelete: function(){
-        	$('#myModal').hide();         
+        toggleEditDelete: function(){      
             var x = students.findWhere({selected: true});
             if(x){
               $('#add-student, #edit-student, #delete-student, #add-assignment').attr('disabled',false);
@@ -431,6 +433,9 @@ var anGradebooks = new ANGradebooks([]);
 			this.toggleEditDelete();
             return false;
         },
+        submitForm: function(){        	
+          $('#edit-student-form').submit();
+        },        
         editSave: function(ev) {
             var studentInformation = $(ev.currentTarget).serializeObject(); //action: "add_student" or action: "update_student" is hidden in the edit-student-template 
             $.post(ajaxurl, studentInformation, function(data, textStatus, jqXHR) { 
@@ -457,13 +462,15 @@ var anGradebooks = new ANGradebooks([]);
         id: 'edit-assignment-form-container-container',
         events: {
             'click button#edit-assignment-cancel': 'editCancel',
+            'click a.media-modal-close' : 'editCancel',            
+            'click #edit-assignment-save': 'submitForm',
             'submit #edit-assignment-form': 'editSave'
         },
         initialize: function(){
             var assignment = assignments.findWhere({
                 selected: true
             });        
-            $('#myModal').append(this.render().el);
+            $('body').append(this.render().el);
             $('#assign-date-datepicker, #assign-due-datepicker').datepicker();
             $('#assign-date-datepicker, #assign-due-datepicker').datepicker('option','dateFormat','yy-mm-dd');
             if(assignment){                  
@@ -493,10 +500,10 @@ var anGradebooks = new ANGradebooks([]);
                 });
                 self.$el.html(template);
             }     
+            this.$el.append('<div class="media-modal-backdrop"></div>');            
             return this;
         },
         toggleEditDelete: function(){
-            $('#myModal').hide();        
             var y = assignments.findWhere({selected: true});
             if(y){
               $('#add-assignment, #edit-assignment, #delete-assignment, #add-student').attr('disabled',false);
@@ -509,6 +516,9 @@ var anGradebooks = new ANGradebooks([]);
             this.remove();
 			this.toggleEditDelete();
             return false;
+        },
+        submitForm: function(){        	
+          $('#edit-assignment-form').submit();
         },
         editSave: function(ev) {
             ev.preventDefault();
@@ -536,13 +546,15 @@ var anGradebooks = new ANGradebooks([]);
         id: 'edit-course-form-container-container',
         events: {
             'click button#edit-course-cancel': 'editCancel',
+            'click a.media-modal-close' : 'editCancel',
+            'click #edit-course-save': 'submitForm',
             'submit #edit-course-form': 'editSave'
         },
         initialize: function(){  
             var course = courses.findWhere({
                 selected: true
             });      
-            $('#myModal').append(this.render().el);    	
+            $('body').append(this.render().el);
             return this;                
         },
         render: function() {
@@ -561,10 +573,10 @@ var anGradebooks = new ANGradebooks([]);
                 });
                 self.$el.html(template);
             }
+            this.$el.append('<div class="media-modal-backdrop"></div>');
             return this;
         },       
         toggleEditDelete: function(){
-			$('#myModal').hide();        
             var x = courses.findWhere({selected: true});
             if(x){
               $('#edit-course, #delete-course').attr('disabled', false);
@@ -578,8 +590,10 @@ var anGradebooks = new ANGradebooks([]);
 			this.toggleEditDelete();
             return false;
         },
+        submitForm: function(){
+        	$('#edit-course-form').submit();
+        },
         editSave: function(ev) {
-            ev.preventDefault();
             var courseInformation = $(ev.currentTarget).serializeObject(); //action: "add_course" or action: "update_course" is hidden in the edit-course-template 
             $.post(ajaxurl, courseInformation, function(data, textStatus, jqXHR) {
                 if(courseInformation['action']=='update_course'){
@@ -796,8 +810,7 @@ var anGradebooks = new ANGradebooks([]);
 			y && y.set({selected: false});
             this.editAssignment();            
         },          
-        editAssignment: function() {
-        	$('#myModal').show();       
+        editAssignment: function() {     
             $('#gradebook-interface-buttons-container').children().attr('disabled',true);
             var view = new EditAssignmentView();         
             return false;
@@ -833,7 +846,7 @@ var anGradebooks = new ANGradebooks([]);
             'click #an-courses-container' : 'toggleEditDelete'
         },
         initialize: function() {
-		    $('body').prepend('<div id="myModal"></div>');	        
+		    //$('body').prepend('<div id="myModal" class="media-modal wp-core-ui"></div>');	        
             template = _.template($('#courses-interface-template').html(), {});
             this.$el.html(template);
             $('#edit-course, #delete-course').attr('disabled',true);

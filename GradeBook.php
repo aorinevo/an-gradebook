@@ -3,7 +3,7 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 2.2.4
+Version: 2.2.5
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
@@ -29,6 +29,7 @@ class AN_GradeBook_Scripts{
 		global $page_hook_suffix;
         if( $hook != $page_hook_suffix ) return;
 		wp_enqueue_style( 'GradeBook_css' );	
+		wp_enqueue_style( 'media-views' );			
 		wp_enqueue_script( 'googlejsapi' ); 	
     	wp_enqueue_script( 'backbone' );
     	wp_enqueue_script( 'underscore' );	
@@ -615,67 +616,121 @@ if (gradebook_check_user_role('administrator')){
 ob_start();
 ?>
     <script id="edit-student-template" type="text/template">
-    <div id="edit-student-form-container">    
-    <form id="edit-student-form">
-       <legend><%= student ? 'Edit ' : 'Create ' %>Student</legend>
-    <hr/>       
-        <input type="hidden" name="action" value="<%= student ? 'update_student' : 'add_student' %>"/>
-        <input type="hidden" name="id" value="<%= student ? student.get('id') : '' %>"/>         
-        <label>First Name:</label>
-        <input type="text" name="firstname" value="<%= student ? student.get('firstname') : '' %> "/>
-        <label>Last Name:</label>
-        <input type="text" name="lastname" value="<%= student ? student.get('lastname') : '' %> "/>
-        <label>ID<%= student ? ':' : ' (if student exists in the data base, use the students id to add. Otherwise a new record will be created for this student):'%></label>
-        <%= student ? student.get('id') : '<input type="text" name="id-exists"/>' %>
-        <p/>
-        <%= student ? 'Update user ' + student.get('id') + ' from course ' + gradebook.get('id')  : 'Add to course ' + gradebook.get('id') %>?
-        <input type="hidden" name="gbid" value="<%= gradebook.get('id') %>"/>
-    <hr/>       
-     <button type="submit" id="edit-student-save" class="wp-core-ui button">Save</button><button type="submit" id="edit-student-cancel" class="wp-core-ui button">Cancel</button>          
-    </form>
-    </div>    
-    </script>
+    <div id="edit-student-form-container" class="media-modal wp-core-ui"> 
+    <a class="media-modal-close" title="Close"><span class="media-modal-icon"></span></a>
+    	<div class="media-modal-content">
+    	    <div class="media-frame wp-core-ui">
+    	    	<div class="media-frame-title">
+    				<h1><%= student ? 'Edit ' : 'Create ' %>Student</h1>
+    			</div>    
+    	    	<div class="media-frame-content">
+    				<form id="edit-student-form">      
+         				<input type="hidden" name="action" value="<%= student ? 'update_student' : 'add_student' %>"/>
+				        <input type="hidden" name="id" value="<%= student ? student.get('id') : '' %>"/>         
+				        <label>First Name:</label>
+				        <input type="text" name="firstname" value="<%= student ? student.get('firstname') : '' %> "/>
+				        <label>Last Name:</label>
+				        <input type="text" name="lastname" value="<%= student ? student.get('lastname') : '' %> "/>
+				        <label>ID<%= student ? ':' : ' (if student exists in the data base, use the students id to add. Otherwise a new record will be created for this student):'%></label>
+				        <%= student ? student.get('id') : '<input type="text" name="id-exists"/>' %>
+				        <p/>
+				        <%= student ? 'Update user ' + student.get('id') + ' from course ' + gradebook.get('id')  : 'Add to course ' + gradebook.get('id') %>?
+				        <input type="hidden" name="gbid" value="<%= gradebook.get('id') %>"/>
+    				</form>
+    			</div>
+        		<div class="media-frame-menu">
+        			<div class="media-menu">
+        			</div>
+       			</div>     			
+        		<div class="media-frame-toolbar">
+    				<div class="media-toolbar">         
+     					<div class="media-toolbar-secondary"></div>
+     					<div class="media-toolbar-primary">
+     						<button id="edit-student-save" class="button media-button button-primary button-large">Save</button>
+     					</div>
+       				</div>
+       			</div> 
+       		</div>
+    	</div>  
+    </div> 
+    </script>    
     
     <script id="edit-assignment-template" type="text/template">
-    <div id="edit-assignment-form-container">    
-    <form id="edit-assignment-form">
-       <legend><%= assignment ? 'Edit ' : 'Create ' %>Assignment</legend>    
-        <hr />
-        <input type="hidden" name="action" value="<%= assignment ? 'update_assignments' : 'add_assignment' %>"/>
-        <input type="hidden" name="id" value="<%= assignment ? assignment.get('id') : '' %>"/>  
-        <label>Title:</label>
-        <input type="text" name="assign_name" value="<%= assignment ? assignment.get('assign_name') : '' %>"/>
-        <label>Date Assigned:</label>
-        <input type="text" name="assign_date" id="assign-date-datepicker" />        
-        <label>Date Due:</label>
-        <input type="text" name="assign_due" id="assign-due-datepicker" />
-        <%= assignment ? 'Update assignment ' + assignment.get('id') + ' from course ' + gradebook.get('id')  : 'Add to course ' + gradebook.get('id') %>?        
-        <input type="hidden" name="gbid" value="<%= gradebook.get('id')%>"/>
-    <hr/>       
-     <button type="submit" id="edit-assignment-save" class="wp-core-ui button">Save</button><button type="submit" id="edit-assignment-cancel" class="wp-core-ui button">Cancel</button>     
-    </form>
-    </div>    
-    </script>
+    <div id="edit-assignment-form-container" class="media-modal wp-core-ui"> 
+    <a class="media-modal-close" title="Close"><span class="media-modal-icon"></span></a>
+    	<div class="media-modal-content">
+    	    <div class="media-frame wp-core-ui">
+    	    	<div class="media-frame-title">
+    				<h1><%= assignment ? 'Edit ' : 'Create ' %>Assignment</h1>
+    			</div>    
+    	    	<div class="media-frame-content">
+    				<form id="edit-assignment-form">      
+        				<input type="hidden" name="action" value="<%= assignment ? 'update_assignments' : 'add_assignment' %>"/>
+				        <input type="hidden" name="id" value="<%= assignment ? assignment.get('id') : '' %>"/>  
+				        <label>Title:</label>
+				        <input type="text" name="assign_name" value="<%= assignment ? assignment.get('assign_name') : '' %>"/>
+				        <label>Date Assigned:</label>
+				        <input type="text" name="assign_date" id="assign-date-datepicker" />        
+				        <label>Date Due:</label>
+				        <input type="text" name="assign_due" id="assign-due-datepicker" />
+				        <%= assignment ? 'Update assignment ' + assignment.get('id') + ' from course ' + gradebook.get('id')  : 'Add to course ' + gradebook.get('id') %>?        
+				        <input type="hidden" name="gbid" value="<%= gradebook.get('id')%>"/>
+    				</form>
+    			</div>
+        		<div class="media-frame-menu">
+        			<div class="media-menu">
+        			</div>
+       			</div>     			
+        		<div class="media-frame-toolbar">
+    				<div class="media-toolbar">         
+     					<div class="media-toolbar-secondary"></div>
+     					<div class="media-toolbar-primary">
+     						<button id="edit-assignment-save" class="button media-button button-primary button-large">Save</button>
+     					</div>
+       				</div>
+       			</div> 
+       		</div>
+    	</div>  
+    </div> 
+    </script>    
     
     <script id="edit-course-template" type="text/template">
-    <div id="edit-course-form-container">
-    <form id="edit-course-form">
-       <legend><%= course ? 'Edit ' : 'Create ' %> Course</legend>
-    <hr />       
-        <input type="hidden" name="action" value="<%= course ? 'update_course' : 'add_course' %>"/>
-        <input type="hidden" name="id" value="<%= course ? course.get('id') : '' %>"/>        
-        <label>Course Name:</label>
-        <input type="text" name="name" value="<%= course ? course.get('name') : '' %>"/>
-        <label>School:</label>
-        <input type="text" name="school" value="<%= course ? course.get('school') : '' %>"/>
-        <label>Semester:</label>
-        <input type="text" name="semester" value="<%= course ? course.get('semester') : '' %>"/>
-        <label>Year:</label>
-        <input type="text" name="year" value="<%= course ? course.get('year') : '' %>"/>
-    <hr/>           
-     <button type="submit" id="edit-course-save" class="wp-core-ui button">Save</button><button type="submit" id="edit-course-cancel" class="wp-core-ui button">Cancel</button>     
-    </form>
-    </div>
+    <div id="edit-course-form-container" class="media-modal wp-core-ui"> 
+    <a class="media-modal-close" title="Close"><span class="media-modal-icon"></span></a>
+    	<div class="media-modal-content">
+    	    <div class="media-frame wp-core-ui">
+    	    	<div class="media-frame-title">
+    				<h1><%= course ? 'Edit ' : 'Create ' %> Course</h1>
+    			</div>    
+    	    	<div class="media-frame-content">
+    				<form id="edit-course-form">      
+        				<input type="hidden" name="action" value="<%= course ? 'update_course' : 'add_course' %>"/>
+        				<input type="hidden" name="id" value="<%= course ? course.get('id') : '' %>"/>        
+        				<label>Course Name:</label>
+        				<input type="text" name="name" value="<%= course ? course.get('name') : '' %>"/>
+        				<label>School:</label>
+        				<input type="text" name="school" value="<%= course ? course.get('school') : '' %>"/>
+        				<label>Semester:</label>
+        				<input type="text" name="semester" value="<%= course ? course.get('semester') : '' %>"/>
+        				<label>Year:</label>
+        				<input type="text" name="year" value="<%= course ? course.get('year') : '' %>"/>
+    				</form>
+    			</div>
+        		<div class="media-frame-menu">
+        			<div class="media-menu">
+        			</div>
+       			</div>     			
+        		<div class="media-frame-toolbar">
+    				<div class="media-toolbar">         
+     					<div class="media-toolbar-secondary"></div>
+     					<div class="media-toolbar-primary">
+     						<button id="edit-course-save" class="button media-button button-primary button-large">Save</button>
+     					</div>
+       				</div>
+       			</div> 
+       		</div>
+    	</div>  
+    </div> 
     </script>
     
     <script id="gradebook-interface-template" type="text/template">

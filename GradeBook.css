@@ -1,17 +1,3 @@
-#myModal{
-    position: fixed;
-    display: none; 
-    top: 0;
-    bottom: 0;     
-    left: 0; 
-    right: 0;       
-    height: 100%;
-    width: 100%;    
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 900;
-}
-
-
 #chart-container{
 	text-align: center;
 }
@@ -19,41 +5,6 @@
 #chart_div{
 	display: inline-block;
 }
-
-#edit-course-form-container-container, #edit-student-form-container-container,
-#edit-assignment-form-container-container{
-   position: fixed;
-   z-index: 999;
-   text-align: center;
-}
-#edit-course-form-container, #edit-student-form-container,
-#edit-assignment-form-container{
-	position: fixed;
-    overflow: scroll;
-	margin: 0 auto;
-	top: 60px;	
-	bottom: 60px;
-	left: 0;
-	right: 0;
-	width: 75%;
-	opacity: 1;
-	background-color: white;
-	border: 2px solid;
-	padding: 2em;
-}
-
-
-#edit-course-form-container input, #edit-student-form-container input,
-#edit-assignment-form-container input{
-  width: 100%;
-}
-
-#edit-course-form-container legend, #edit-student-form-container legend,
-#edit-assignment-form-container legend{
-  margin: 0 auto;
-}
-
-
 
 #an-gradebooks #courses-interface-buttons-container{
   text-align: center;
