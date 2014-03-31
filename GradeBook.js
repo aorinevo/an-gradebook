@@ -120,7 +120,7 @@
                 amid: this.model.get('amid'),
                 assign_points_earned: value
             }, function(data) {
-                data && self.model.set({
+                if(data) self.model.set({
                     assign_points_earned: data['assign_points_earned']
                 });
             }, 'json');
@@ -676,6 +676,7 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
 		   this.$el.html('<div id="chart_div"></div>');
 		   
 		   this.listenTo(assignments, 'change', this.toggleChart);
+		   this.listenTo(cells, 'change:assign_points_earned', this.reloadChart);		   
 		   return this;
 		},
 		toggleChart: function(assignment){
@@ -694,6 +695,13 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
 			} else {
 				$('#chart_div').empty();			
 			}
+		},
+		reloadChart: function(cell){
+			var amid = cell.get('amid');
+			var assignment = assignments.findWhere({id: amid});			
+			var selected_assignment = assignments.findWhere({selected: true});
+			if(selected_assignment){ var selected_amid = selected_assignment.get('id');}
+			if(amid == selected_amid) this.toggleChart(assignment);
 		}
 	});    
 	
