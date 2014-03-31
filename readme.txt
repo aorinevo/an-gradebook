@@ -4,7 +4,7 @@ Donate link:
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
 Tested up to: 3.8.1
-Stable tag: 2.2.5
+Stable tag: 2.2.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +47,13 @@ Students are able to:
 6. Student view of GradeBook with an assignment selected - pie chart displays automatically.
 
 == Changelog ==
+
+Version 2.2.6:
+
+* Started to address global namespace pollution - mostly done.
+* Fixed a bug where pie chart percentages weren’t displaying correctly (One of the percents would be pushed to the boarder of the pie chart).
+* Now you can press escape to exit an add/edit screen.
+* Now you can press enter to save on an add/edit screen.
 
 Version 2.2.5:
 

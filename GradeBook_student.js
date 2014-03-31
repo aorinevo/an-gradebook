@@ -1,4 +1,22 @@
 (function($) {
+
+  var AN = AN || {};
+  AN.Models = AN.Models || {};
+  AN.Collections = AN.Collections || {};
+  AN.Views = AN.Views || {};
+  AN.Routers = AN.Routers || {};
+  AN.Funcs = AN.Funcs || {};
+  
+  AN.Models.Base = Backbone.Model.extend();
+
+  AN.Collections.Base = Backbone.Collection.extend({
+    model: AN.Models.Base
+  });
+
+  AN.Views.Base = Backbone.View.extend();
+  AN.Routers.Base = Backbone.Router.extend();  
+
+
      google.load('visualization', '1.0', {'packages':['corechart']});
 
 
@@ -26,7 +44,7 @@
          chart.draw(datag, optionsg);
       }
       
-    var Cell = Backbone.Model.extend({
+    AN.Models.Cell = AN.Models.Base.extend({
         defaults: {
             uid: null,
             // user id
@@ -38,11 +56,11 @@
             selected: false
         }
     });
-    var Cells = Backbone.Collection.extend({
-        model: Cell
+    AN.Collections.Cells = AN.Collections.Base.extend({
+        model: AN.Models.Cell
     });
-    var cells = new Cells([]);
-    var CellView = Backbone.View.extend({
+    var cells = new AN.Collections.Cells([]);
+    AN.Views.CellView = AN.Views.Base.extend({
         tagName: 'td',
         initialize: function() {
             this.listenTo(assignments, 'change:selected', this.selectCell);
@@ -77,7 +95,7 @@
             }
         }
     });
-    var Assignment = Backbone.Model.extend({
+    AN.Models.Assignment = AN.Models.Base.extend({
         defaults: {
             assign_name: 'assign name',
             gbid: null,
@@ -89,11 +107,11 @@
             });
         }
     });
-    var Assignments = Backbone.Collection.extend({
-        model: Assignment
+    AN.Collections.Assignments = AN.Collections.Base.extend({
+        model: AN.Models.Assignment
     });
-    var assignments = new Assignments([]);    
-    var AssignmentView = Backbone.View.extend({
+    var assignments = new AN.Collections.Assignments([]);    
+    AN.Views.AssignmentView = AN.Views.Base.extend({
         tagName: 'th',
         events: {
             'click .assignment': 'selectAssignment',
@@ -137,7 +155,7 @@
             }
         }
     });
-    var Student = Backbone.Model.extend({
+    AN.Models.Student = AN.Models.Base.extend({
         defaults: {
             firstname: 'john',
             lastname: 'doe',
@@ -146,12 +164,12 @@
             selected: false
         }
     });    
-    var Students = Backbone.Collection.extend({
-        model: Student
+    AN.Collections.Students = AN.Collections.Base.extend({
+        model: AN.Models.Student
     });
-    var students = new Students([]);    
+    var students = new AN.Collections.Students([]);    
     
-    var StudentView = Backbone.View.extend({
+    AN.Views.StudentView = AN.Views.Base.extend({
         tagName: 'tr',
         events: {
             'click .student': 'selectStudent'
@@ -174,7 +192,7 @@
             	});
             var self = this;
             _.each(x, function(cell) {
-                var view = new CellView({
+                var view = new AN.Views.CellView({
                     model: cell
                 });
                 self.$el.append(view.render().el);
@@ -220,14 +238,14 @@
         },
         addCell: function(assignment) {
             if (assignment.get('uid') == this.model.get('id')) {
-                var view = new CellView({
+                var view = new AN.Views.CellView({
                     model: assignment
                 });
                 this.$el.append(view.render().el);
             }
         }
     });
-    var Course = Backbone.Model.extend({
+    AN.Models.Course = AN.Models.Base.extend({
         defaults: {
             name: 'Calculus I',
             school: 'Bergen',
@@ -236,11 +254,11 @@
             selected: false
         }
     });    
-    var Courses = Backbone.Collection.extend({
-        model: Course
+    AN.Collections.Courses = AN.Collections.Base.extend({
+        model: AN.Models.Course
     });
-    var courses = new Courses([]);    
-    var CourseView = Backbone.View.extend({
+    var courses = new AN.Collections.Courses([]);    
+    AN.Views.CourseView = AN.Views.Base.extend({
         tagName: 'tr',
         events: {
             'click .course': 'selectCourse'
@@ -290,16 +308,16 @@
         }
     });
     
-var ANGradebook = Backbone.Model.extend({
+	AN.Models.ANGradebook = AN.Models.Base.extend({
 });
 
-var ANGradebooks = Backbone.Collection.extend({
-  	model: ANGradebook
+	AN.Collections.ANGradebooks = AN.Collections.Base.extend({
+  	model: AN.Models.ANGradebook
 });
 
-var anGradebooks = new ANGradebooks([]);
+var anGradebooks = new AN.Collections.ANGradebooks([]);
 
-	var PieChartView = Backbone.View.extend({
+	AN.Views.PieChartView = AN.Views.Base.extend({
 		id: 'chart-container',
 		initialize: function(){
 		   $('#an-gradebooks').after(this.$el);
@@ -316,20 +334,20 @@ var anGradebooks = new ANGradebooks([]);
 						gbid : assignment.get('gbid')
 					},
 					function(data){
+						$('#chart_div').empty()					
 						drawChart({grades: data['grades'],assign_name: assignment.get('assign_name')});
-						$('#chart_div').show();
 					}, 
 					'json');
 			return this;
 			} else {
-				$('#chart_div').hide();
+				$('#chart_div').empty();			
 			}
 		}
 	});    
 	
-	var pieChart = new PieChartView();
+	var pieChart = new AN.Views.PieChartView();
 	
-    var Gradebook = Backbone.View.extend({
+    AN.Views.Gradebook = AN.Views.Base.extend({
         id: 'an-gradebook',
         initialize: function() {
             var self = this;
@@ -384,7 +402,7 @@ var anGradebooks = new ANGradebooks([]);
                     cells.add(cell);
                 });                          
                 _.each(uids, function(studentID) {
-                    var view = new StudentView({
+                    var view = new AN.Views.StudentView({
                         model: students.get(studentID)
                     });
                     $('#students').append(view.render().el);
@@ -396,7 +414,7 @@ var anGradebooks = new ANGradebooks([]);
                     gbid: self.model.get('id')
                 });
                 _.each(y, function(assignment) {
-                    var view = new AssignmentView({
+                    var view = new AN.Views.AssignmentView({
                         model: assignment
                     });
                     $('#students-header tr').append(view.render().el);
@@ -414,7 +432,7 @@ var anGradebooks = new ANGradebooks([]);
             !this.model.get('selected') && this.remove();
         }
     });
-    var App = Backbone.View.extend({
+    AN.Views.App = AN.Views.Base.extend({
         el: '#an-gradebooks',
         events: {
             'click .course': 'showGradebook'
@@ -441,7 +459,7 @@ var anGradebooks = new ANGradebooks([]);
         showGradebook: function() {
             var x = courses.findWhere({selected: true});
             if (x) {
-                var gradebook = new Gradebook({
+                var gradebook = new AN.Views.Gradebook({
                     model: x
                 });
                 $('#an-gradebooks').append(gradebook.render().el);
@@ -449,11 +467,11 @@ var anGradebooks = new ANGradebooks([]);
             return this;
         },
         addCourse: function(course) {
-            var view = new CourseView({
+            var view = new AN.Views.CourseView({
                 model: course
             });
             $('#courses').append(view.render().el);
         }
     });
-    var app = new App();
+    var app = new AN.Views.App();
 })(jQuery);

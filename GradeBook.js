@@ -1,4 +1,22 @@
 (function($) {
+
+
+  var AN = AN || {};
+  AN.Models = AN.Models || {};
+  AN.Collections = AN.Collections || {};
+  AN.Views = AN.Views || {};
+  AN.Routers = AN.Routers || {};
+  AN.Funcs = AN.Funcs || {};
+  
+  AN.Models.Base = Backbone.Model.extend();
+
+  AN.Collections.Base = Backbone.Collection.extend({
+    model: AN.Models.Base
+  });
+
+  AN.Views.Base = Backbone.View.extend();
+  AN.Routers.Base = Backbone.Router.extend();  
+  
      google.load('visualization', '1.0', {'packages':['corechart']});
 
 
@@ -42,7 +60,7 @@
         return o;
     };
 
-    var Cell = Backbone.Model.extend({
+    AN.Models.Cell = AN.Models.Base.extend({
         defaults: {
             uid: null,
             // user id
@@ -60,12 +78,14 @@
             });
         }
     });
-    var Cells = Backbone.Collection.extend({
-        model: Cell
+    
+    AN.Collections.Cells = AN.Collections.Base.extend({
+        model: AN.Models.Cell
     });
     
-    var cells = new Cells([]);
-    var CellView = Backbone.View.extend({
+    var cells = new AN.Collections.Cells([]);
+    
+    AN.Views.CellView = AN.Views.Base.extend({
         tagName: 'td',
         events: {
             "click .view": "edit",
@@ -135,7 +155,7 @@
             }
         }
     });
-    var Assignment = Backbone.Model.extend({
+    AN.Models.Assignment = AN.Models.Base.extend({
         defaults: {
             assign_name: 'assign name',
             gbid: null,
@@ -147,11 +167,11 @@
             });
         }
     });
-    var Assignments = Backbone.Collection.extend({
-        model: Assignment
+    AN.Collections.Assignments = AN.Collections.Base.extend({
+        model: AN.Models.Assignment
     });
-    var assignments = new Assignments([]);    
-    var AssignmentView = Backbone.View.extend({
+    var assignments = new AN.Collections.Assignments([]);    
+    AN.Views.AssignmentView = AN.Views.Base.extend({
         tagName: 'th',
         events: {
             'click .assignment': 'selectAssignment',
@@ -199,7 +219,7 @@
             }
         }
     });
-    var Student = Backbone.Model.extend({
+    AN.Models.Student = AN.Models.Base.extend({
         defaults: {
             firstname: 'john',
             lastname: 'doe',
@@ -213,12 +233,12 @@
             });
         }
     });    
-    var Students = Backbone.Collection.extend({
-        model: Student
+    AN.Collections.Students = AN.Collections.Base.extend({
+        model: AN.Models.Student
     });
-    var students = new Students([]);    
+    var students = new AN.Collections.Students([]);    
     
-    var StudentView = Backbone.View.extend({
+    AN.Views.StudentView = AN.Views.Base.extend({
         tagName: 'tr',
         events: {
             'click .student': 'selectStudent'
@@ -251,7 +271,7 @@
             	});
             var self = this;
             _.each(x, function(cell) {
-                var view = new CellView({
+                var view = new AN.Views.CellView({
                     model: cell
                 });
                 self.$el.append(view.render().el);
@@ -297,7 +317,7 @@
         },
         addCell: function(assignment) {
             if (assignment.get('uid') == this.model.get('id')) {
-                var view = new CellView({
+                var view = new AN.Views.CellView({
                     model: assignment
                 });
                 this.$el.append(view.render().el);
@@ -371,20 +391,21 @@
         }
     });
     
-var ANGradebook = Backbone.Model.extend({
+	AN.Models.ANGradebook = AN.Models.Base.extend({
 });
 
-var ANGradebooks = Backbone.Collection.extend({
-  	model: ANGradebook
+	AN.Collections.ANGradebooks = AN.Collections.Base.extend({
+  	model: AN.Models.ANGradebook
 });
 
-var anGradebooks = new ANGradebooks([]);
+var anGradebooks = new AN.Collections.ANGradebooks([]);
 
-    var EditStudentView = Backbone.View.extend({
+    AN.Views.EditStudentView = AN.Views.Base.extend({
         id: 'edit-student-form-container-container',
         events: {
             'click button#edit-student-cancel': 'editCancel',
-            'click a.media-modal-close' : 'editCancel',            
+            'click a.media-modal-close' : 'editCancel', 
+			'keyup'  : 'keyPressHandler',                            
             'click #edit-student-save': 'submitForm',            
             'submit #edit-student-form': 'editSave'
         },
@@ -416,7 +437,13 @@ var anGradebooks = new ANGradebooks([]);
                 });
                 self.$el.html(template);
             }     
-            this.$el.append('<div class="media-modal-backdrop"></div>');                                    
+            this.$el.append('<div class="media-modal-backdrop"></div>');
+			_.defer(function(){
+				this.inputName = self.$('input[name="firstname"]');
+				var strLength= inputName.val().length;
+				inputName.focus();				
+				inputName[0].setSelectionRange(strLength, strLength);
+			});                                                 
             return this;
         },
         toggleEditDelete: function(){      
@@ -427,7 +454,12 @@ var anGradebooks = new ANGradebooks([]);
               $('#edit-student, #delete-student').attr('disabled',true);
             }     
             $('#add-student, #add-assignment').attr('disabled',false);
-        },        
+        },   
+ 		keyPressHandler: function(e) {
+            if (e.keyCode == 27) this.editCancel();
+            if (e.keyCode == 13) this.submitForm();
+            return this;
+        },                  
         editCancel: function() {
             this.remove();           
 			this.toggleEditDelete();
@@ -458,11 +490,12 @@ var anGradebooks = new ANGradebooks([]);
             return false;
         }
     });
-    var EditAssignmentView = Backbone.View.extend({
+    AN.Views.EditAssignmentView = AN.Views.Base.extend({
         id: 'edit-assignment-form-container-container',
         events: {
             'click button#edit-assignment-cancel': 'editCancel',
-            'click a.media-modal-close' : 'editCancel',            
+            'click a.media-modal-close' : 'editCancel', 
+			'keyup'  : 'keyPressHandler',    			                                   
             'click #edit-assignment-save': 'submitForm',
             'submit #edit-assignment-form': 'editSave'
         },
@@ -500,7 +533,13 @@ var anGradebooks = new ANGradebooks([]);
                 });
                 self.$el.html(template);
             }     
-            this.$el.append('<div class="media-modal-backdrop"></div>');            
+            this.$el.append('<div class="media-modal-backdrop"></div>');   
+			_.defer(function(){
+				this.inputName = self.$('input[name="assign_name"]');
+				var strLength= inputName.val().length;
+				inputName.focus();				
+				inputName[0].setSelectionRange(strLength, strLength);
+			});                      
             return this;
         },
         toggleEditDelete: function(){
@@ -511,7 +550,12 @@ var anGradebooks = new ANGradebooks([]);
               $('#edit-assignment, #delete-assignment').attr('disabled',true); 
             }    
             $('#add-assignment, #add-student').attr('disabled',false);            
-        },        
+        },      
+		keyPressHandler: function(e) {
+            if (e.keyCode == 27) this.editCancel();
+            if (e.keyCode == 13) this.submitForm();
+            return this;
+        },             
         editCancel: function() {
             this.remove();
 			this.toggleEditDelete();
@@ -542,11 +586,12 @@ var anGradebooks = new ANGradebooks([]);
             return false;
         }
     });
-    var EditCourseView = Backbone.View.extend({
+    AN.Views.EditCourseView = AN.Views.Base.extend({
         id: 'edit-course-form-container-container',
         events: {
             'click button#edit-course-cancel': 'editCancel',
             'click a.media-modal-close' : 'editCancel',
+            'keyup'  : 'keyPressHandler',        
             'click #edit-course-save': 'submitForm',
             'submit #edit-course-form': 'editSave'
         },
@@ -566,14 +611,22 @@ var anGradebooks = new ANGradebooks([]);
                 var template = _.template($('#edit-course-template').html(), {
                     course: course
                 });
-                self.$el.html(template);
+                self.$el.html(template);                              
             } else {
                 var template = _.template($('#edit-course-template').html(), {
                     course: null
                 });
-                self.$el.html(template);
-            }
+                self.$el.html(template);                
+            }            
+                this.input = this.$('input #testing');
+            	console.log(this.input.focus);              
             this.$el.append('<div class="media-modal-backdrop"></div>');
+			_.defer(function(){
+				this.inputName = self.$('input[name="name"]');
+				var strLength= inputName.val().length;
+				inputName.focus();				
+				inputName[0].setSelectionRange(strLength, strLength);
+			});            
             return this;
         },       
         toggleEditDelete: function(){
@@ -584,7 +637,12 @@ var anGradebooks = new ANGradebooks([]);
               $('#edit-course, #delete-course').attr('disabled', true); 
             }         
             $('#add-course').attr('disabled', false);            
-        },          
+        },         
+        keyPressHandler: function(e) {
+            if (e.keyCode == 27) this.editCancel();
+            if (e.keyCode == 13) this.submitForm();
+            return this;
+        },                 
         editCancel: function() {
             this.remove();            
 			this.toggleEditDelete();
@@ -611,7 +669,7 @@ var anGradebooks = new ANGradebooks([]);
             return false;
         }
     });
-	var PieChartView = Backbone.View.extend({
+	AN.Views.PieChartView = AN.Views.Base.extend({
 		id: 'chart-container',
 		initialize: function(){
 		   $('#an-gradebooks').after(this.$el);
@@ -628,20 +686,20 @@ var anGradebooks = new ANGradebooks([]);
 						gbid : assignment.get('gbid')
 					},
 					function(data){
+						$('#chart_div').empty()					
 						drawChart({grades: data['grades'],assign_name: assignment.get('assign_name')});
-						$('#chart_div').show();
 					}, 
 					'json');
 			return this;
 			} else {
-				$('#chart_div').hide();
+				$('#chart_div').empty();			
 			}
 		}
 	});    
 	
-	var pieChart = new PieChartView();
+	var pieChart = new AN.Views.PieChartView();
 	
-    var Gradebook = Backbone.View.extend({
+    AN.Views.Gradebook = AN.Views.Base.extend({
         id: 'an-gradebook',
         initialize: function() {
             var self = this;
@@ -698,7 +756,7 @@ var anGradebooks = new ANGradebooks([]);
                     cells.add(cell);
                 });                          
                 _.each(uids, function(studentID) {
-                    var view = new StudentView({
+                    var view = new AN.Views.StudentView({
                         model: students.get(studentID)
                     });
                     $('#students').append(view.render().el);
@@ -710,7 +768,7 @@ var anGradebooks = new ANGradebooks([]);
                     gbid: self.model.get('id')
                 });
                 _.each(y, function(assignment) {
-                    var view = new AssignmentView({
+                    var view = new AN.Views.AssignmentView({
                         model: assignment
                     });
                     $('#students-header tr').append(view.render().el);
@@ -756,7 +814,7 @@ var anGradebooks = new ANGradebooks([]);
         },
         addStudent: function(studentgradebook) {
             student = students.get({id: studentgradebook.get('uid')});
-            var view = new StudentView({
+            var view = new AN.Views.StudentView({
                 model: student
             });
             $('#students').append(view.render().el);
@@ -772,7 +830,7 @@ var anGradebooks = new ANGradebooks([]);
         editStudent: function() {
         	$('#myModal').show();
             $('#gradebook-interface-buttons-container').children().attr('disabled',true);
-            var view = new EditStudentView();         
+            var view = new AN.Views.EditStudentView();         
             return false;
         },
         deleteStudent: function() {
@@ -797,7 +855,7 @@ var anGradebooks = new ANGradebooks([]);
             }, 'json');
         },
         addAssignment: function(assignment) {
-            var view = new AssignmentView({
+            var view = new AN.Views.AssignmentView({
                 model: assignment
             });
             $('#students-header tr').append(view.render().el);
@@ -812,7 +870,7 @@ var anGradebooks = new ANGradebooks([]);
         },          
         editAssignment: function() {     
             $('#gradebook-interface-buttons-container').children().attr('disabled',true);
-            var view = new EditAssignmentView();         
+            var view = new AN.Views.EditAssignmentView();         
             return false;
         },
         deleteAssignment: function() {
@@ -836,7 +894,7 @@ var anGradebooks = new ANGradebooks([]);
             }, 'json');
         }
     });
-    var App = Backbone.View.extend({
+    AN.Views.App = AN.Views.Base.extend({
         el: '#an-gradebooks',
         events: {
             'click button#add-course': 'editCoursePre',
@@ -870,7 +928,7 @@ var anGradebooks = new ANGradebooks([]);
             var x = courses.findWhere({selected: true});
             if (x) {
                 this.toggleEditDelete();
-                var gradebook = new Gradebook({
+                var gradebook = new AN.Views.Gradebook({
                     model: x
                 });
                 $('#an-gradebooks').append(gradebook.render().el);
@@ -898,7 +956,7 @@ var anGradebooks = new ANGradebooks([]);
         editCourse: function() {
         	$('#myModal').show();        
             $('#courses-interface-buttons-container').children().attr('disabled', true);
-            var view = new EditCourseView();
+            var view = new AN.Views.EditCourseView();
             return false;
         },
         addCourse: function(course) {
@@ -924,5 +982,5 @@ var anGradebooks = new ANGradebooks([]);
             }, 'json');
         }
     });
-    var app = new App();
+    var app = new AN.Views.App();
 })(jQuery);
