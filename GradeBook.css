@@ -4,6 +4,8 @@
 
 #chart_div{
 	display: inline-block;
+	margin-left:auto;
+	margin-right:auto;
 }
 
 #an-gradebooks #courses-interface-buttons-container{
@@ -41,6 +43,14 @@ form, input {
 	border-left: 4px solid #2ea2cc;
 }
 
+#students-header .hover {
+	background-color: #f7fcfe;
+}
+
+#students td.hover{
+   background-color: #f7fcfe;
+}
+
 
 
 #courses tr:hover{
@@ -64,11 +74,29 @@ background-color: #f9f9f9;
 
 #students td .view {
 	width: inherit;
-	text-align: center;
+	text-align: right;
     padding: 0;
     border: none;
     margin: inherit;
     display: block;
+}
+
+#students-header .column-title {
+	display: inline-block;
+	cursor: pointer;
+	padding-left: 0px;
+	padding-bottom: 0px;
+	padding-top: 0px;
+  width: 60%;
+}
+
+#students-header .column-sort {
+	display: inline-block;
+	cursor: pointer;	
+	padding-right:0px;
+	padding-left: 0px;
+	padding-bottom: 0px;
+	padding-top: 0px;	
 }
 
 #students td .edit {
@@ -77,10 +105,13 @@ background-color: #f9f9f9;
 
 #students td.editing .edit {
     padding: 0;
-    text-align: center;
+    text-align: right;
     display: block;
 }
 
+#edit-assignment-form, #edit-student-form, #edit-course-form{
+	padding: 10px;
+}
 /*! jQuery UI - v1.10.4 - 2014-02-13
 * http://jqueryui.com
 * Includes: jquery.ui.core.css, jquery.ui.resizable.css, jquery.ui.selectable.css, jquery.ui.accordion.css, jquery.ui.autocomplete.css, jquery.ui.

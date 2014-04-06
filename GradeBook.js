@@ -7,6 +7,7 @@
   AN.Views = AN.Views || {};
   AN.Routers = AN.Routers || {};
   AN.Funcs = AN.Funcs || {};
+  AN.GlobalVars = AN.GlobalVars || {};  
   
   AN.Models.Base = Backbone.Model.extend();
 
@@ -35,8 +36,8 @@
 
         // Set chart options
         var optionsg = {'title': data['assign_name'],
-                       'width':400,
-                       'height':400,
+                       'width': '300',
+                       'height': '300',
                        'backgroundColor': 'none'};
 
         // Instantiate and draw our chart, passing in some options.
@@ -70,6 +71,7 @@
             // assignment id
             assign_points_earned: 0,
             selected: false,
+            hover: false,
             display: false
         },
         toggleSelected: function() {
@@ -83,7 +85,7 @@
         model: AN.Models.Cell
     });
     
-    var cells = new AN.Collections.Cells([]);
+    AN.GlobalVars.cells = new AN.Collections.Cells([]);
     
     AN.Views.CellView = AN.Views.Base.extend({
         tagName: 'td',
@@ -94,8 +96,10 @@
         },
         initialize: function() {
             this.listenTo(this.model, 'change:assign_points_earned', this.render);
-            this.listenTo(assignments, 'change:selected', this.selectCell);
+            this.listenTo(AN.GlobalVars.assignments, 'change:selected', this.selectCell);
+            this.listenTo(AN.GlobalVars.assignments, 'change:hover', this.hoverCell);            
             this.listenTo(this.model, 'change:selected', this.selectCellCSS);
+            this.listenTo(this.model, 'change:hover', this.hoverCellCSS);            
             this.listenTo(this.model, 'remove', function() {
                 this.remove();
             });
@@ -104,6 +108,9 @@
             this.$el.html('<div class="view">' + this.model.get('assign_points_earned') + '</div> <input class="edit" type="text" value="' + this.model.get('assign_points_earned') + '"></input>');
             this.input = this.$('.edit');
             return this;
+        },
+        hoverCell: function(){
+        	
         },
         close: function() {
             this.remove();
@@ -133,8 +140,29 @@
             this.$el.addClass("editing");
             this.input.focus();
         },
+        hoverCell: function(ev) {
+            var x = AN.GlobalVars.assignments.findWhere({
+                hover: true
+            });
+            if (x && this.model.get('amid') == x.get('id')) {
+                this.model.set({
+                    hover: true
+                });
+            } else {
+                this.model.set({
+                    hover: false
+                });
+            }
+        },
+        hoverCellCSS: function() {
+            if (this.model.get('hover')) {
+                this.$el.addClass('hover');
+            } else {
+                this.$el.removeClass('hover');
+            }
+        },        
         selectCell: function(ev) {
-            var x = assignments.findWhere({
+            var x = AN.GlobalVars.assignments.findWhere({
                 selected: true
             });
             if (x && this.model.get('amid') == x.get('id')) {
@@ -158,60 +186,79 @@
     AN.Models.Assignment = AN.Models.Base.extend({
         defaults: {
             assign_name: 'assign name',
-            gbid: null,
+            sorted: '',
             selected: false
-        },
-        toggleSelected: function() {
-            this.set({
-                selected: !this.get('selected')
-            });
         }
     });
     AN.Collections.Assignments = AN.Collections.Base.extend({
         model: AN.Models.Assignment
     });
-    var assignments = new AN.Collections.Assignments([]);    
+    AN.GlobalVars.assignments = new AN.Collections.Assignments([]);    
     AN.Views.AssignmentView = AN.Views.Base.extend({
         tagName: 'th',
+        className: 'assignment manage-column sortable asc',
         events: {
-            'click .assignment': 'selectAssignment',
-            'click': 'unSelect'
+            'click .column-title': 'selectColumn',
+            'click .column-sort': 'sortColumn',
+            'mouseenter div.column-frame' : 'mouseEnter',
+            'mouseleave div.column-frame' : 'mouseLeave'
         },
         initialize: function() {
 			this.listenTo(this.model, 'change:assign_name', this.render);         
-            this.listenTo(this.model, 'change:selected', this.selectAssignmentCSS);
-            this.listenTo(this.model, 'remove', function() {
-                this.remove();
-            });
+            this.listenTo(this.model, 'change:selected', this.selectColumnCSS);
+            this.listenTo(this.model, 'change:sorted', this.sortColumnCSS);            
+            this.listenTo(this.model, 'remove', function() { this.remove(); });
         },
-        render: function() {
-            this.$el.html('<div class="assignment">' + this.model.get('assign_name') + '</div><div class="test"></div>');
+        mouseEnter: function(){
+        	this.$el.addClass('hover');
+        	this.model.set({hover: true});
+        },
+        mouseLeave: function(){
+        	this.$el.removeClass('hover');	
+        	this.model.set({hover: false});	
+        },
+        render: function() {   
+            this.$el.html('<div class="column-frame"><div class="column-title">' + this.model.get('assign_name') + '</div><div class="column-sort an-sorting-indicator dashicons dashicons-arrow-down"></div></div>');
             return this;
         },
-        selectAssignment: function(ev) {
-            var x = students.findWhere({
-                selected: true
-            });
-            x && x.set({
-                selected: false
-            });
-            if (this.model.get('selected')) {
-                this.model.set({
-                    selected: false
-                });
+        sortColumn: function(ev){
+        	var y = AN.GlobalVars.assignments.findWhere({selected: true});
+        	y && y.set({selected: false});
+            if (this.model.get('sorted')) {
+            	if (this.model.get('sorted')=='desc') {
+                	this.model.set({sorted: 'asc'});
+            	} else {
+                	this.model.set({sorted: 'desc'});            
+            	}
             } else {
-                var x = assignments.findWhere({
-                    selected: true
+                var x = AN.GlobalVars.assignments.find(function(model){
+                	return model.get('sorted').length >0;
                 });
-                x && x.set({
-                    selected: false
-                });
-                this.model.set({
-                    selected: true
-                });
-            }
+                x && x.set({ sorted: '' });
+                this.model.set({ sorted: 'asc' });
+            }        	
         },
-        selectAssignmentCSS: function() {
+        sortColumnCSS: function() {
+            if (this.model.get('sorted')) {
+        		var desc = this.$el.hasClass('desc');
+        		this.$el.toggleClass( "desc", !desc ).toggleClass( "asc", desc );              	
+            } else {
+                this.$el.removeClass('asc desc');
+                this.$el. addClass('asc');
+            }
+        },        
+        selectColumn: function(ev) {
+            var x = AN.GlobalVars.students.findWhere({ selected: true });
+            x && x.set({ selected: false });
+            if (this.model.get('selected')) {
+                this.model.set({ selected: false });
+            } else {
+                var x = AN.GlobalVars.assignments.findWhere({ selected: true });
+                x && x.set({ selected: false });
+                this.model.set({ selected: true });
+            }
+        },       
+        selectColumnCSS: function() {
             if (this.model.get('selected')) {
                 this.$el.addClass('selected');
             } else {
@@ -223,20 +270,16 @@
         defaults: {
             firstname: 'john',
             lastname: 'doe',
-            gbid: null,
-            id: '',
             selected: false
-        },
-        toggleSelected: function() {
-            this.set({
-                selected: !this.get('selected')
-            });
         }
     });    
     AN.Collections.Students = AN.Collections.Base.extend({
-        model: AN.Models.Student
+        model: AN.Models.Student,
+        comparator: function( model ) {
+  				return model.get( 'lastname' );
+		}
     });
-    var students = new AN.Collections.Students([]);    
+    AN.GlobalVars.students = new AN.Collections.Students([]);    
     
     AN.Views.StudentView = AN.Views.Base.extend({
         tagName: 'tr',
@@ -244,18 +287,18 @@
             'click .student': 'selectStudent'
         },
         initialize: function() {
-            this.listenTo(cells, 'add', this.addCell);
+            this.listenTo(AN.GlobalVars.cells, 'add', this.addCell);
 			this.listenTo(this.model, 'change:firstname change:lastname', this.render);            
             this.listenTo(this.model, 'change:selected', this.selectStudentCSS);
             this.listenTo(this.model, 'remove', function() {
                 this.remove()
             });
-            this.listenTo(anGradebooks, 'remove', function(anGradebook) {                
+            this.listenTo(AN.GlobalVars.anGradebooks, 'remove', function(anGradebook) {                
                 if(this.model.get('id')==anGradebook.get('uid')){
                 	this.remove();
                 }
             });            
-            this.listenTo(courses.findWhere({
+            this.listenTo(AN.GlobalVars.courses.findWhere({
                 selected: true
             }), 'change:selected', function() {
                 this.remove()
@@ -264,9 +307,9 @@
         },
         render: function() {
             this.$el.html('<td class="student">' + this.model.get("firstname") + '</td><td>' + this.model.get("lastname") + '</td><td>' + this.model.get("id") + '</td>');
-            var gbid = courses.findWhere({selected: true}).get('id');
-            var x = cells.where({
-            	uid: this.model.get('id').toString(),
+            var gbid = parseInt(AN.GlobalVars.courses.findWhere({selected: true}).get('id')); //anq: why is this not already an integer??
+            var x = AN.GlobalVars.cells.where({
+            	uid: parseInt(this.model.get('id')),		//anq: why is this not already an integer??
             	gbid: gbid
             	});
             var self = this;
@@ -279,7 +322,7 @@
             return this;
         },
         selectStudent: function(ev) {
-            var x = assignments.findWhere({
+            var x = AN.GlobalVars.assignments.findWhere({
                 selected: true
             });
             x && x.set({
@@ -290,7 +333,7 @@
                     selected: false
                 });
             } else {
-                var x = students.findWhere({
+                var x = AN.GlobalVars.students.findWhere({
                     selected: true
                 });
                 x && x.set({
@@ -309,7 +352,7 @@
             }
         },
         close: function() {
-            if (courses.findWhere({
+            if (AN.GlobalVars.courses.findWhere({
                 id: this.model.get('gbid')
             }).get('selected') == false) {
                 this.remove();
@@ -324,7 +367,7 @@
             }
         }
     });
-    var Course = Backbone.Model.extend({
+    AN.Models.Course = AN.Models.Base.extend({
         defaults: {
             name: 'Calculus I',
             school: 'Bergen',
@@ -333,11 +376,11 @@
             selected: false
         }
     });    
-    var Courses = Backbone.Collection.extend({
-        model: Course
+    AN.Collections.Courses = AN.Collections.Base.extend({
+        model: AN.Models.Course
     });
-    var courses = new Courses([]);    
-    var CourseView = Backbone.View.extend({
+    AN.GlobalVars.courses = new AN.Collections.Courses([]);    
+    AN.Views.CourseView = AN.Views.Base.extend({
         tagName: 'tr',
         events: {
             'click .course': 'selectCourse'
@@ -354,13 +397,13 @@
             return this;
         },
         selectCourse: function(ev) {
-            var x = students.findWhere({
+            var x = AN.GlobalVars.students.findWhere({
                 selected: true
             });
             x && x.set({
                 selected: false
             });
-            var y = assignments.findWhere({
+            var y = AN.GlobalVars.assignments.findWhere({
                 selected: true
             });
             y && y.set({
@@ -371,7 +414,7 @@
                     selected: false
                 });
             } else {
-                var x = courses.findWhere({
+                var x = AN.GlobalVars.courses.findWhere({
                     selected: true
                 });
                 x && x.set({
@@ -398,7 +441,7 @@
   	model: AN.Models.ANGradebook
 });
 
-var anGradebooks = new AN.Collections.ANGradebooks([]);
+	AN.GlobalVars.anGradebooks = new AN.Collections.ANGradebooks([]);
 
     AN.Views.EditStudentView = AN.Views.Base.extend({
         id: 'edit-student-form-container-container',
@@ -410,7 +453,7 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
             'submit #edit-student-form': 'editSave'
         },
         initialize: function(){
-            var student = students.findWhere({
+            var student = AN.GlobalVars.students.findWhere({
                 selected: true
             });       
             $('body').append(this.render().el);     	
@@ -418,10 +461,10 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
         },        
         render: function() {
             var self = this;
-            var student = students.findWhere({
+            var student = AN.GlobalVars.students.findWhere({
                 selected: true
             });
-            var gradebook = courses.findWhere({
+            var gradebook = AN.GlobalVars.courses.findWhere({
         		selected: true
             });
             if (student) {
@@ -447,7 +490,7 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
             return this;
         },
         toggleEditDelete: function(){      
-            var x = students.findWhere({selected: true});
+            var x = AN.GlobalVars.students.findWhere({selected: true});
             if(x){
               $('#add-student, #edit-student, #delete-student, #add-assignment').attr('disabled',false);
             }else{           
@@ -472,17 +515,17 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
             var studentInformation = $(ev.currentTarget).serializeObject(); //action: "add_student" or action: "update_student" is hidden in the edit-student-template 
             $.post(ajaxurl, studentInformation, function(data, textStatus, jqXHR) { 
                 if(studentInformation['action']=='update_student'){
-                	var x = students.get(data['student']['id']);
+                	var x = AN.GlobalVars.students.get(data['student']['id']);
                 	_.each(data['student'], function(valz, keyz){
                 	   var y = JSON.parse('{"' + keyz + '":"' + valz + '"}');
                 	   x.set(y);
                 	});
                 } else {
                 	_.each(data['assignment'], function(assignment) {
-                  	  cells.add(assignment);
+                  	  	AN.GlobalVars.cells.add(assignment);
               		});
-                	students.add(data['student']);
-                	anGradebooks.add(data['anGradebook']);                            	
+                	AN.GlobalVars.students.add(data['student']);
+                	AN.GlobalVars.anGradebooks.add(data['anGradebook']);                            	
                 }                                                        
             }, 'json');
             this.remove();
@@ -500,7 +543,7 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
             'submit #edit-assignment-form': 'editSave'
         },
         initialize: function(){
-            var assignment = assignments.findWhere({
+            var assignment = AN.GlobalVars.assignments.findWhere({
                 selected: true
             });        
             $('body').append(this.render().el);
@@ -514,10 +557,10 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
         },
         render: function() {
             var self = this;
-            var assignment = assignments.findWhere({
+            var assignment = AN.GlobalVars.assignments.findWhere({
                 selected: true
             });
-            var gradebook = courses.findWhere({
+            var gradebook = AN.GlobalVars.courses.findWhere({
                 selected: true
             });
             if (assignment) {
@@ -543,7 +586,7 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
             return this;
         },
         toggleEditDelete: function(){
-            var y = assignments.findWhere({selected: true});
+            var y = AN.GlobalVars.assignments.findWhere({selected: true});
             if(y){
               $('#add-assignment, #edit-assignment, #delete-assignment, #add-student').attr('disabled',false);
             }else{          
@@ -569,15 +612,18 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
             var assignmentInformation = $(ev.currentTarget).serializeObject(); //action: "add_assignment" or action: "update_assignments" is hidden in the edit-course-template 
             $.post(ajaxurl, assignmentInformation, function(data, textStatus, jqXHR) {
                 if(assignmentInformation['action']=='update_assignments'){
-                	var x = assignments.get(data['id']);
+                	var x = AN.GlobalVars.assignments.get(data['id']);
                 	_.each(data, function(valz, keyz){
                 	   var y = JSON.parse('{"' + keyz + '":"' + valz + '"}');
                 	   x.set(y);
                 	});
                 } else {
-                	assignments.add(data['assignmentDetails']);
+                	var x = _.map(data['assignmentDetails'], function(y){
+                		return isNaN(y) ? y : parseInt(y);
+                	});
+                	AN.GlobalVars.assignments.add(data['assignmentDetails']);
                 	_.each(data['assignmentStudents'], function(cell) {
-                    	cells.add(cell)
+                    	AN.GlobalVars.cells.add(cell)
                 	});              
                 }               
             }, 'json');
@@ -596,7 +642,7 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
             'submit #edit-course-form': 'editSave'
         },
         initialize: function(){  
-            var course = courses.findWhere({
+            var course = AN.GlobalVars.courses.findWhere({
                 selected: true
             });      
             $('body').append(this.render().el);
@@ -604,7 +650,7 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
         },
         render: function() {
             var self = this;
-            var course = courses.findWhere({
+            var course = AN.GlobalVars.courses.findWhere({
                 selected: true
             });
             if (course) {
@@ -617,9 +663,7 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
                     course: null
                 });
                 self.$el.html(template);                
-            }            
-                this.input = this.$('input #testing');
-            	console.log(this.input.focus);              
+            }                        
             this.$el.append('<div class="media-modal-backdrop"></div>');
 			_.defer(function(){
 				this.inputName = self.$('input[name="name"]');
@@ -630,7 +674,7 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
             return this;
         },       
         toggleEditDelete: function(){
-            var x = courses.findWhere({selected: true});
+            var x = AN.GlobalVars.courses.findWhere({selected: true});
             if(x){
               $('#edit-course, #delete-course').attr('disabled', false);
             }else{
@@ -655,13 +699,13 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
             var courseInformation = $(ev.currentTarget).serializeObject(); //action: "add_course" or action: "update_course" is hidden in the edit-course-template 
             $.post(ajaxurl, courseInformation, function(data, textStatus, jqXHR) {
                 if(courseInformation['action']=='update_course'){
-                	var x = courses.get(data['id']);
+                	var x = AN.GlobalVars.courses.get(data['id']);
                 	_.each(data, function(valz, keyz){
                 	   var y = JSON.parse('{"' + keyz + '":"' + valz + '"}');
                 	   x.set(y);
                 	});
                 } else {
-	                courses.add(data);                
+	                AN.GlobalVars.courses.add(data);                
                 }
             }, 'json');
 			this.toggleEditDelete();       
@@ -670,13 +714,10 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
         }
     });
 	AN.Views.PieChartView = AN.Views.Base.extend({
-		id: 'chart-container',
+		el: '#chart_div',
 		initialize: function(){
-		   $('#an-gradebooks').after(this.$el);
-		   this.$el.html('<div id="chart_div"></div>');
-		   
-		   this.listenTo(assignments, 'change', this.toggleChart);
-		   this.listenTo(cells, 'change:assign_points_earned', this.reloadChart);		   
+		   this.listenTo(AN.GlobalVars.assignments, 'change:selected', this.toggleChart);
+		   this.listenTo(AN.GlobalVars.cells, 'change:assign_points_earned', this.reloadChart);		   
 		   return this;
 		},
 		toggleChart: function(assignment){
@@ -698,14 +739,14 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
 		},
 		reloadChart: function(cell){
 			var amid = cell.get('amid');
-			var assignment = assignments.findWhere({id: amid});			
-			var selected_assignment = assignments.findWhere({selected: true});
+			var assignment = AN.GlobalVars.assignments.findWhere({id: amid});			
+			var selected_assignment = AN.GlobalVars.assignments.findWhere({selected: true});
 			if(selected_assignment){ var selected_amid = selected_assignment.get('id');}
 			if(amid == selected_amid) this.toggleChart(assignment);
 		}
 	});    
 	
-	var pieChart = new AN.Views.PieChartView();
+	AN.GlobalVars.pieChart = new AN.Views.PieChartView();
 	
     AN.Views.Gradebook = AN.Views.Base.extend({
         id: 'an-gradebook',
@@ -748,41 +789,26 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
                 dataType: 'json'
             });   
             this.AjaxRequests = [aj1,aj2,aj3,aj4];                           
-            $.when(aj1,aj2,aj3,aj4).done(function(a1, a2, a3, a4) {    
+            $.when(aj1,aj2,aj3,aj4).done(function(a1, a2, a3, a4) { 
+            		AN.GlobalVars.students.reset();   
+					AN.GlobalVars.cells.reset();               		            		
+					AN.GlobalVars.assignments.reset();               		            							
                 _.each(a1[0], function(student) {
-                    students.add(student);
-                });
-                _.each(a4[0], function(gradebook) {
-                    anGradebooks.add(gradebook);
-                });
-                var x = anGradebooks.where({
-                    gbid: self.model.get('id')
-                });
-                x = _.pluck(x, 'attributes'); 
-                var uids = _.pluck(x,'uid');                                                
-                _.each(a3[0], function(cell) {                	
-                    cells.add(cell);
-                });                          
-                _.each(uids, function(studentID) {
-                    var view = new AN.Views.StudentView({
-                        model: students.get(studentID)
-                    });
-                    $('#students').append(view.render().el);
+                    AN.GlobalVars.students.add(student);
                 });
                 _.each(a2[0], function(assignment) {
-                    assignments.add(assignment);
-                });
-                var y = assignments.where({
-                    gbid: self.model.get('id')
-                });
-                _.each(y, function(assignment) {
-                    var view = new AN.Views.AssignmentView({
-                        model: assignment
-                    });
-                    $('#students-header tr').append(view.render().el);
-                });
-                self.listenTo(anGradebooks, 'add', self.addStudent);
-                self.listenTo(assignments, 'add', self.addAssignment);
+                    AN.GlobalVars.assignments.add(assignment);
+                }); 
+                _.each(a3[0], function(cell) {                	
+                    AN.GlobalVars.cells.add(cell);
+                });                                
+                _.each(a4[0], function(gradebook) {
+                    AN.GlobalVars.anGradebooks.add(gradebook);
+                });                                          
+                self.render();
+                self.listenTo(AN.GlobalVars.anGradebooks, 'add', self.addStudent);
+                self.listenTo(AN.GlobalVars.assignments, 'add', self.addAssignment);
+            	self.listenTo(AN.GlobalVars.assignments, 'change:sorted', self.sortAssignment);                
             });
             this.listenTo(this.model, 'change:selected', this.close);
             return this;
@@ -799,16 +825,34 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
         render: function() {
             var template = _.template($('#gradebook-interface-template').html(), {});
             this.$el.html(template);
+                var x = AN.GlobalVars.students.toJSON();  
+                x = _.sortBy(x, 'lastname');                                        
+                _.each(x, function(student) {
+                    var view = new AN.Views.StudentView({
+                        model: AN.GlobalVars.students.get(student['id'])
+                    });
+					$('#students').append(view.render().el);                    
+                });              
+                var y = AN.GlobalVars.assignments.where({
+                    gbid: parseInt(this.model.get('id'))   //anq: why is this.model.get('id') a string to begin with??
+                });
+                _.each(y, function(assignment) {
+                    var view = new AN.Views.AssignmentView({
+                        model: assignment
+                    });
+                    $('#students-header tr').append(view.render().el);
+                });    
+            this.toggleEditDelete();                        
             return this;
         },
         toggleEditDelete: function(){
-            var x = students.findWhere({selected: true});
+            var x = AN.GlobalVars.students.findWhere({selected: true});
             if(x){
               $('#edit-student, #delete-student').attr('disabled',false);
             }else{
               $('#edit-student, #delete-student').attr('disabled',true);
             }
-            var y = assignments.findWhere({selected: true});
+            var y = AN.GlobalVars.assignments.findWhere({selected: true});
             if(y){
               $('#edit-assignment, #delete-assignment').attr('disabled',false);
             }else{
@@ -821,7 +865,7 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
             !this.model.get('selected') && this.remove();
         },
         addStudent: function(studentgradebook) {
-            student = students.get({id: studentgradebook.get('uid')});
+            student = AN.GlobalVars.students.get({id: parseInt(studentgradebook.get('uid'))});
             var view = new AN.Views.StudentView({
                 model: student
             });
@@ -829,9 +873,9 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
             return this;
         },
         editStudentPre: function(){
-            var x = students.findWhere({selected: true});
+            var x = AN.GlobalVars.students.findWhere({selected: true});
             x && x.set({selected: false});
-			var y = assignments.findWhere({selected: true});
+			var y = AN.GlobalVars.assignments.findWhere({selected: true});
 			y && y.set({selected: false});
             this.editStudent();            
         },          
@@ -842,10 +886,10 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
             return false;
         },
         deleteStudent: function() {
-            var x = students.findWhere({
+            var x = AN.GlobalVars.students.findWhere({
                 selected: true
             });
-            var y = courses.findWhere({
+            var y = AN.GlobalVars.courses.findWhere({
             	selected: true
             });
             var self = this;
@@ -857,8 +901,8 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
                 x.set({
                     selected: false
                 });
-                var z = anGradebooks.findWhere({uid: x.get('id').toString(), gbid: y.get('id').toString()});
-                anGradebooks.remove(z.get('id'));
+                var z = AN.GlobalVars.anGradebooks.findWhere({uid: x.get('id').toString(), gbid: y.get('id').toString()});
+                AN.GlobalVars.anGradebooks.remove(z.get('id'));
 	            self.toggleEditDelete();                
             }, 'json');
         },
@@ -870,9 +914,9 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
             return this;
         },
         editAssignmentPre: function(){       
-            var x = students.findWhere({selected: true});
+            var x = AN.GlobalVars.students.findWhere({selected: true});
             x && x.set({selected: false});
-			var y = assignments.findWhere({selected: true});
+			var y = AN.GlobalVars.assignments.findWhere({selected: true});
 			y && y.set({selected: false});
             this.editAssignment();            
         },          
@@ -881,8 +925,32 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
             var view = new AN.Views.EditAssignmentView();         
             return false;
         },
+        sortAssignment: function(ev) {
+            var template = _.template($('#gradebook-interface-template').html(), {});
+            this.$el.html(template);
+                var x = AN.GlobalVars.cells.toJSON();  
+                x = _.where(x, {amid: parseInt(ev.get('id'))});              
+                x = _.sortBy(x, 'assign_points_earned');                                        
+                _.each(x, function(cell) {
+                    var view = new AN.Views.StudentView({
+                        model: AN.GlobalVars.students.get(cell['uid'])
+                    });
+					$('#students').append(view.render().el);                    
+                });              
+                var y = AN.GlobalVars.assignments.where({
+                    gbid: parseInt(this.model.get('id'))   //anq: why is this.model.get('id') a string to begin with??
+                });
+                _.each(y, function(assignment) {
+                    var view = new AN.Views.AssignmentView({
+                        model: assignment
+                    });
+                    $('#students-header tr').append(view.render().el);
+                });       
+            this.toggleEditDelete();                     
+            return this;
+        },
         deleteAssignment: function() {
-            var todel = assignments.findWhere({
+            var todel = AN.GlobalVars.assignments.findWhere({
                 selected: true
             });
             $.post(ajaxurl, {
@@ -892,12 +960,12 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
                 todel.set({
                     selected: false
                 });
-                assignments.remove(todel.get('id'));
-                var x = cells.where({
-                    amid: todel.get('id')
+                AN.GlobalVars.assignments.remove(todel.get('id'));
+                var x = AN.GlobalVars.cells.where({
+                    amid: parseInt(todel.get('id'))
                 });
                 _.each(x, function(cell) {
-                    cells.remove(cell);
+                    AN.GlobalVars.cells.remove(cell);
                 });
             }, 'json');
         }
@@ -911,8 +979,7 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
             'click .course': 'showGradebook',
             'click #an-courses-container' : 'toggleEditDelete'
         },
-        initialize: function() {
-		    //$('body').prepend('<div id="myModal" class="media-modal wp-core-ui"></div>');	        
+        initialize: function() {	        
             template = _.template($('#courses-interface-template').html(), {});
             this.$el.html(template);
             $('#edit-course, #delete-course').attr('disabled',true);
@@ -925,15 +992,15 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
                 dataType: 'json',
                 success: function(data) {
                     _.each(data, function(course) {
-                        courses.add(course);
+                        AN.GlobalVars.courses.add(course);
                     });
                 }
             });
-            this.listenTo(courses, 'add', this.addCourse);
+            this.listenTo(AN.GlobalVars.courses, 'add', this.addCourse);
             return this;
         },
         showGradebook: function() {
-            var x = courses.findWhere({selected: true});
+            var x = AN.GlobalVars.courses.findWhere({selected: true});
             if (x) {
                 this.toggleEditDelete();
                 var gradebook = new AN.Views.Gradebook({
@@ -947,7 +1014,7 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
             return this;
         },
         toggleEditDelete: function(){
-            var x = courses.findWhere({selected: true});
+            var x = AN.GlobalVars.courses.findWhere({selected: true});
             if(x){
               $('#edit-course, #delete-course').attr('disabled',false);
             }else{
@@ -955,7 +1022,7 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
             }         
         },    
         editCoursePre: function(){
-            var x = courses.findWhere({selected: true});
+            var x = AN.GlobalVars.courses.findWhere({selected: true});
             if(x){
             x.set({selected: false});
             }
@@ -968,13 +1035,13 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
             return false;
         },
         addCourse: function(course) {
-            var view = new CourseView({
+            var view = new AN.Views.CourseView({
                 model: course
             });
             $('#courses').append(view.render().el);
         },
         deleteCourse: function() {
-            var todel = courses.findWhere({
+            var todel = AN.GlobalVars.courses.findWhere({
                 selected: true
             });
             var self = this;
@@ -985,10 +1052,10 @@ var anGradebooks = new AN.Collections.ANGradebooks([]);
                 todel.set({
                     selected: false
                 });
-                courses.remove(todel.get('id'));
+                AN.GlobalVars.courses.remove(todel.get('id'));
                 self.toggleEditDelete();
             }, 'json');
         }
     });
-    var app = new AN.Views.App();
+    AN.GlobalVars.app = new AN.Views.App();
 })(jQuery);

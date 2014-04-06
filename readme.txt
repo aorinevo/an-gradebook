@@ -4,7 +4,7 @@ Donate link:
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
 Tested up to: 3.8.1
-Stable tag: 2.2.6
+Stable tag: 2.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +47,13 @@ Students are able to:
 6. Student view of GradeBook with an assignment selected - pie chart displays automatically.
 
 == Changelog ==
+
+Version 2.3:
+
+* Global namespace issues have been addressed.  Everything in GradeBook.js is now owned by AN.
+* Added sorting on assignment columns - can only sort in ascending order.
+* Added highlighting of columns on hover.
+* Fixed styling issues where pie chart width to fit within viewing window.
 
 Version 2.2.6:
 

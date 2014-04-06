@@ -3,7 +3,7 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 2.2.6
+Version: 2.3
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
@@ -20,6 +20,7 @@ class AN_GradeBook_Scripts{
 	}
 	public function register_gradebook_scripts(){
 		wp_register_style( 'GradeBook_css', plugins_url('GradeBook.css',__File__), array(), AN_GRADEBOOK_VERSION, false );
+		wp_register_style( 'list-tables', plugins_url('list-tables.css',__File__), array(), AN_GRADEBOOK_VERSION, false );		
 		wp_register_script('googlejsapi', 'https://www.google.com/jsapi', array(), null, false ); 
 		wp_register_script( 'GradeBook_js', plugins_url('GradeBook.js',__File__),array( 'jquery1_11_0', 'backbone','underscore' ), AN_GRADEBOOK_VERSION, true );
 		wp_register_script( 'GradeBook_student_js', plugins_url('GradeBook_student.js',__File__),array( 'jquery1_11_0', 'backbone','underscore' ), AN_GRADEBOOK_VERSION, true );
@@ -30,6 +31,7 @@ class AN_GradeBook_Scripts{
         if( $hook != $page_hook_suffix ) return;
 		wp_enqueue_style( 'GradeBook_css' );	
 		wp_enqueue_style( 'media-views' );			
+		wp_enqueue_style( 'list-tables' );		
 		wp_enqueue_script( 'googlejsapi' ); 	
     	wp_enqueue_script( 'backbone' );
     	wp_enqueue_script( 'underscore' );	
@@ -247,11 +249,19 @@ class AN_GradeBookAPI{
 			$assignments = $wpdb->get_results('SELECT * FROM an_assignment WHERE uid = '. $result, ARRAY_A);	
 			$anGradebook = $wpdb->get_results('SELECT * FROM an_gradebook WHERE id = '. $wpdb->insert_id, ARRAY_A);					
 			usort($assignments, build_sorter('assign_order'));
+			foreach($assignments as &$assignmentDetail){
+				$assignmentDetail['amid'] = intval($assignmentDetail['amid']);		
+				$assignmentDetail['uid'] = intval($assignmentDetail['uid']);				
+				$assignmentDetail['assign_order'] = intval($assignmentDetail['assign_order']);			
+				$assignmentDetail['assign_points_earned'] = intval($assignmentDetail['assign_points_earned']);		
+				$assignmentDetail['gbid'] = intval($assignmentDetail['gbid']);	
+				$assignmentDetail['id'] = intval($assignmentDetail['id']);
+			} 			
 			echo json_encode(array(
 	      		'student'=> array('firstname' => $studentDetails -> first_name,
 	      		'lastname' => $studentDetails -> last_name,
-	      		'gbid' => strval($_POST['gbid']),
-	      		'id' => strval($result)),
+	      		'gbid' => intval($_POST['gbid']),
+	      		'id' => intval($result)),
 	      		'assignment' => $assignments,
 	      		'anGradebook' => $anGradebook
 			));
@@ -273,12 +283,23 @@ class AN_GradeBookAPI{
           		'uid' => $studentDetails->ID, 'assign_order' => $assignment['assign_order']));
     		};    			
 			$anGradebook = $wpdb->get_results('SELECT * FROM an_gradebook WHERE id = '. $wpdb->insert_id, ARRAY_A);	
+			foreach($anGradebook as &$value){
+				$value['gbid'] = intval($value['gbid']);
+			}
 			$assignments = $wpdb->get_results('SELECT * FROM an_assignment WHERE uid = '. $studentDetails->ID .' AND gbid = '. $_POST['gbid'], ARRAY_A);										
 				usort($assignments, build_sorter('assign_order'));
+			foreach($assignments as &$assignmentDetail){
+				$assignmentDetail['amid'] = intval($assignmentDetail['amid']);		
+				$assignmentDetail['uid'] = intval($assignmentDetail['uid']);				
+				$assignmentDetail['assign_order'] = intval($assignmentDetail['assign_order']);			
+				$assignmentDetail['assign_points_earned'] = intval($assignmentDetail['assign_points_earned']);		
+				$assignmentDetail['gbid'] = intval($assignmentDetail['gbid']);	
+				$assignmentDetail['id'] = intval($assignmentDetail['id']);
+			} 				
 				echo json_encode(array(
 	      			'student'=> array('firstname' => $studentDetails -> first_name,
 	      			'lastname' => $studentDetails -> last_name,
-	      			'gbid' => strval($_POST['gbid']),
+	      			'gbid' => intval($_POST['gbid']),
 	      			'id' => $studentDetails -> ID),
 	      			'assignment' => $assignments,
 	      			'anGradebook' => $anGradebook
@@ -298,9 +319,9 @@ class AN_GradeBookAPI{
 		$result = wp_update_user( array ( 'ID' => $_POST['id'], 'first_name' => $_POST['firstname'], 'last_name' => $_POST['lastname'] ) ) ;
 		$studentDetails = get_user_by('id',$result);		  
 	    echo json_encode(array(
-			student=> array(firstname => $studentDetails -> first_name,
-	    	lastname => $studentDetails -> last_name,
-	    	id => strval($result))
+			'student' => array(firstname => $studentDetails -> first_name,
+	    	'lastname' => $studentDetails -> last_name,
+	    	'id' => $result)
 		));
    		die();
 	}
@@ -414,9 +435,10 @@ class AN_GradeBookAPI{
           		'firstname'=> $studentData->first_name, 
           		'lastname'=>$studentData->last_name, 
           		'id'=>$studentData->ID,
-          		'gbid' => $_GET['gbid']
+          		'gbid' => intval($_GET['gbid'])
           		);
     	}
+		usort($studentIDs, build_sorter('lastname'));
     	echo json_encode($studentIDs);
     	die();
 	}
@@ -444,6 +466,11 @@ if (!gradebook_check_user_role('administrator')){
 	}     
     $assignmentDetails = $wpdb->get_results('SELECT * FROM an_assignments WHERE gbid = '. $_GET['gbid'], ARRAY_A);
 	usort($assignmentDetails, build_sorter('assign_order'));    
+	foreach($assignmentDetails as &$assignmentDetail){
+		$assignmentDetail['assign_order'] = intval($assignmentDetail['assign_order']);					
+		$assignmentDetail['gbid'] = intval($assignmentDetail['gbid']);	
+		$assignmentDetail['id'] = intval($assignmentDetail['id']);
+	}
     echo json_encode($assignmentDetails);
     die();
 }
@@ -452,7 +479,7 @@ public function get_student_assignments(){
     global $wpdb;
     $wpdb->show_errors();   
     $assignmentDetails = $wpdb->get_results('SELECT * FROM an_assignments WHERE gbid = '. $_GET['gbid'], ARRAY_A);
-	usort($assignmentDetails, build_sorter('assign_order'));    
+	usort($assignmentDetails, build_sorter('assign_order'));    	
     echo json_encode($assignmentDetails);
     die();
 }
@@ -507,6 +534,14 @@ if (!gradebook_check_user_role('administrator')){
 	}    
    $assignmentDetails = $wpdb->get_results('SELECT * FROM an_assignment WHERE gbid = '. $_GET['gbid'], ARRAY_A);
     usort($assignmentDetails, build_sorter('assign_order')); 
+	foreach($assignmentDetails as &$assignmentDetail){
+		$assignmentDetail['amid'] = intval($assignmentDetail['amid']);		
+		$assignmentDetail['uid'] = intval($assignmentDetail['uid']);				
+		$assignmentDetail['assign_order'] = intval($assignmentDetail['assign_order']);			
+		$assignmentDetail['assign_points_earned'] = intval($assignmentDetail['assign_points_earned']);		
+		$assignmentDetail['gbid'] = intval($assignmentDetail['gbid']);	
+		$assignmentDetail['id'] = intval($assignmentDetail['id']);
+	}    
    echo json_encode($assignmentDetails);
    die();
 }
@@ -596,13 +631,24 @@ if (!gradebook_check_user_role('administrator')){
 	);
 	}
 	$assignmentDetails = $wpdb->get_row("SELECT * FROM an_assignments WHERE id = $assignID", ARRAY_A);
+	$assignmentDetails['assign_order'] = intval($assignmentDetails['assign_order']);					
+	$assignmentDetails['gbid'] = intval($assignmentDetails['gbid']);	
+	$assignmentDetails['id'] = intval($assignmentDetails['id']);
+		
 	$assignmentStudents = $wpdb->get_results("SELECT * FROM an_assignment WHERE amid = $assignID", ARRAY_A);
-	
+	foreach($assignmentStudents as &$assignmentDetail){
+				$assignmentDetail['amid'] = intval($assignmentDetail['amid']);		
+				$assignmentDetail['uid'] = intval($assignmentDetail['uid']);				
+				$assignmentDetail['assign_order'] = intval($assignmentDetail['assign_order']);			
+				$assignmentDetail['assign_points_earned'] = intval($assignmentDetail['assign_points_earned']);		
+				$assignmentDetail['gbid'] = intval($assignmentDetail['gbid']);	
+				$assignmentDetail['id'] = intval($assignmentDetail['id']);
+	} 		
 	$data = array("assignmentDetails"=>$assignmentDetails,
 			"assignmentStudents"=>$assignmentStudents);
 	echo json_encode($data);
 	die();
-}
+   }
 }
 
 $an_gradebook_scripts = new AN_GradeBook_Scripts();
@@ -620,6 +666,12 @@ ob_start();
     <a class="media-modal-close" title="Close"><span class="media-modal-icon"></span></a>
     	<div class="media-modal-content">
     	    <div class="media-frame wp-core-ui">
+				<div class="media-frame-menu">
+					<div class="media-menu">
+						<a href="#" class="media-menu-item"><%= student ? 'Edit ' : 'Create ' %>Student</a>
+						<div class="separator"></div>
+					</div>
+				</div>    	    
     	    	<div class="media-frame-title">
     				<h1><%= student ? 'Edit ' : 'Create ' %>Student</h1>
     			</div>    
@@ -637,11 +689,7 @@ ob_start();
 				        <%= student ? 'Update user ' + student.get('id') + ' from course ' + gradebook.get('id')  : 'Add to course ' + gradebook.get('id') %>?
 				        <input type="hidden" name="gbid" value="<%= gradebook.get('id') %>"/>
     				</form>
-    			</div>
-        		<div class="media-frame-menu">
-        			<div class="media-menu">
-        			</div>
-       			</div>     			
+    			</div>			
         		<div class="media-frame-toolbar">
     				<div class="media-toolbar">         
      					<div class="media-toolbar-secondary"></div>
@@ -660,6 +708,12 @@ ob_start();
     <a class="media-modal-close" title="Close"><span class="media-modal-icon"></span></a>
     	<div class="media-modal-content">
     	    <div class="media-frame wp-core-ui">
+				<div class="media-frame-menu">
+					<div class="media-menu">
+						<a href="#" class="media-menu-item"><%= assignment ? 'Edit ' : 'Create ' %>Assignment</a>
+						<div class="separator"></div>
+					</div>
+				</div>
     	    	<div class="media-frame-title">
     				<h1><%= assignment ? 'Edit ' : 'Create ' %>Assignment</h1>
     			</div>    
@@ -676,11 +730,7 @@ ob_start();
 				        <%= assignment ? 'Update assignment ' + assignment.get('id') + ' from course ' + gradebook.get('id')  : 'Add to course ' + gradebook.get('id') %>?        
 				        <input type="hidden" name="gbid" value="<%= gradebook.get('id')%>"/>
     				</form>
-    			</div>
-        		<div class="media-frame-menu">
-        			<div class="media-menu">
-        			</div>
-       			</div>     			
+    			</div>    			
         		<div class="media-frame-toolbar">
     				<div class="media-toolbar">         
      					<div class="media-toolbar-secondary"></div>
@@ -702,6 +752,12 @@ ob_start();
     	    	<div class="media-frame-title">
     				<h1><%= course ? 'Edit ' : 'Create ' %> Course</h1>
     			</div>    
+				<div class="media-frame-menu">
+					<div class="media-menu">
+						<a href="#" class="media-menu-item"><%= course ? 'Edit ' : 'Create ' %>Course</a>
+						<div class="separator"></div>
+					</div>
+				</div>       			
     	    	<div class="media-frame-content">
     				<form id="edit-course-form">      
         				<input type="hidden" name="action" value="<%= course ? 'update_course' : 'add_course' %>"/>
@@ -715,11 +771,7 @@ ob_start();
         				<label>Year:</label>
         				<input type="text" name="year" value="<%= course ? course.get('year') : '' %>"/>
     				</form>
-    			</div>
-        		<div class="media-frame-menu">
-        			<div class="media-menu">
-        			</div>
-       			</div>     			
+    			</div>    			
         		<div class="media-frame-toolbar">
     				<div class="media-toolbar">         
      					<div class="media-toolbar-secondary"></div>
@@ -734,6 +786,7 @@ ob_start();
     </script>
     
     <script id="gradebook-interface-template" type="text/template">
+    <hr/>
     <div id="gradebook-interface-buttons-container">
     <button type="button" id="add-student" class="wp-core-ui button">Add Student</button>
     <button type="button" id="edit-student" class="wp-core-ui button">Edit Student</button>  
@@ -746,11 +799,14 @@ ob_start();
     <table id="an-gradebook-container" class="wp-list-table widefat fixed pages">  
     <thead id="students-header">
       <tr>
-        <th>First Name</th><th>Last Name</th><th>ID</th>
+        <th><div><span>First Name</span> <span class="sorting-indicator"></span> </div></th><th>Last Name</th><th>ID</th>
       </tr>
     </thead>
     <tbody id="students"></tbody>
     </table>
+    <div id="chart-container">
+    	<div id="chart_div"></div>
+    </div>
     </script>
 
     <script id="student-gradebook-interface-template" type="text/template">   
@@ -770,7 +826,8 @@ ob_start();
     <button id="add-course" class="wp-core-ui button">Add Course</button>        
     <button id="edit-course" class="wp-core-ui button">Edit Course</button>    
     <button id="delete-course" class="wp-core-ui button">Delete Course</button>         
-    </div>    
+    </div> 
+    <hr/>       
     <table id="an-courses-container" class="wp-list-table widefat fixed pages">  
        <thead>
         <tr>
