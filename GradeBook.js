@@ -128,7 +128,7 @@
                 assign_points_earned: value
             }, function(data) {
                 if(data) self.model.set({
-                    assign_points_earned: data['assign_points_earned']
+                    assign_points_earned: parseInt(data['assign_points_earned'])
                 });
             }, 'json');
             this.$el.removeClass("editing");
@@ -953,10 +953,11 @@
             var todel = AN.GlobalVars.assignments.findWhere({
                 selected: true
             });
+            var self = this;
             $.post(ajaxurl, {
                 action: 'delete_assignment',
                 id: todel.get('id')
-            }, function(data, textStatus, jqXHR) {
+            }, function(data, textStatus, jqXHR) {          
                 todel.set({
                     selected: false
                 });
@@ -967,6 +968,7 @@
                 _.each(x, function(cell) {
                     AN.GlobalVars.cells.remove(cell);
                 });
+	            self.toggleEditDelete();                     
             }, 'json');
         }
     });

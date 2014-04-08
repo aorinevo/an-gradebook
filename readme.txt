@@ -4,7 +4,7 @@ Donate link:
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
 Tested up to: 3.8.1
-Stable tag: 2.3
+Stable tag: 2.3.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +47,11 @@ Students are able to:
 6. Student view of GradeBook with an assignment selected - pie chart displays automatically.
 
 == Changelog ==
+
+Version 2.3.1:
+
+* Bug Fix: Edit Assignment and Delete Assignment buttons didn’t disable after a selected assignment was deleted.
+* Bug Fix: After editing a student score, sorting broke because the new score was saved as a string.  
 
 Version 2.3:
 
