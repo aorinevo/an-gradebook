@@ -1,5 +1,5 @@
 === AN_GradeBook ===
-Contributors: anevo, jamarparris
+Contributors: anevo, JamarParris
 Donate link: 
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
