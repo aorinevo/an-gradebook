@@ -3,11 +3,13 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 2.3.1
+Version: 2.3.2
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
 */
+
+
 
 define( "AN_GRADEBOOK_VERSION", "2.2.6");
 
@@ -406,18 +408,30 @@ class AN_GradeBookAPI{
 		if (!gradebook_check_user_role('administrator')){	
 			echo json_encode(array("status" => "Not Allowed."));
 			die();
-		}   
+		}  
+		$delete_options = $_POST['delete_options'];
 		$x = $_POST['id'];
-		$y = $_POST['gbid'];
-		$results1 = $wpdb->delete('an_gradebook',array('uid'=>$x, 'gbid'=>$y));
-		$results2 = $wpdb->delete('an_assignment',array('uid'=>$x, 'gbid'=>$y));
-		if (($results1+$results2)>0){
-			echo json_encode(array('0'=>$results1,'1'=>$results2));
-			die();
-		} else {
-			echo 'failed to delete student!';
-			die();
-		}
+		$y = $_POST['gbid'];		
+		switch($delete_options){
+			case 'gradebook':
+				$results1 = $wpdb->delete('an_gradebook',array('uid'=>$x, 'gbid'=>$y));
+				$results2 = $wpdb->delete('an_assignment',array('uid'=>$x, 'gbid'=>$y));
+				echo json_encode('student deleted from gradebook');							
+			break;
+			case 'all_gradebooks':
+				$results1 = $wpdb->delete('an_gradebook',array('uid'=>$x));
+				$results2 = $wpdb->delete('an_assignment',array('uid'=>$x));	
+				echo json_encode('student deleted from all gradebooks');	
+			break;
+			case 'database':
+				$results1 = $wpdb->delete('an_gradebook',array('uid'=>$x));
+				$results2 = $wpdb->delete('an_assignment',array('uid'=>$x));				
+				require_once(ABSPATH.'wp-admin/includes/user.php' );
+				wp_delete_user($x);			
+				echo json_encode('student removed from wordpress database');					
+			break;
+		} 
+		die();
 	}
 
 
@@ -427,7 +441,8 @@ class AN_GradeBookAPI{
 		if (!gradebook_check_user_role('administrator')){	
 			echo json_encode(array("status" => "Not Allowed."));
 			die();
-		} 
+		}
+		
     	$studentIDs = $wpdb->get_results('SELECT uid FROM an_gradebook WHERE gbid = '. $_GET['gbid'], ARRAY_N);
    		foreach($studentIDs as &$value){
         	$studentData = get_userdata($value[0]);
@@ -701,7 +716,51 @@ ob_start();
        		</div>
     	</div>  
     </div> 
-    </script>    
+    </script>   
+    
+    <script id="delete-student-template" type="text/template">
+    <div id="delete-student-form-container" class="media-modal wp-core-ui"> 
+    <a class="media-modal-close" title="Close"><span class="media-modal-icon"></span></a>
+    	<div class="media-modal-content">
+    	    <div class="media-frame wp-core-ui">
+				<div class="media-frame-menu">
+					<div class="media-menu">
+						<a href="#" class="media-menu-item">Delete Student</a>
+						<div class="separator"></div>
+					</div>
+				</div>    	    
+    	    	<div class="media-frame-title">
+    				<h1>Delete Student</h1>
+    			</div>    
+    	    	<div class="media-frame-content">
+    				<form id="delete-student-form">      
+         				<input type="hidden" name="action" value="delete_student"/>
+				        <input type="hidden" name="id" value="<%= student ? student.get('id') : '' %>"/> 
+				        Delete <%= student.get('firstname')%> <%= student.get('lastname')%> with student id <%= student.get('id')%> from:  
+				        <br/>      
+						<select name="delete_options">
+							<option value="gradebook">this gradebook only.</option>
+							<option value="all_gradebooks">all gradebooks.</option>
+							<option value="database">the wordpress database.</option>
+						</select>
+						<br/>
+						Removing a student from the wordpress database will also remove that student from all gradebooks.
+				        <p/>
+				        <input type="hidden" name="gbid" value="<%= gradebook.get('id') %>"/>
+    				</form>
+    			</div>			
+        		<div class="media-frame-toolbar">
+    				<div class="media-toolbar">         
+     					<div class="media-toolbar-secondary"></div>
+     					<div class="media-toolbar-primary">
+     						<button id="delete-student-delete" class="button media-button button-primary button-large">Delete</button>
+     					</div>
+       				</div>
+       			</div> 
+       		</div>
+    	</div>  
+    </div> 
+    </script>      
     
     <script id="edit-assignment-template" type="text/template">
     <div id="edit-assignment-form-container" class="media-modal wp-core-ui"> 

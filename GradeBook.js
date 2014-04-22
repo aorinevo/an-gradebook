@@ -533,6 +533,85 @@
             return false;
         }
     });
+    
+
+    AN.Views.DeleteStudentView = AN.Views.Base.extend({
+        id: 'delete-student-form-container-container',
+        events: {
+            'click button#delete-student-cancel': 'deleteCancel',
+            'click a.media-modal-close' : 'deleteCancel', 
+			'keyup'  : 'keyPressHandler',                            
+            'click #delete-student-delete': 'submitForm',            
+            'submit #delete-student-form': 'deleteSave'
+        },
+        initialize: function(){
+            var student = AN.GlobalVars.students.findWhere({
+                selected: true
+            });       
+            $('body').append(this.render().el);     	
+            return this;
+        },        
+        render: function() {
+            var self = this;
+            var student = AN.GlobalVars.students.findWhere({
+                selected: true
+            });
+            var gradebook = AN.GlobalVars.courses.findWhere({
+        		selected: true
+            });
+            if (student) {
+                var template = _.template($('#delete-student-template').html(), {
+                    student: student,
+                    gradebook: gradebook
+                });
+                self.$el.html(template);
+            }
+            this.$el.append('<div class="media-modal-backdrop"></div>');                                              
+            return this;
+        },
+        toggleEditDelete: function(){      
+            var x = AN.GlobalVars.students.findWhere({selected: true});
+            if(x){
+              $('#add-student, #edit-student, #delete-student, #add-assignment').attr('disabled',false);
+            }else{           
+              $('#edit-student, #delete-student').attr('disabled',true);
+            }     
+            $('#add-student, #add-assignment').attr('disabled',false);
+        },   
+ 		keyPressHandler: function(e) {
+            if (e.keyCode == 27) this.editCancel();
+            if (e.keyCode == 13) this.submitForm();
+            return this;
+        },                  
+        deleteCancel: function() {
+            this.remove();           
+			this.toggleEditDelete();
+            return false;
+        },
+        submitForm: function(){        	
+          $('#delete-student-form').submit();
+        },        
+        deleteSave: function(ev) {
+            var studentInformation = $(ev.currentTarget).serializeObject(); //action: "delete_student" is hidden in the delete-student-template 
+            console.log(studentInformation);
+            $.post(ajaxurl, studentInformation, function(data, textStatus, jqXHR) {
+                var x = AN.GlobalVars.students.get(studentInformation['id']);       
+                console.log(x);     
+                x.set({
+                    selected: false
+                });
+                console.log(x);
+                var z = AN.GlobalVars.anGradebooks.findWhere({uid: x.get('id').toString(), gbid: x.get('gbid').toString()});
+                console.log(z);
+                AN.GlobalVars.anGradebooks.remove(z.get('id'));              
+            }, 'json');            
+            this.remove();
+            this.toggleEditDelete();
+            return false;
+        }
+    });
+    
+        
     AN.Views.EditAssignmentView = AN.Views.Base.extend({
         id: 'edit-assignment-form-container-container',
         events: {
@@ -880,31 +959,14 @@
             this.editStudent();            
         },          
         editStudent: function() {
-        	$('#myModal').show();
             $('#gradebook-interface-buttons-container').children().attr('disabled',true);
             var view = new AN.Views.EditStudentView();         
             return false;
         },
         deleteStudent: function() {
-            var x = AN.GlobalVars.students.findWhere({
-                selected: true
-            });
-            var y = AN.GlobalVars.courses.findWhere({
-            	selected: true
-            });
-            var self = this;
-            $.post(ajaxurl, {
-                action: 'delete_student',
-                id: x.get('id'),
-                gbid: y.get('id')
-            }, function(data, textStatus, jqXHR) {
-                x.set({
-                    selected: false
-                });
-                var z = AN.GlobalVars.anGradebooks.findWhere({uid: x.get('id').toString(), gbid: y.get('id').toString()});
-                AN.GlobalVars.anGradebooks.remove(z.get('id'));
-	            self.toggleEditDelete();                
-            }, 'json');
+        	$('#gradebook-interface-buttons-container').children().attr('disabled',true);
+        	var view = new AN.Views.DeleteStudentView(); 
+        	return false;
         },
         addAssignment: function(assignment) {
             var view = new AN.Views.AssignmentView({
