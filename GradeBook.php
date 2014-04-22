@@ -9,6 +9,8 @@ Author URI: http://www.aorinevo.com
 License: GPL
 */
 
+
+
 define( "AN_GRADEBOOK_VERSION", "2.2.6");
 
 //Load scripts
@@ -427,7 +429,10 @@ class AN_GradeBookAPI{
 		if (!gradebook_check_user_role('administrator')){	
 			echo json_encode(array("status" => "Not Allowed."));
 			die();
-		} 
+		}
+		
+		$include_grades = $_GET['grades'] ? true : false;
+		
     	$studentIDs = $wpdb->get_results('SELECT uid FROM an_gradebook WHERE gbid = '. $_GET['gbid'], ARRAY_N);
    		foreach($studentIDs as &$value){
         	$studentData = get_userdata($value[0]);
