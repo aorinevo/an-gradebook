@@ -408,18 +408,30 @@ class AN_GradeBookAPI{
 		if (!gradebook_check_user_role('administrator')){	
 			echo json_encode(array("status" => "Not Allowed."));
 			die();
-		}   
+		}  
+		$delete_options = $_POST['delete_options'];
 		$x = $_POST['id'];
-		$y = $_POST['gbid'];
-		$results1 = $wpdb->delete('an_gradebook',array('uid'=>$x, 'gbid'=>$y));
-		$results2 = $wpdb->delete('an_assignment',array('uid'=>$x, 'gbid'=>$y));
-		if (($results1+$results2)>0){
-			echo json_encode(array('0'=>$results1,'1'=>$results2));
-			die();
-		} else {
-			echo 'failed to delete student!';
-			die();
-		}
+		$y = $_POST['gbid'];		
+		switch($delete_options){
+			case 'gradebook':
+				$results1 = $wpdb->delete('an_gradebook',array('uid'=>$x, 'gbid'=>$y));
+				$results2 = $wpdb->delete('an_assignment',array('uid'=>$x, 'gbid'=>$y));
+				echo json_encode('student deleted from gradebook');							
+			break;
+			case 'all_gradebooks':
+				$results1 = $wpdb->delete('an_gradebook',array('uid'=>$x));
+				$results2 = $wpdb->delete('an_assignment',array('uid'=>$x));	
+				echo json_encode('student deleted from all gradebooks');	
+			break;
+			case 'database':
+				$results1 = $wpdb->delete('an_gradebook',array('uid'=>$x));
+				$results2 = $wpdb->delete('an_assignment',array('uid'=>$x));				
+				require_once(ABSPATH.'wp-admin/includes/user.php' );
+				wp_delete_user($x);			
+				echo json_encode('student removed from wordpress database');					
+			break;
+		} 
+		die();
 	}
 
 
@@ -721,7 +733,7 @@ ob_start();
     				<h1>Delete Student</h1>
     			</div>    
     	    	<div class="media-frame-content">
-    				<form id="edit-student-form">      
+    				<form id="delete-student-form">      
          				<input type="hidden" name="action" value="delete_student"/>
 				        <input type="hidden" name="id" value="<%= student ? student.get('id') : '' %>"/> 
 				        Delete <%= student.get('firstname')%> <%= student.get('lastname')%> with student id <%= student.get('id')%> from:  

@@ -538,11 +538,11 @@
     AN.Views.DeleteStudentView = AN.Views.Base.extend({
         id: 'delete-student-form-container-container',
         events: {
-            'click button#delete-student-cancel': 'editCancel',
-            'click a.media-modal-close' : 'editCancel', 
+            'click button#delete-student-cancel': 'deleteCancel',
+            'click a.media-modal-close' : 'deleteCancel', 
 			'keyup'  : 'keyPressHandler',                            
             'click #delete-student-delete': 'submitForm',            
-            'submit #delete-student-form': 'editSave'
+            'submit #delete-student-form': 'deleteSave'
         },
         initialize: function(){
             var student = AN.GlobalVars.students.findWhere({
@@ -565,20 +565,8 @@
                     gradebook: gradebook
                 });
                 self.$el.html(template);
-            }/* else {
-                var template = _.template($('#delete-student-template').html(), {
-                    student: null,
-                    gradebook: gradebook
-                });
-                self.$el.html(template);
-            }   */
-            this.$el.append('<div class="media-modal-backdrop"></div>');
-			/*_.defer(function(){
-				this.inputName = self.$('input[name="firstname"]');
-				var strLength= inputName.val().length;
-				inputName.focus();				
-				inputName[0].setSelectionRange(strLength, strLength);
-			});  */                                               
+            }
+            this.$el.append('<div class="media-modal-backdrop"></div>');                                              
             return this;
         },
         toggleEditDelete: function(){      
@@ -595,7 +583,7 @@
             if (e.keyCode == 13) this.submitForm();
             return this;
         },                  
-        editCancel: function() {
+        deleteCancel: function() {
             this.remove();           
 			this.toggleEditDelete();
             return false;
@@ -603,23 +591,20 @@
         submitForm: function(){        	
           $('#delete-student-form').submit();
         },        
-        editSave: function(ev) {
-            var studentInformation = $(ev.currentTarget).serializeObject(); //action: "add_student" or action: "update_student" is hidden in the edit-student-template 
-            $.post(ajaxurl, studentInformation, function(data, textStatus, jqXHR) { 
-                if(studentInformation['action']=='update_student'){
-                	var x = AN.GlobalVars.students.get(data['student']['id']);
-                	_.each(data['student'], function(valz, keyz){
-                	   var y = JSON.parse('{"' + keyz + '":"' + valz + '"}');
-                	   x.set(y);
-                	});
-                } else {
-                	_.each(data['assignment'], function(assignment) {
-                  	  	AN.GlobalVars.cells.add(assignment);
-              		});
-                	AN.GlobalVars.students.add(data['student']);
-                	AN.GlobalVars.anGradebooks.add(data['anGradebook']);                            	
-                }                                                        
-            }, 'json');
+        deleteSave: function(ev) {
+            var studentInformation = $(ev.currentTarget).serializeObject(); //action: "delete_student" is hidden in the delete-student-template 
+            console.log(studentInformation);
+            $.post(ajaxurl, studentInformation, function(data, textStatus, jqXHR) {
+                var x = AN.GlobalVars.students.get(studentInformation['id']);       
+                console.log(x);     
+                x.set({
+                    selected: false
+                });
+                console.log(x);
+                var z = AN.GlobalVars.anGradebooks.findWhere({uid: x.get('id').toString(), gbid: x.get('gbid').toString()});
+                console.log(z);
+                AN.GlobalVars.anGradebooks.remove(z.get('id'));              
+            }, 'json');            
             this.remove();
             this.toggleEditDelete();
             return false;
@@ -982,25 +967,6 @@
         	$('#gradebook-interface-buttons-container').children().attr('disabled',true);
         	var view = new AN.Views.DeleteStudentView(); 
         	return false;
-            var x = AN.GlobalVars.students.findWhere({
-                selected: true
-            });
-            var y = AN.GlobalVars.courses.findWhere({
-            	selected: true
-            });
-            var self = this;
-            $.post(ajaxurl, {
-                action: 'delete_student',
-                id: x.get('id'),
-                gbid: y.get('id')
-            }, function(data, textStatus, jqXHR) {
-                x.set({
-                    selected: false
-                });
-                var z = AN.GlobalVars.anGradebooks.findWhere({uid: x.get('id').toString(), gbid: y.get('id').toString()});
-                AN.GlobalVars.anGradebooks.remove(z.get('id'));
-	            self.toggleEditDelete();                
-            }, 'json');
         },
         addAssignment: function(assignment) {
             var view = new AN.Views.AssignmentView({
