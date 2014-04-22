@@ -48,6 +48,10 @@ Students are able to:
 
 == Changelog ==
 
+Version 2.3.2:
+
+* You can now delete a student from a particular gradebook, all the gradebooks, or the wordpress database.
+
 Version 2.3.1:
 
 * Bug Fix: Edit Assignment and Delete Assignment buttons didn’t disable after a selected assignment was deleted.
