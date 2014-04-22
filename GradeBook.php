@@ -431,8 +431,6 @@ class AN_GradeBookAPI{
 			die();
 		}
 		
-		$include_grades = $_GET['grades'] ? true : false;
-		
     	$studentIDs = $wpdb->get_results('SELECT uid FROM an_gradebook WHERE gbid = '. $_GET['gbid'], ARRAY_N);
    		foreach($studentIDs as &$value){
         	$studentData = get_userdata($value[0]);
