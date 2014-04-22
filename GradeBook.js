@@ -1,868 +1,1125 @@
 (function($) {
 
-// LIST OF DOM IDS:
-// '#GradeBook_courses' refers to the courses table.
-// '#wp_GradeBook_' + isselecteddata references the currently selected gradebook. 
-// '#wp_GradeBook_' + wasselected references the prior selected gradebook. Example: if selected 
-//		gradebook with id 1 and then grade book with id 10 the value of was selected is 1
-// '#wp_GradeBook_assignments_' + isselected references the currently selected gradebooks assignments table. 
-// '#add-course' refers to the Add Course button
-// '#delete-course' refers to the Delete Course button
-// '#add-assignment' refers to the Add Assignment button
-// '#delete-assignment' refers to the Delete Assignment button
-// '#add-student' refers to the Add Student button
-// '#delete-student' refers to the Delete Student button
-// '#CRUD-student' refers to the contains the 4 buttons Add Stuent, Delete Student, Add Assignment, Delete Assignment
+
+  var AN = AN || {};
+  AN.Models = AN.Models || {};
+  AN.Collections = AN.Collections || {};
+  AN.Views = AN.Views || {};
+  AN.Routers = AN.Routers || {};
+  AN.Funcs = AN.Funcs || {};
+  AN.GlobalVars = AN.GlobalVars || {};  
+  
+  AN.Models.Base = Backbone.Model.extend();
+
+  AN.Collections.Base = Backbone.Collection.extend({
+    model: AN.Models.Base
+  });
+
+  AN.Views.Base = Backbone.View.extend();
+  AN.Routers.Base = Backbone.Router.extend();  
+  
+     google.load('visualization', '1.0', {'packages':['corechart']});
 
 
+        function drawChart(data) {
+        // Create the data table.
+        var datag = new google.visualization.DataTable();
+		datag.addColumn('string', 'Grades');
+        datag.addColumn('number', 'Number');
+        datag.addRows([
+          ['A', data['grades'][0]],
+          ['B', data['grades'][1]],
+          ['C', data['grades'][2]],
+          ['D', data['grades'][3]],
+          ['F', data['grades'][4]]
+        ]);
 
+        // Set chart options
+        var optionsg = {'title': data['assign_name'],
+                       'width': '300',
+                       'height': '300',
+                       'backgroundColor': 'none'};
 
-	
-//**********************/
-//* Add/Delete Courses */
-//**********************/
-
-$( '#add-course' ).hover(function(){
-	$( '#icon_add_course' ).css('opacity',1);
-},function(){
-	$( '#icon_add_course' ).css('opacity',.5);		
-});
-
-$( '#delete-course' ).hover(function(){
-	$( '#icon_delete_course' ).css('opacity',1);
-},function(){
-	$( '#icon_delete_course' ).css('opacity',.5);		
-});
-
-$( '#add-assignment' ).hover(function(){
-	$( '#icon_add_assignment' ).css('opacity',1);
-},function(){
-	$( '#icon_add_assignment' ).css('opacity',.5);		
-});
-
-$( '#delete-assignment' ).hover(function(){
-	$( '#icon_delete_assignment' ).css('opacity',1);
-},function(){
-	$( '#icon_delete_assignment' ).css('opacity',.5);		
-});
-
-$( '#add-student' ).hover(function(){
-	$( '#icon_add_student' ).css('opacity',1);
-},function(){
-	$( '#icon_add_student' ).css('opacity',.5);		
-});
-
-$( '#delete-student' ).hover(function(){
-	$( '#icon_delete_student' ).css('opacity',1);
-},function(){
-	$( '#icon_delete_student' ).css('opacity',.5);		
-});
-
-$( '#GradeBook_courses tbody td:not(.noteditable)' ).each(function()
-{
-    $(this).editable(ajax_object.ajax_url,{ 
-	submitdata: {
-		action: 'edit_course',
-		course_id : $(this).siblings()[0].innerHTML,
-		colIndex : $( this ).prevAll().length 
-	},
-	indicator : 'Saving...',        
-        height:$(this).height()+'px',
-        width:$(this).width()+'px',
-        onblur: 'submit'
-   	});
-});
-
-	
-	var course_name = $( "#course_name" ),
-	    course_school = $( "#course_school" ),
-	    course_semester = $( "#course_semester")
-            course_year = $( "#course_year" ),
-            allFields = $( [] ).add( course_name ).add( course_school ).add( course_semester ).add( course_year ),
-            tips = $( ".validateTips" );
-	
-	$( "#add-course-form" ).dialog({
-		autoOpen: false,
-		height: 300,
-		width: 350,
-		modal: true,
-		buttons: {
-			"Add Course": function() {
-				var bValid = true;
-				allFields.removeClass( "ui-state-error" );
- 
-				bValid = bValid && checkLength( course_name, "Course Name: ", 3, 40 );
-				bValid = bValid && checkLength( course_school, "School: ", 3, 40 );				
-				bValid = bValid && checkLength( course_semester, "Semester: ", 3, 40 );				
-				bValid = bValid && checkRegexp( course_year, /^\d{4}$/, "Year: YYYY" );
- 
-				if ( bValid ) {
-					$.get(ajax_object.ajax_url, { 
-						action: 'add_course',
-						course_name : course_name.val(),
-						course_school : course_school.val(),
-						course_semester : course_semester.val(),
-						course_year: course_year.val()
-					}, function(data){
-						$( "#GradeBook_courses tbody" ).append(function(){
-							var row_data = "";
-							for(i = 0; i<data.length;i++){
-							if(i==0){
-								row_data = row_data + "<td class = 'noteditable'>" + 
-								data[i] + "</td>";
-							} else{
-			    					row_data = row_data + "<td>" + data[i] + "</td>";
-			    				}};
-			    				return "<tr>" + row_data + "</tr>"; 
-			    			});
-			    			$( '#GradeBook_courses tbody tr:nth-child(even)' )
-							.removeClass('even')
-							.addClass('odd');
-						$( '#GradeBook_courses tbody tr:nth-child(odd)' )
-      							.removeClass('odd')
-      							.addClass('even');    							
-						$( '#GradeBook_courses tbody tr:last-child td:not(.noteditable)' ).each(function(){
-							$(this).editable(ajax_object.ajax_url,{ 
-								submitdata: {
-									action: 'edit_course',
-									course_id : $(this).siblings()[0].innerHTML,
-									colIndex : $( this ).prevAll().length 
-								},
-								indicator : 'Saving...',        
-       								height:$(this).height()+'px',
-								width:$(this).width()+'px',
-								onblur: 'submit'
-						});
-						});
-						$('#GradeBook_container').append(function(){
-						var x = "<table  id='wp_GradeBook_" + data[0] + "' class='GradeBook_students' border='0' cellpadding='0' cellspacing='0' style = 'display: none;' >" +
-							"<thead>" +
-								"<tr>" +
-									"<th id='comment_ID'>ID</th>" +
-									"<th id='user_id'>USER ID</th>" +
-									"<th id='first_name'>FIRST NAME</th>" +
-									"<th id='last_name'>LAST NAME</th>" +																		
-								"</tr>" +
-							"</thead>" +
-							"<tbody>" +
-							"</tbody>";
-						return x;
-						}
-						);
-						
-						
-$("#GradeBook_courses tbody tr:last-child td:first-child").click(function() {
-    		$(this).parent().toggleClass('ui-selected').siblings().removeClass('ui-selected');
-    		isselected = $('#GradeBook_courses').find('.ui-selected td').map(function() {
-        		return $(this).text();
-    		}).get();
-		isselectedlength = isselected.length;
-		isselecteddata = isselected[0];
-		$( '#GradeBook_courses tbody tr' ).click(function(){
-		if ( $( this ).hasClass('ui-selected') ) {
-			$( "#delete-course" ).button( "option", "disabled", false );
-		}else{
-			$( "#delete-course" ).button( "option", "disabled", true );	
-		}
-		});
-		if (nonetosome === 0)  {
-			nonetosome =1;
-			$('#wp_GradeBook_' + isselecteddata).show('slide', {
-					direction: 'right'
-				});
-			$('#CRUD-students').show('slide', {
-					direction: 'right'
-				});
-			wasselecteddata = isselecteddata;
-			if (isselectedlength === 0) {
-				nonetosome = 0;
-				$('#CRUD-students').hide('slide', {
-					direction: 'left'
-				});
-			}					
-		} else {
-			$('#wp_GradeBook_' + wasselecteddata).hide('slide', {
-					direction: 'left'
-				}, function() {
-					$('#wp_GradeBook_' + isselecteddata).show('slide', {
-						direction : 'right'
-					});
-				});
-				wasselecteddata = isselected[0];
-				if (isselectedlength === 0) {
-					nonetosome = 0;
-					$('#CRUD-students').hide('slide', {
-						direction: 'left'
-					});
-				}
-		}
-	});						
-						
-						
-						
-						
-						
-						
-														
-						$( "#add-course-form" ).dialog( "close" );		
-					},
-					"json");
-				}
-                	},
-			Cancel: function() {
-				$( this ).dialog( "close" );
-                	}
-		},
-		close: function() {
-                	allFields.val( "" ).removeClass( "ui-state-error" );
-		}
-        });
-        
- 
-        $( "#add-course" )
-		.button()
-		.click(function() {
-			$( "#add-course-form" ).dialog( "open" );
-		});
-		
-
-	
-	$( "#delete-course-confirm" ).dialog({
-		autoOpen: false,
-		resizable: false,
-		height: 300,
-		width: 350,
-		modal: true,
-		buttons: {
-		   	"Delete": function(){
-		   		var selected_row_data = $( '#GradeBook_courses' )
-		   			.find( ".ui-selected td" ).map(function(){
-		   				return this.innerHTML;
-					}).get().join(",").split(',');
-				if ( selected_row_data[0] > 0  ) {
-					$.get(ajax_object.ajax_url, { 
-						action: 'delete_course',
-						course_id : selected_row_data[0]
-					},
-					function(data){
-						$( '#GradeBook_courses')
-							.find( ".ui-selected td" ).parent()
-							.remove();
-						$( '#wp_GradeBook_' + selected_row_data[0] ).remove();
-						$( '#GradeBook_courses tbody tr:nth-child(odd)' )
-							.removeClass('odd')
-							.addClass('even');
-						$( '#GradeBook_courses tbody tr:nth-child(even)' )
-      							.removeClass('even')
-      							.addClass('odd');     							
-						$( "#delete-course-confirm" ).dialog( "close" );
-						$( "#delete-course" ).button( "option", "disabled", true );
-						$('#CRUD-students').hide('slide', {
-							direction: 'left'
-						});
-						nonetosome = 0;
-					});
-				} else {
-					alert( 'No row selected!' + selected_row_data + " space " + selected_row_data[0] );
-					$( this ).dialog("close");
-				}
-		   	},
-			Cancel: function() {
-				$( this ).dialog( "close" );
-			}
-		}
-	});
-	$( "#delete-course" )
-		.button()
-		.click(function() {
-			$( "#delete-course-confirm" ).dialog( "open" );
-		});
-	$( "#delete-course" ).button( "option", "disabled", true );
-	
-
-  	
-  	$( '#GradeBook_courses tbody tr' ).click(function(){
-  		var x = $( '#GradeBook_courses tbody tr' ).hasClass('ui-selected');
-		if ( x ) {
-			$( "#delete-course" ).button( "option", "disabled", false );
-		}else{
-			$( "#delete-course" ).button( "option", "disabled", true );	
-		}
-	});
-	
-	
-
-
-	var user_login = $( "#user_login" ),
-	    first_name = $( "#first_name" ),
-	    last_name = $( "#last_name")
-            email = $( "#email" ),
-            password = $( "#password" ),
-            allFields = $( [] ).add( user_login ).add( first_name ).add( last_name ).add( email ).add( password ),
-            tips = $( ".validateTips" );
- 
-        function updateTips( t ) {
-            tips
-                .text( t )
-                .addClass( "ui-state-highlight" );
-            setTimeout(function() {
-                tips.removeClass( "ui-state-highlight", 1500 );
-            }, 500 );
-        }
- 
-        function checkLength( o, n, min, max ) {
-            if ( o.val().length > max || o.val().length < min ) {
-                o.addClass( "ui-state-error" );
-                updateTips( "Length of " + n + " must be between " +
-                    min + " and " + max + "." );
-                return false;
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+         chart.draw(datag, optionsg);
+      }
+      
+    $.fn.serializeObject = function() {
+        var o = {};
+        var a = this.serializeArray();
+        $.each(a, function() {
+            if (o[this.name] !== undefined) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
+                }
+                o[this.name].push(this.value || '');
             } else {
-                return true;
+                o[this.name] = this.value || '';
+            }
+        });
+        return o;
+    };
+
+    AN.Models.Cell = AN.Models.Base.extend({
+        defaults: {
+            uid: null,
+            // user id
+            gbid: null,
+            order: null,
+            amid: null,
+            // assignment id
+            assign_points_earned: 0,
+            selected: false,
+            hover: false,
+            display: false
+        },
+        toggleSelected: function() {
+            this.set({
+                selected: !this.get('selected')
+            });
+        }
+    });
+    
+    AN.Collections.Cells = AN.Collections.Base.extend({
+        model: AN.Models.Cell
+    });
+    
+    AN.GlobalVars.cells = new AN.Collections.Cells([]);
+    
+    AN.Views.CellView = AN.Views.Base.extend({
+        tagName: 'td',
+        events: {
+            "click .view": "edit",
+            "keypress .edit": "updateOnEnter",
+            "blur .edit": "hideInput"
+        },
+        initialize: function() {
+            this.listenTo(this.model, 'change:assign_points_earned', this.render);
+            this.listenTo(AN.GlobalVars.assignments, 'change:selected', this.selectCell);
+            this.listenTo(AN.GlobalVars.assignments, 'change:hover', this.hoverCell);            
+            this.listenTo(this.model, 'change:selected', this.selectCellCSS);
+            this.listenTo(this.model, 'change:hover', this.hoverCellCSS);            
+            this.listenTo(this.model, 'remove', function() {
+                this.remove();
+            });
+        },
+        render: function() {
+            this.$el.html('<div class="view">' + this.model.get('assign_points_earned') + '</div> <input class="edit" type="text" value="' + this.model.get('assign_points_earned') + '"></input>');
+            this.input = this.$('.edit');
+            return this;
+        },
+        hoverCell: function(){
+        	
+        },
+        close: function() {
+            this.remove();
+        },
+        updateOnEnter: function(e) {
+            if (e.keyCode == 13) this.hideInput();
+        },
+        hideInput: function() { //this gets called twice.
+            var value = this.input.val();
+            var self = this;
+            $.post(ajaxurl, {
+                action: 'update_assignment',
+                uid: this.model.get('uid'),
+                amid: this.model.get('amid'),
+                assign_points_earned: value
+            }, function(data) {
+                if(data) self.model.set({
+                    assign_points_earned: parseInt(data['assign_points_earned'])
+                });
+            }, 'json');
+            this.$el.removeClass("editing");
+        },
+        edit: function() {
+            var w = this.$el.width();
+            this.input.css('width', w);
+            this.input.css('margin-right', -w); //I'm not really sure why, but this works??		    
+            this.$el.addClass("editing");
+            this.input.focus();
+        },
+        hoverCell: function(ev) {
+            var x = AN.GlobalVars.assignments.findWhere({
+                hover: true
+            });
+            if (x && this.model.get('amid') == x.get('id')) {
+                this.model.set({
+                    hover: true
+                });
+            } else {
+                this.model.set({
+                    hover: false
+                });
+            }
+        },
+        hoverCellCSS: function() {
+            if (this.model.get('hover')) {
+                this.$el.addClass('hover');
+            } else {
+                this.$el.removeClass('hover');
+            }
+        },        
+        selectCell: function(ev) {
+            var x = AN.GlobalVars.assignments.findWhere({
+                selected: true
+            });
+            if (x && this.model.get('amid') == x.get('id')) {
+                this.model.set({
+                    selected: true
+                });
+            } else {
+                this.model.set({
+                    selected: false
+                });
+            }
+        },
+        selectCellCSS: function() {
+            if (this.model.get('selected')) {
+                this.$el.addClass('selected');
+            } else {
+                this.$el.removeClass('selected');
             }
         }
- 
-        function checkRegexp( o, regexp, n ) {
-            if ( !( regexp.test( o.val() ) ) ) {
-                o.addClass( "ui-state-error" );
-                updateTips( n );
-                return false;
+    });
+    AN.Models.Assignment = AN.Models.Base.extend({
+        defaults: {
+            assign_name: 'assign name',
+            sorted: '',
+            selected: false
+        }
+    });
+    AN.Collections.Assignments = AN.Collections.Base.extend({
+        model: AN.Models.Assignment
+    });
+    AN.GlobalVars.assignments = new AN.Collections.Assignments([]);    
+    AN.Views.AssignmentView = AN.Views.Base.extend({
+        tagName: 'th',
+        className: 'assignment manage-column sortable asc',
+        events: {
+            'click .column-title': 'selectColumn',
+            'click .column-sort': 'sortColumn',
+            'mouseenter div.column-frame' : 'mouseEnter',
+            'mouseleave div.column-frame' : 'mouseLeave'
+        },
+        initialize: function() {
+			this.listenTo(this.model, 'change:assign_name', this.render);         
+            this.listenTo(this.model, 'change:selected', this.selectColumnCSS);
+            this.listenTo(this.model, 'change:sorted', this.sortColumnCSS);            
+            this.listenTo(this.model, 'remove', function() { this.remove(); });
+        },
+        mouseEnter: function(){
+        	this.$el.addClass('hover');
+        	this.model.set({hover: true});
+        },
+        mouseLeave: function(){
+        	this.$el.removeClass('hover');	
+        	this.model.set({hover: false});	
+        },
+        render: function() {   
+            this.$el.html('<div class="column-frame"><div class="column-title">' + this.model.get('assign_name') + '</div><div class="column-sort an-sorting-indicator dashicons dashicons-arrow-down"></div></div>');
+            return this;
+        },
+        sortColumn: function(ev){
+        	var y = AN.GlobalVars.assignments.findWhere({selected: true});
+        	y && y.set({selected: false});
+            if (this.model.get('sorted')) {
+            	if (this.model.get('sorted')=='desc') {
+                	this.model.set({sorted: 'asc'});
+            	} else {
+                	this.model.set({sorted: 'desc'});            
+            	}
             } else {
-                return true;
+                var x = AN.GlobalVars.assignments.find(function(model){
+                	return model.get('sorted').length >0;
+                });
+                x && x.set({ sorted: '' });
+                this.model.set({ sorted: 'asc' });
+            }        	
+        },
+        sortColumnCSS: function() {
+            if (this.model.get('sorted')) {
+        		var desc = this.$el.hasClass('desc');
+        		this.$el.toggleClass( "desc", !desc ).toggleClass( "asc", desc );              	
+            } else {
+                this.$el.removeClass('asc desc');
+                this.$el. addClass('asc');
+            }
+        },        
+        selectColumn: function(ev) {
+            var x = AN.GlobalVars.students.findWhere({ selected: true });
+            x && x.set({ selected: false });
+            if (this.model.get('selected')) {
+                this.model.set({ selected: false });
+            } else {
+                var x = AN.GlobalVars.assignments.findWhere({ selected: true });
+                x && x.set({ selected: false });
+                this.model.set({ selected: true });
+            }
+        },       
+        selectColumnCSS: function() {
+            if (this.model.get('selected')) {
+                this.$el.addClass('selected');
+            } else {
+                this.$el.removeClass('selected');
             }
         }
- 
-	$( "#add-student-form" ).dialog({
-		autoOpen: false,
-		height: 300,
-		width: 350,
-		modal: true,
-		buttons: {
-			"Add Student": function() {
-				var bValid = true;
-				allFields.removeClass( "ui-state-error" );
- 
-				bValid = bValid && checkLength( user_login, "User Login: ", 3, 16 );
-				bValid = bValid && checkLength( first_name, "First Name: ", 3, 16 );				
-				bValid = bValid && checkLength( last_name, "Last Name: ", 3, 16 );				
-				bValid = bValid && checkLength( email, "email", 6, 80 );
-				bValid = bValid && checkLength( password, "password", 5, 16 );
-				bValid = bValid && checkRegexp( user_login, /^[a-z]([0-9a-z_])+$/i, 
-                    			"User login may consist of a-z, 0-9, underscores, begin with a letter." );
-                    // From jquery.validate.js (by joern), contributed by Scott Gonzalez: 
-                    // http://projects.scottsplayground.com/email_address_validation/
-				bValid = bValid && checkRegexp( email, /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i, "eg. ui@jquery.com" );
-				bValid = bValid && checkRegexp( password, /^([0-9a-zA-Z])+$/, "Password field only allow : a-z 0-9" );
- 
-				if ( bValid ) {
-					$.get(ajax_object.ajax_url, { 
-						action: 'add_student',
-						user_login: user_login.val(),
-						first_name: first_name.val(),
-						last_name: last_name.val(),
-						user_email: email.val(),
-						password: password.val(),
-						course_id : isselecteddata
-					}, function(data){
-						$( "#wp_GradeBook_" + isselecteddata + " tbody" ).append(function(){
-							var row_data = "";
-							for(i = 0; i<data.length;i++){
-							if(i==0 || i==1){
-								row_data = row_data + "<td class = 'noteditable'>" + 
-								data[i] + "</td>";
-							} else{
-			    					row_data = row_data + "<td>" + data[i] + "</td>";
-			    				}};
-	
-			    				if($( "#wp_GradeBook_" + isselecteddata + 
-			    				" tbody:last-child" ).hasClass('odd')){
-			    					return "<tr class='even'>" + row_data + "</tr>"; 
-			    				} else {
-			    				return "<tr class='odd'>" + row_data + "</tr>"; 
-			    				}
-			    			});
-			    			$( "#wp_GradeBook_" + isselecteddata + " tbody:last-child td:not(.noteditable)")
-			    			.each(function(){
-    						$(this).editable(ajax_object.ajax_url,{ 
-						submitdata: {
-							action: 'edit_student',
-							column_id: $('#wp_GradeBook_' + isselecteddata + ' thead th:eq('+
-							$( this ).index() +')').attr('id'),
-							comment_ID : $(this).siblings()[0].innerHTML,
-							course_id : isselecteddata
-						},
-							indicator : 'Saving...',        
-        						height: '100%',
-						        width: '100%',
-						        onblur: 'submit'
-   						});
-					});			
-						$( '#wp_GradeBook_' + isselecteddata + ' tbody tr:nth-child(odd)' )
-							.removeClass('odd')
-							.addClass('even');
-      						$( '#wp_GradeBook_' + isselecteddata + ' tbody tr:nth-child(even)' )
-      							.removeClass('even')
-      							.addClass('odd');
-      						$( "#wp_GradeBook_" + isselecteddata + " tbody tr:last-child td:eq(0)" ).click(function() {
-    						$(this).parent().toggleClass("ui-selected").siblings().removeClass("ui-selected");
-    						$('#wp_GradeBook_' + wasselecteddata + ' thead th').removeClass('ui-selected');
-    			 			$( "#delete-assignment" ).button( "option", "disabled", true );
-						var x = $( '#wp_GradeBook_' + isselecteddata + ' tbody tr' ).hasClass('ui-selected');
-							if ( x ) {
-								$( "#delete-student" ).button( "option", "disabled", false );
-							}else{
-								$( "#delete-student" ).button( "option", "disabled", true );	
-							}
-    						});  	     	
-						$( "#add-student-form" ).dialog( "close" );		
-					},
-					"json");	
-				}
-                	},
-			Cancel: function() {
-				$( this ).dialog( "close" );
-                	}
-		},
-		close: function() {
-                	allFields.val( "" ).removeClass( "ui-state-error" );
+    });
+    AN.Models.Student = AN.Models.Base.extend({
+        defaults: {
+            firstname: 'john',
+            lastname: 'doe',
+            selected: false
+        }
+    });    
+    AN.Collections.Students = AN.Collections.Base.extend({
+        model: AN.Models.Student,
+        comparator: function( model ) {
+  				return model.get( 'lastname' );
 		}
-        });
+    });
+    AN.GlobalVars.students = new AN.Collections.Students([]);    
+    
+    AN.Views.StudentView = AN.Views.Base.extend({
+        tagName: 'tr',
+        events: {
+            'click .student': 'selectStudent'
+        },
+        initialize: function() {
+            this.listenTo(AN.GlobalVars.cells, 'add', this.addCell);
+			this.listenTo(this.model, 'change:firstname change:lastname', this.render);            
+            this.listenTo(this.model, 'change:selected', this.selectStudentCSS);
+            this.listenTo(this.model, 'remove', function() {
+                this.remove()
+            });
+            this.listenTo(AN.GlobalVars.anGradebooks, 'remove', function(anGradebook) {                
+                if(this.model.get('id')==anGradebook.get('uid')){
+                	this.remove();
+                }
+            });            
+            this.listenTo(AN.GlobalVars.courses.findWhere({
+                selected: true
+            }), 'change:selected', function() {
+                this.remove()
+            });
+            
+        },
+        render: function() {
+            this.$el.html('<td class="student">' + this.model.get("firstname") + '</td><td>' + this.model.get("lastname") + '</td><td>' + this.model.get("id") + '</td>');
+            var gbid = parseInt(AN.GlobalVars.courses.findWhere({selected: true}).get('id')); //anq: why is this not already an integer??
+            var x = AN.GlobalVars.cells.where({
+            	uid: parseInt(this.model.get('id')),		//anq: why is this not already an integer??
+            	gbid: gbid
+            	});
+            var self = this;
+            _.each(x, function(cell) {
+                var view = new AN.Views.CellView({
+                    model: cell
+                });
+                self.$el.append(view.render().el);
+            });
+            return this;
+        },
+        selectStudent: function(ev) {
+            var x = AN.GlobalVars.assignments.findWhere({
+                selected: true
+            });
+            x && x.set({
+                selected: false
+            });
+            if (this.model.get('selected')) {
+                this.model.set({
+                    selected: false
+                });
+            } else {
+                var x = AN.GlobalVars.students.findWhere({
+                    selected: true
+                });
+                x && x.set({
+                    selected: false
+                });
+                this.model.set({
+                    selected: true
+                });
+            }
+        },
+        selectStudentCSS: function() {
+            if (this.model.get('selected')) {
+                this.$el.addClass('selected');
+            } else {
+                this.$el.removeClass('selected');
+            }
+        },
+        close: function() {
+            if (AN.GlobalVars.courses.findWhere({
+                id: this.model.get('gbid')
+            }).get('selected') == false) {
+                this.remove();
+            }
+        },
+        addCell: function(assignment) {
+            if (assignment.get('uid') == this.model.get('id')) {
+                var view = new AN.Views.CellView({
+                    model: assignment
+                });
+                this.$el.append(view.render().el);
+            }
+        }
+    });
+    AN.Models.Course = AN.Models.Base.extend({
+        defaults: {
+            name: 'Calculus I',
+            school: 'Bergen',
+            semester: 'Fall',
+            year: '2014',
+            selected: false
+        }
+    });    
+    AN.Collections.Courses = AN.Collections.Base.extend({
+        model: AN.Models.Course
+    });
+    AN.GlobalVars.courses = new AN.Collections.Courses([]);    
+    AN.Views.CourseView = AN.Views.Base.extend({
+        tagName: 'tr',
+        events: {
+            'click .course': 'selectCourse'
+        },
+        initialize: function() {
+			this.listenTo(this.model, 'change:name change:school change:semester change:year', this.render);
+            this.listenTo(this.model, 'change:selected', this.selectCourseCSS);
+            this.listenTo(this.model, 'remove', function() {
+                this.remove();
+            });
+        },
+        render: function() {
+            this.$el.html('<td>' + this.model.get("id") + '</td><td class="course">' + this.model.get("name") + '</td><td>' + this.model.get("school") + '</td>' + '</td><td>' + this.model.get("semester") + '</td>' + '</td><td>' + this.model.get("year") + '</td>');
+            return this;
+        },
+        selectCourse: function(ev) {
+            var x = AN.GlobalVars.students.findWhere({
+                selected: true
+            });
+            x && x.set({
+                selected: false
+            });
+            var y = AN.GlobalVars.assignments.findWhere({
+                selected: true
+            });
+            y && y.set({
+                selected: false
+            });
+            if (this.model.get('selected')) {
+                this.model.set({
+                    selected: false
+                });
+            } else {
+                var x = AN.GlobalVars.courses.findWhere({
+                    selected: true
+                });
+                x && x.set({
+                    selected: false
+                });
+                this.model.set({
+                    selected: true
+                });
+            }
+        },
+        selectCourseCSS: function() {
+            if (this.model.get('selected')) {
+                this.$el.addClass('selected');
+            } else {
+                this.$el.removeClass('selected');
+            }
+        }
+    });
+    
+	AN.Models.ANGradebook = AN.Models.Base.extend({
+});
+
+	AN.Collections.ANGradebooks = AN.Collections.Base.extend({
+  	model: AN.Models.ANGradebook
+});
+
+	AN.GlobalVars.anGradebooks = new AN.Collections.ANGradebooks([]);
+
+    AN.Views.EditStudentView = AN.Views.Base.extend({
+        id: 'edit-student-form-container-container',
+        events: {
+            'click button#edit-student-cancel': 'editCancel',
+            'click a.media-modal-close' : 'editCancel', 
+			'keyup'  : 'keyPressHandler',                            
+            'click #edit-student-save': 'submitForm',            
+            'submit #edit-student-form': 'editSave'
+        },
+        initialize: function(){
+            var student = AN.GlobalVars.students.findWhere({
+                selected: true
+            });       
+            $('body').append(this.render().el);     	
+            return this;
+        },        
+        render: function() {
+            var self = this;
+            var student = AN.GlobalVars.students.findWhere({
+                selected: true
+            });
+            var gradebook = AN.GlobalVars.courses.findWhere({
+        		selected: true
+            });
+            if (student) {
+                var template = _.template($('#edit-student-template').html(), {
+                    student: student,
+                    gradebook: gradebook
+                });
+                self.$el.html(template);
+            } else {
+                var template = _.template($('#edit-student-template').html(), {
+                    student: null,
+                    gradebook: gradebook
+                });
+                self.$el.html(template);
+            }     
+            this.$el.append('<div class="media-modal-backdrop"></div>');
+			_.defer(function(){
+				this.inputName = self.$('input[name="firstname"]');
+				var strLength= inputName.val().length;
+				inputName.focus();				
+				inputName[0].setSelectionRange(strLength, strLength);
+			});                                                 
+            return this;
+        },
+        toggleEditDelete: function(){      
+            var x = AN.GlobalVars.students.findWhere({selected: true});
+            if(x){
+              $('#add-student, #edit-student, #delete-student, #add-assignment').attr('disabled',false);
+            }else{           
+              $('#edit-student, #delete-student').attr('disabled',true);
+            }     
+            $('#add-student, #add-assignment').attr('disabled',false);
+        },   
+ 		keyPressHandler: function(e) {
+            if (e.keyCode == 27) this.editCancel();
+            if (e.keyCode == 13) this.submitForm();
+            return this;
+        },                  
+        editCancel: function() {
+            this.remove();           
+			this.toggleEditDelete();
+            return false;
+        },
+        submitForm: function(){        	
+          $('#edit-student-form').submit();
+        },        
+        editSave: function(ev) {
+            var studentInformation = $(ev.currentTarget).serializeObject(); //action: "add_student" or action: "update_student" is hidden in the edit-student-template 
+            $.post(ajaxurl, studentInformation, function(data, textStatus, jqXHR) { 
+                if(studentInformation['action']=='update_student'){
+                	var x = AN.GlobalVars.students.get(data['student']['id']);
+                	_.each(data['student'], function(valz, keyz){
+                	   var y = JSON.parse('{"' + keyz + '":"' + valz + '"}');
+                	   x.set(y);
+                	});
+                } else {
+                	_.each(data['assignment'], function(assignment) {
+                  	  	AN.GlobalVars.cells.add(assignment);
+              		});
+                	AN.GlobalVars.students.add(data['student']);
+                	AN.GlobalVars.anGradebooks.add(data['anGradebook']);                            	
+                }                                                        
+            }, 'json');
+            this.remove();
+            this.toggleEditDelete();
+            return false;
+        }
+    });
+    
+
+    AN.Views.DeleteStudentView = AN.Views.Base.extend({
+        id: 'delete-student-form-container-container',
+        events: {
+            'click button#delete-student-cancel': 'deleteCancel',
+            'click a.media-modal-close' : 'deleteCancel', 
+			'keyup'  : 'keyPressHandler',                            
+            'click #delete-student-delete': 'submitForm',            
+            'submit #delete-student-form': 'deleteSave'
+        },
+        initialize: function(){
+            var student = AN.GlobalVars.students.findWhere({
+                selected: true
+            });       
+            $('body').append(this.render().el);     	
+            return this;
+        },        
+        render: function() {
+            var self = this;
+            var student = AN.GlobalVars.students.findWhere({
+                selected: true
+            });
+            var gradebook = AN.GlobalVars.courses.findWhere({
+        		selected: true
+            });
+            if (student) {
+                var template = _.template($('#delete-student-template').html(), {
+                    student: student,
+                    gradebook: gradebook
+                });
+                self.$el.html(template);
+            }
+            this.$el.append('<div class="media-modal-backdrop"></div>');                                              
+            return this;
+        },
+        toggleEditDelete: function(){      
+            var x = AN.GlobalVars.students.findWhere({selected: true});
+            if(x){
+              $('#add-student, #edit-student, #delete-student, #add-assignment').attr('disabled',false);
+            }else{           
+              $('#edit-student, #delete-student').attr('disabled',true);
+            }     
+            $('#add-student, #add-assignment').attr('disabled',false);
+        },   
+ 		keyPressHandler: function(e) {
+            if (e.keyCode == 27) this.editCancel();
+            if (e.keyCode == 13) this.submitForm();
+            return this;
+        },                  
+        deleteCancel: function() {
+            this.remove();           
+			this.toggleEditDelete();
+            return false;
+        },
+        submitForm: function(){        	
+          $('#delete-student-form').submit();
+        },        
+        deleteSave: function(ev) {
+            var studentInformation = $(ev.currentTarget).serializeObject(); //action: "delete_student" is hidden in the delete-student-template 
+            console.log(studentInformation);
+            $.post(ajaxurl, studentInformation, function(data, textStatus, jqXHR) {
+                var x = AN.GlobalVars.students.get(studentInformation['id']);       
+                console.log(x);     
+                x.set({
+                    selected: false
+                });
+                console.log(x);
+                var z = AN.GlobalVars.anGradebooks.findWhere({uid: x.get('id').toString(), gbid: x.get('gbid').toString()});
+                console.log(z);
+                AN.GlobalVars.anGradebooks.remove(z.get('id'));              
+            }, 'json');            
+            this.remove();
+            this.toggleEditDelete();
+            return false;
+        }
+    });
+    
         
- 
-        $( "#add-student" )
-		.button()
-		.click(function() {
-			$( "#add-student-form" ).dialog( "open" );
-		});
-		
-	var assignment_name = $( "#assignment_name" ),
-	    assigned_on = $( "#datepicker_assigned_on" ),
-	    assignment_due_date = $( "#datepicker_assignment_due_date");
-	
- 	$( '#add-assignment-form' ).dialog({
- 		autoOpen: false,
- 		height: 400,
- 		width: 500,
- 		modal: true,
- 		buttons: {
- 			"Create": function(){
- 				var year1 = assigned_on.datepicker( "getDate" ).getFullYear(),
- 			 	    day1 = assigned_on.datepicker( "getDate" ).getDate(),
- 			 	    month1 = assigned_on.datepicker( "getDate" ).getMonth()+1;
- 				var year2 = assignment_due_date.datepicker( "getDate" ).getFullYear(),
- 			 	    day2 = assignment_due_date.datepicker( "getDate" ).getDate(),
- 			 	    month2 = assignment_due_date.datepicker( "getDate" ).getMonth()+1;
- 			 	     			 	    
-				$.get(ajax_object.ajax_url,{ 
-					action: 'add_assignment',
-					assignment_name : assignment_name.val(),
-					assigned_on : year1 + "-" + month1 + "-" + day1, 
-					assignment_due_date : year2 + "-" + month2 + "-" + day2,
-					course_id : isselecteddata
+    AN.Views.EditAssignmentView = AN.Views.Base.extend({
+        id: 'edit-assignment-form-container-container',
+        events: {
+            'click button#edit-assignment-cancel': 'editCancel',
+            'click a.media-modal-close' : 'editCancel', 
+			'keyup'  : 'keyPressHandler',    			                                   
+            'click #edit-assignment-save': 'submitForm',
+            'submit #edit-assignment-form': 'editSave'
+        },
+        initialize: function(){
+            var assignment = AN.GlobalVars.assignments.findWhere({
+                selected: true
+            });        
+            $('body').append(this.render().el);
+            $('#assign-date-datepicker, #assign-due-datepicker').datepicker();
+            $('#assign-date-datepicker, #assign-due-datepicker').datepicker('option','dateFormat','yy-mm-dd');
+            if(assignment){                  
+            $('#assign-date-datepicker').datepicker('setDate', assignment.get('assign_date'));                                                            
+            $('#assign-due-datepicker').datepicker('setDate', assignment.get('assign_due'));       
+            }     	
+            return this;
+        },
+        render: function() {
+            var self = this;
+            var assignment = AN.GlobalVars.assignments.findWhere({
+                selected: true
+            });
+            var gradebook = AN.GlobalVars.courses.findWhere({
+                selected: true
+            });
+            if (assignment) {
+                var template = _.template($('#edit-assignment-template').html(), {
+                    assignment: assignment,
+                    gradebook: gradebook
+                });
+                self.$el.html(template);             
+            } else {
+                var template = _.template($('#edit-assignment-template').html(), {
+                    assignment: null,
+                    gradebook: gradebook
+                });
+                self.$el.html(template);
+            }     
+            this.$el.append('<div class="media-modal-backdrop"></div>');   
+			_.defer(function(){
+				this.inputName = self.$('input[name="assign_name"]');
+				var strLength= inputName.val().length;
+				inputName.focus();				
+				inputName[0].setSelectionRange(strLength, strLength);
+			});                      
+            return this;
+        },
+        toggleEditDelete: function(){
+            var y = AN.GlobalVars.assignments.findWhere({selected: true});
+            if(y){
+              $('#add-assignment, #edit-assignment, #delete-assignment, #add-student').attr('disabled',false);
+            }else{          
+              $('#edit-assignment, #delete-assignment').attr('disabled',true); 
+            }    
+            $('#add-assignment, #add-student').attr('disabled',false);            
+        },      
+		keyPressHandler: function(e) {
+            if (e.keyCode == 27) this.editCancel();
+            if (e.keyCode == 13) this.submitForm();
+            return this;
+        },             
+        editCancel: function() {
+            this.remove();
+			this.toggleEditDelete();
+            return false;
+        },
+        submitForm: function(){        	
+          $('#edit-assignment-form').submit();
+        },
+        editSave: function(ev) {
+            ev.preventDefault();
+            var assignmentInformation = $(ev.currentTarget).serializeObject(); //action: "add_assignment" or action: "update_assignments" is hidden in the edit-course-template 
+            $.post(ajaxurl, assignmentInformation, function(data, textStatus, jqXHR) {
+                if(assignmentInformation['action']=='update_assignments'){
+                	var x = AN.GlobalVars.assignments.get(data['id']);
+                	_.each(data, function(valz, keyz){
+                	   var y = JSON.parse('{"' + keyz + '":"' + valz + '"}');
+                	   x.set(y);
+                	});
+                } else {
+                	var x = _.map(data['assignmentDetails'], function(y){
+                		return isNaN(y) ? y : parseInt(y);
+                	});
+                	AN.GlobalVars.assignments.add(data['assignmentDetails']);
+                	_.each(data['assignmentStudents'], function(cell) {
+                    	AN.GlobalVars.cells.add(cell)
+                	});              
+                }               
+            }, 'json');
+            this.remove();
+			this.toggleEditDelete();       
+            return false;
+        }
+    });
+    AN.Views.EditCourseView = AN.Views.Base.extend({
+        id: 'edit-course-form-container-container',
+        events: {
+            'click button#edit-course-cancel': 'editCancel',
+            'click a.media-modal-close' : 'editCancel',
+            'keyup'  : 'keyPressHandler',        
+            'click #edit-course-save': 'submitForm',
+            'submit #edit-course-form': 'editSave'
+        },
+        initialize: function(){  
+            var course = AN.GlobalVars.courses.findWhere({
+                selected: true
+            });      
+            $('body').append(this.render().el);
+            return this;                
+        },
+        render: function() {
+            var self = this;
+            var course = AN.GlobalVars.courses.findWhere({
+                selected: true
+            });
+            if (course) {
+                var template = _.template($('#edit-course-template').html(), {
+                    course: course
+                });
+                self.$el.html(template);                              
+            } else {
+                var template = _.template($('#edit-course-template').html(), {
+                    course: null
+                });
+                self.$el.html(template);                
+            }                        
+            this.$el.append('<div class="media-modal-backdrop"></div>');
+			_.defer(function(){
+				this.inputName = self.$('input[name="name"]');
+				var strLength= inputName.val().length;
+				inputName.focus();				
+				inputName[0].setSelectionRange(strLength, strLength);
+			});            
+            return this;
+        },       
+        toggleEditDelete: function(){
+            var x = AN.GlobalVars.courses.findWhere({selected: true});
+            if(x){
+              $('#edit-course, #delete-course').attr('disabled', false);
+            }else{
+              $('#edit-course, #delete-course').attr('disabled', true); 
+            }         
+            $('#add-course').attr('disabled', false);            
+        },         
+        keyPressHandler: function(e) {
+            if (e.keyCode == 27) this.editCancel();
+            if (e.keyCode == 13) this.submitForm();
+            return this;
+        },                 
+        editCancel: function() {
+            this.remove();            
+			this.toggleEditDelete();
+            return false;
+        },
+        submitForm: function(){
+        	$('#edit-course-form').submit();
+        },
+        editSave: function(ev) {
+            var courseInformation = $(ev.currentTarget).serializeObject(); //action: "add_course" or action: "update_course" is hidden in the edit-course-template 
+            $.post(ajaxurl, courseInformation, function(data, textStatus, jqXHR) {
+                if(courseInformation['action']=='update_course'){
+                	var x = AN.GlobalVars.courses.get(data['id']);
+                	_.each(data, function(valz, keyz){
+                	   var y = JSON.parse('{"' + keyz + '":"' + valz + '"}');
+                	   x.set(y);
+                	});
+                } else {
+	                AN.GlobalVars.courses.add(data);                
+                }
+            }, 'json');
+			this.toggleEditDelete();       
+            this.remove();
+            return false;
+        }
+    });
+	AN.Views.PieChartView = AN.Views.Base.extend({
+		el: '#chart_div',
+		initialize: function(){
+		   this.listenTo(AN.GlobalVars.assignments, 'change:selected', this.toggleChart);
+		   this.listenTo(AN.GlobalVars.cells, 'change:assign_points_earned', this.reloadChart);		   
+		   return this;
+		},
+		toggleChart: function(assignment){
+			if(assignment.get('selected')){
+			$.get(ajaxurl, { 
+						action: 'get_pie_chart',
+						amid : assignment.get('id'),
+						gbid : assignment.get('gbid')
 					},
 					function(data){
-      							$( '#wp_GradeBook_' + isselecteddata + ' thead tr' )
-      								.append("<th id='" + data['assign_id'] + "' title=''>" + data['assignment_name'] + "</th>");
-      				       	$( '#wp_GradeBook_' + isselecteddata + ' thead tr th[id='+data['assign_id']+']' )
-       					.tooltip({ content: 
-       							'Date Due: ' + data['assignment_due_date']
-       						});  		
-      							$( '#wp_GradeBook_' + isselecteddata + ' tbody tr:nth-child(even)' )
-      								.append("<td ></td>");
-      							$( '#wp_GradeBook_' + isselecteddata + ' tbody tr:nth-child(odd)' )
-      								.append("<td></td>"); 
-      							$( '#wp_GradeBook_' + isselecteddata + ' tbody tr td:last-child' ).each(function(){
-    						$(this).editable(ajax_object.ajax_url,{ 
-						submitdata: {
-							action: 'edit_student',							
-							column_id: data['assign_id'],
-							comment_ID : $(this).siblings()[0].innerHTML,
-							course_id : isselecteddata
-						},
-							indicator : 'Saving...',        
-        						height: '100%',
-						        width: '100%',
-						        onblur: 'submit'
-   						});
-					});   
-					$( '#wp_GradeBook_' + isselecteddata + ' thead tr th:last-child' ).click(function() {
-    						$(this).toggleClass("ui-selected").siblings().removeClass("ui-selected");
-    						$('#wp_GradeBook_' + wasselecteddata + ' tbody tr').removeClass('ui-selected');
-    			 			$( "#delete-student" ).button( "option", "disabled", true );
-						var x = $( '#wp_GradeBook_' + isselecteddata + ' thead tr th' ).hasClass('ui-selected');
-							if ( x ) {
-								$( "#delete-assignment" ).button( "option", "disabled", false );
-							}else{
-								$( "#delete-assignment" ).button( "option", "disabled", true );	
-							}
-    						});  						
+						$('#chart_div').empty()					
+						drawChart({grades: data['grades'],assign_name: assignment.get('assign_name')});
 					}, 
-					"json"
-				);
-				$(this).dialog( 'close' );
- 			},
- 			Cancel: function(){
- 				$( this ).dialog( "close" );
- 			}
- 		}
- 	});
- 	
- 	$( "#add-assignment" )
- 		.button()
- 		.click(function() {
- 			$( "#add-assignment-form" ).dialog( "open" );
- 		});
- 		
-	$( "#datepicker_assigned_on" ).datepicker();
-	$( "#datepicker_assignment_due_date" ).datepicker();
-	
- 	$( '#delete-assignment-confirm' ).dialog({
- 		autoOpen: false,
- 		height: 400,
- 		width: 500,
- 		modal: true,
-		buttons: {
-		   	"Delete": function(){
-				var x = $( '#wp_GradeBook_' + isselecteddata ).find('.ui-selected').attr('id');
-				var y = $( '#wp_GradeBook_' + isselecteddata ).find('.ui-selected').index();
-				y = y+1;
-				$( '#wp_GradeBook_' + isselecteddata + ' tr th:nth-child(' + y + ')' ).remove();
-				$( '#wp_GradeBook_' + isselecteddata + ' tr td:nth-child(' + y + ')' ).remove();
-		   		$.get(ajax_object.ajax_url, { 
-		   				action: 'delete_assignment',
-						assignment_name : x,
-						assign_id : x.slice(7),
-						course_id : isselecteddata
-				}, function(data){ 							
-					$( "#delete-assignment-confirm" ).dialog( "close" );
-					$( "#delete-assignment" ).button( "option", "disabled", true );
-				});
-				$(this).dialog('close');
-		   	},
-			Cancel: function() {
-				$( this ).dialog( "close" );
+					'json');
+			return this;
+			} else {
+				$('#chart_div').empty();			
 			}
+		},
+		reloadChart: function(cell){
+			var amid = cell.get('amid');
+			var assignment = AN.GlobalVars.assignments.findWhere({id: amid});			
+			var selected_assignment = AN.GlobalVars.assignments.findWhere({selected: true});
+			if(selected_assignment){ var selected_amid = selected_assignment.get('id');}
+			if(amid == selected_amid) this.toggleChart(assignment);
 		}
- 	});
-
- 	
- 	$( "#delete-assignment" )
- 		.button()
- 		.click(function() {
- 			$( "#delete-assignment-confirm" ).dialog( "open" );
- 		}); 
- 	$( "#delete-assignment" ).button( "option", "disabled", true );	
-
- 		
- 		
-//***************************************************************/
-//* jQuery that creates the toggle selection in                 */
-//* the courses table and slide transition between gradebooks   */
-//***************************************************************/
-
-	var wasselecteddata;
-	var isselected;
-	var nonetosome = 0;
-	var tables_loaded = Array();
-		
+	});    
 	
-	$("#GradeBook_courses tbody tr td:first-child").each(function(){$(this).click(function() {
-    		$(this).parent().toggleClass('ui-selected').siblings().removeClass('ui-selected');
-    		isselected = $('#GradeBook_courses').find('.ui-selected td').map(function() {
-        		return $(this).text();
-    		}).get();
-		isselectedlength = isselected.length;
-		isselecteddata = isselected[0];
-		var wasloaded = false;
-		for (i = 0; i< tables_loaded.length;i++){
-		    if(tables_loaded[i]==isselected[0]){
-		    	wasloaded = true;
-		    }
-		}
-		if (nonetosome === 0 && wasloaded==false) {
-			$.ajax({
-				url: ajax_object.ajax_url, 
-				data:	{ action: 'get_table_data', course_id: isselected[0]}, 
-				success: function(data, textStatus, jqXHR ){
-					var column_names = data['column_names'];
-					var assign_data = data['assign_data'];
-					var column_id = data['column_ids'];
-					var table_data = data['table_data'];
-					var number_of_rows = data['number_of_rows'];													
-					tables_loaded.push(isselected[0]);
-					for(i = 0; i<column_names.length;i++){
-						$( "#wp_GradeBook_" + isselecteddata + " thead tr" ).append(
-			    				"<th id='" + column_id[i]  + "' title=''>" + column_names[i] + "</th>" 						
-       						);
-       					if(i>3){	
-       					$( '#wp_GradeBook_' + isselecteddata + ' thead tr th[id^="assign_"][id='+column_id[i]+']' )
-       					.tooltip({ content: 
-       							'Date Due: ' + assign_data[i-4][2]
-       						});
-       					}
-       					};
-       					for(i = 0; i<number_of_rows;i++){
-						$( "#wp_GradeBook_" + isselecteddata + " tbody" ).append(function(){
-						var row_data = "";
-							for(j = 0; j<column_names.length;j++){
-							if(j==0||j==1){
-							row_data = row_data + "<td class='noteditable'>" + table_data[i][j] + "</td>"
-							}else{
-			    				row_data = row_data + "<td>" + table_data[i][j] + "</td>"
-			    				}
-			    				};
-			    				if (i%2){
-			    					return "<tr class='odd'>" + row_data + "</tr>";
-			    				} else {
-			    					return "<tr class='even'>" + row_data + "</tr>";
-			    				}
-			    			});
-       					};
-					$('#wp_GradeBook_' + wasselecteddata + ' tbody tr').removeClass('ui-selected');
-    					$('#wp_GradeBook_' + wasselecteddata + ' thead th').removeClass('ui-selected');
-			 		$( "#delete-assignment" ).button( "option", "disabled", true );					
-					$( "#delete-student" ).button( "option", "disabled", true );   
-					$( '#wp_GradeBook_' + isselecteddata + ' tbody td:not(.noteditable)' ).each(function(){
-    						$(this).editable(ajax_object.ajax_url,{ 
-						submitdata: {
-							action: 'edit_student',
-							column_id: $('#wp_GradeBook_' + isselecteddata + ' thead th:eq('+
-							$( this ).prevAll().length +')').attr('id'),
-							comment_ID : $(this).siblings()[0].innerHTML,
-							course_id : isselecteddata
-						},
-							indicator : 'Saving...',        
-        						height: '100%',
-						        width: '100%',
-						        onblur: 'submit'
-   						});
-					});
-					$( "#wp_GradeBook_" + isselecteddata + " tbody td" ).live('click',
-					function(){
-						var x = $( "#wp_GradeBook_" + isselecteddata ).find( 
-						".ui-selected td" ).map(function(){
-							return this.innerHTML;
-						}).get().join(",").split(',').length;
-						if ( x > 1 ) {
-							$( "#delete-student" ).button( "option", "disabled", false );
-						}else{
-							$( "#delete-student" ).button( "option", "disabled", true );	
-						}
-					});
-					$('#wp_GradeBook_' + isselecteddata).show('slide', {
-						direction: 'right'
-					});
-					$('#CRUD-students').show('slide', {
-						direction: 'right'
-					});
-						wasselecteddata = isselecteddata;  					
-				},
-				dataType: "json",
-				async: false	
-			});
-        		nonetosome = 1;
-
-    		} else if (nonetosome === 1 && wasloaded==false && isselectedlength>1)  {
-			$.ajax({
-				url: ajax_object.ajax_url, 
-				data:	{ action: 'get_table_data', course_id: isselected[0]}, 
-				success: function(data, textStatus, jqXHR ){
-					var column_names = data['column_names'];
-					var column_id = data['column_ids'];
-					var assign_data = data['assign_data'];					
-					var table_data = data['table_data'];
-					var number_of_rows = data['number_of_rows'];													
-					tables_loaded.push(isselected[0]);
-					for(i = 0; i<column_names.length;i++){
-						$( "#wp_GradeBook_" + isselecteddata + " thead tr" ).append(
-			    				"<th id='" + column_id[i]  + "' title=''>" + column_names[i] + "</th>" 						
-       						);
-       					if(i>3){	
-       					$( '#wp_GradeBook_' + isselecteddata + ' thead tr th[id^="assign_"][id='+column_id[i]+']' )
-       					.tooltip({ content: 
-       							'Due Date: ' + assign_data[i-4][2] + '<br/> Test'
-       						});
-       					}       						
-       					};
-       					for(i = 0; i<number_of_rows;i++){
-						$( "#wp_GradeBook_" + isselecteddata + " tbody" ).append(function(){
-						var row_data = "";
-							for(j = 0; j<column_names.length;j++){
-							if(j==0||j==1){
-							row_data = row_data + "<td class='noteditable'>" + table_data[i][j] + "</td>"
-							}else{
-			    				row_data = row_data + "<td>" + table_data[i][j] + "</td>"
-			    				}
-			    				};
-			    				if (i%2){			    				
-			    					return "<tr class='odd'>" + row_data + "</tr>";
-			    				} else {
-			    					return "<tr class='even'>" + row_data + "</tr>";
-			    				}
-			    			});
-       					};
-					$('#wp_GradeBook_' + wasselecteddata + ' tbody tr').removeClass('ui-selected');
-    					$('#wp_GradeBook_' + wasselecteddata + ' thead th').removeClass('ui-selected');
-			 		$( "#delete-assignment" ).button( "option", "disabled", true );						
-					$( "#delete-student" ).button( "option", "disabled", true );
-					$( '#wp_GradeBook_' + isselecteddata + ' tbody td:not(.noteditable)' ).each(function(){
-    						$(this).editable(ajax_object.ajax_url,{ 
-						submitdata: {
-							action: 'edit_student',
-							column_id: $('#wp_GradeBook_' + isselecteddata + ' thead th:eq('+
-							$( this ).prevAll().length +')').attr('id'),
-							comment_ID : $(this).siblings()[0].innerHTML,
-							course_id : isselecteddata
-						},
-							indicator : 'Saving...',        
-        						height: '100%',
-						        width: '100%',
-						        onblur: 'submit'
-   						});
-					});
-					$( "#wp_GradeBook_" + isselecteddata + " tbody td" ).live('click',
-					function(){
-						var x = $( "#wp_GradeBook_" + isselecteddata ).find( 
-						".ui-selected td" ).map(function(){
-							return this.innerHTML;
-						}).get().join(",").split(',').length;
-						if ( x > 1 ) {
-							$( "#delete-student" ).button( "option", "disabled", false );
-						}else{
-							$( "#delete-student" ).button( "option", "disabled", true );	
-						}
-					});
-					$('#wp_GradeBook_' + wasselecteddata).hide('slide', {
-						direction: 'left'
-					}, function() {
-						$('#wp_GradeBook_' + isselecteddata).show('slide', {
-							direction : 'right'
-						});
-					});
-						wasselecteddata = isselected[0];  					     					
-				},
-				dataType: "json",
-				async: false
-			});
-		} else if (nonetosome === 0 && wasloaded)  {
-			nonetosome =1;
-			$('#wp_GradeBook_' + isselecteddata).show('slide', {
-					direction: 'right'
-				});
-			$('#CRUD-students').show('slide', {
-					direction: 'right'
-				});
-			$('#wp_GradeBook_' + wasselecteddata + ' tbody tr').removeClass('ui-selected');
-    			$('#wp_GradeBook_' + wasselecteddata + ' thead th').removeClass('ui-selected');
-	 		$( "#delete-assignment" ).button( "option", "disabled", true );	    			
-			$( "#delete-student" ).button( "option", "disabled", true );		
-			if (isselectedlength === 0) {
-				nonetosome = 0;
-				$('#wp_GradeBook_' + wasselecteddata + ' tbody tr').removeClass('ui-selected');
-    				$('#wp_GradeBook_' + wasselecteddata + ' thead th').removeClass('ui-selected');
-		 		$( "#delete-assignment" ).button( "option", "disabled", true );	
-				$( "#delete-student" ).button( "option", "disabled", true );
-				$('#CRUD-students').hide('slide', {
-					direction: 'left'
-				});
-			}
-			wasselecteddata = isselecteddata;					
-		} else {
-			$('#wp_GradeBook_' + wasselecteddata).hide('slide', {
-					direction: 'left'
-				}, function() {	
-					$('#wp_GradeBook_' + isselecteddata).show('slide', {
-						direction : 'right'
-					});
-				});
-				$('#wp_GradeBook_' + wasselecteddata + ' tbody tr').removeClass('ui-selected');
-    				$('#wp_GradeBook_' + wasselecteddata + ' thead th').removeClass('ui-selected');				
-				$( "#delete-student" ).button( "option", "disabled", true );
-				if (isselectedlength === 0) {
-					nonetosome = 0;
-				$('#wp_GradeBook_' + wasselecteddata + ' tbody tr').removeClass('ui-selected');
-    				$('#wp_GradeBook_' + wasselecteddata + ' thead th').removeClass('ui-selected');				
-				$( "#delete-student" ).button( "option", "disabled", true );	
-					$('#CRUD-students').hide('slide', {
-						direction: 'left'
-					});
-				}
-				wasselecteddata = isselected[0];				
-		}
-		if(!wasloaded){
-		$('#wp_GradeBook_' + isselecteddata + ' thead th:eq(3)').nextAll().click(function() {
-    			$(this).toggleClass("ui-selected").siblings().removeClass("ui-selected");  
-    			$('#wp_GradeBook_' + wasselecteddata + ' tbody tr').removeClass('ui-selected');
-    			 $( "#delete-student" ).button( "option", "disabled", true );	
-		var x = $( '#wp_GradeBook_' + isselecteddata + ' thead tr th' ).hasClass('ui-selected');
-		if ( x ) {
-			$( "#delete-assignment" ).button( "option", "disabled", false );
-		}else{
-			$( "#delete-assignment" ).button( "option", "disabled", true );	
-		}	
-  		});
-		$('#wp_GradeBook_' + isselecteddata + ' tbody tr td:first-child').each(function(){
-			$(this).click(function() {
-				$( "#delete-assignment" ).button( "option", "disabled", true );	
-    				$(this).parent().toggleClass('ui-selected').siblings().removeClass('ui-selected');
-    				$('#wp_GradeBook_' + wasselecteddata + ' thead th').removeClass('ui-selected');
-    			});
-    		});
-    		}
-	});
-	});
-
-//********************************************/
-//* Add/Delete Student Add/Delete Assignment */
-//********************************************/
+	AN.GlobalVars.pieChart = new AN.Views.PieChartView();
 	
-	$( "#delete-student-confirm" ).dialog({
-		autoOpen: false,
-		resizable: false,
-		height: 300,
-		width: 350,
-		modal: true,
-		buttons: {
-		   	"Delete": function(){
-		   		var x = $( "#wp_GradeBook_" + isselecteddata ).find( ".ui-selected td" ).map(function(){
-					return this.innerHTML;	
-				}).get().join(",").split(',');
-				if ( x.length > 1  ) {
-					$.get(ajax_object.ajax_url, { 
-						action: 'delete_student',
-						comment_ID : x[0],
-						user_id : x[1],
-						course_id : isselecteddata
-					},
-					function(data){
-						$( "#wp_GradeBook_" + isselecteddata )
-							.find( ".ui-selected td" ).parent()
-							.remove();
-						$( '#wp_GradeBook_' + isselecteddata + ' tbody tr:nth-child(odd)' )
-							.removeClass('odd')
-							.addClass('even');
-      						$( '#wp_GradeBook_' + isselecteddata + ' tbody tr:nth-child(even)' )
-      							.removeClass('even')
-      							.addClass('odd');     							
-						$( "#delete-student-confirm" ).dialog( "close" );
-						$( "#delete-student" ).button( "option", "disabled", true );
-					});
-				} else {
-					alert( 'No row selected!'  );
-					$( this ).dialog("close");
-				}
-		   	},
-			Cancel: function() {
-				$( this ).dialog( "close" );
-			}
-		}
-	});
-	
-	$( "#delete-student" )
-		.button()
-		.click(function() {
-			$( "#delete-student-confirm" ).dialog( "open" );
-		});
-	$( "#delete-student" ).button( "option", "disabled", true );
-	
-	
+    AN.Views.Gradebook = AN.Views.Base.extend({
+        id: 'an-gradebook',
+        initialize: function() {
+            var self = this;
+			var aj1 = $.ajax({
+                url: ajaxurl,
+                data: {
+                    action: 'get_students',
+                    gbid: this.model.id
+                },
+                contentType: 'json',
+                dataType: 'json'
+            });
+            var aj2 = $.ajax({
+                url: ajaxurl,
+                data: {
+                    action: 'get_assignments',
+                    gbid: this.model.id
+                },
+                contentType: 'json',
+                dataType: 'json'
+            });
+            var aj3 = $.ajax({
+                url: ajaxurl,
+                data: {
+                    action: 'get_assignment',
+                    gbid: this.model.id
+                },
+                contentType: 'json',
+                dataType: 'json'
+            });
+			var aj4 = $.ajax({
+                url: ajaxurl,
+                data: {
+                    action: 'get_gradebook',
+                    gbid: this.model.id
+                },
+                contentType: 'json',
+                dataType: 'json'
+            });   
+            this.AjaxRequests = [aj1,aj2,aj3,aj4];                           
+            $.when(aj1,aj2,aj3,aj4).done(function(a1, a2, a3, a4) { 
+            		AN.GlobalVars.students.reset();   
+					AN.GlobalVars.cells.reset();               		            		
+					AN.GlobalVars.assignments.reset();               		            							
+                _.each(a1[0], function(student) {
+                    AN.GlobalVars.students.add(student);
+                });
+                _.each(a2[0], function(assignment) {
+                    AN.GlobalVars.assignments.add(assignment);
+                }); 
+                _.each(a3[0], function(cell) {                	
+                    AN.GlobalVars.cells.add(cell);
+                });                                
+                _.each(a4[0], function(gradebook) {
+                    AN.GlobalVars.anGradebooks.add(gradebook);
+                });                                          
+                self.render();
+                self.listenTo(AN.GlobalVars.anGradebooks, 'add', self.addStudent);
+                self.listenTo(AN.GlobalVars.assignments, 'add', self.addAssignment);
+            	self.listenTo(AN.GlobalVars.assignments, 'change:sorted', self.sortAssignment);                
+            });
+            this.listenTo(this.model, 'change:selected', this.close);
+            return this;
+        },
+        events: {
+            'click button#add-student': 'editStudentPre',
+            'click button#edit-student': 'editStudent',
+            'click button#delete-student': 'deleteStudent',
+            'click button#add-assignment': 'editAssignmentPre',
+            'click button#edit-assignment': 'editAssignment',
+            'click button#delete-assignment': 'deleteAssignment',
+            'click #an-gradebook-container' : 'toggleEditDelete'
+        },
+        render: function() {
+            var template = _.template($('#gradebook-interface-template').html(), {});
+            this.$el.html(template);
+                var x = AN.GlobalVars.students.toJSON();  
+                x = _.sortBy(x, 'lastname');                                        
+                _.each(x, function(student) {
+                    var view = new AN.Views.StudentView({
+                        model: AN.GlobalVars.students.get(student['id'])
+                    });
+					$('#students').append(view.render().el);                    
+                });              
+                var y = AN.GlobalVars.assignments.where({
+                    gbid: parseInt(this.model.get('id'))   //anq: why is this.model.get('id') a string to begin with??
+                });
+                _.each(y, function(assignment) {
+                    var view = new AN.Views.AssignmentView({
+                        model: assignment
+                    });
+                    $('#students-header tr').append(view.render().el);
+                });    
+            this.toggleEditDelete();                        
+            return this;
+        },
+        toggleEditDelete: function(){
+            var x = AN.GlobalVars.students.findWhere({selected: true});
+            if(x){
+              $('#edit-student, #delete-student').attr('disabled',false);
+            }else{
+              $('#edit-student, #delete-student').attr('disabled',true);
+            }
+            var y = AN.GlobalVars.assignments.findWhere({selected: true});
+            if(y){
+              $('#edit-assignment, #delete-assignment').attr('disabled',false);
+            }else{
+              $('#edit-assignment, #delete-assignment').attr('disabled',true);
+            }            
+        },
+        close: function() {
+            for(var i = 0; i < this.AjaxRequests.length; i++)
+    			this.AjaxRequests[i].abort();	        
+            !this.model.get('selected') && this.remove();
+        },
+        addStudent: function(studentgradebook) {
+            student = AN.GlobalVars.students.get({id: parseInt(studentgradebook.get('uid'))});
+            var view = new AN.Views.StudentView({
+                model: student
+            });
+            $('#students').append(view.render().el);
+            return this;
+        },
+        editStudentPre: function(){
+            var x = AN.GlobalVars.students.findWhere({selected: true});
+            x && x.set({selected: false});
+			var y = AN.GlobalVars.assignments.findWhere({selected: true});
+			y && y.set({selected: false});
+            this.editStudent();            
+        },          
+        editStudent: function() {
+            $('#gradebook-interface-buttons-container').children().attr('disabled',true);
+            var view = new AN.Views.EditStudentView();         
+            return false;
+        },
+        deleteStudent: function() {
+        	$('#gradebook-interface-buttons-container').children().attr('disabled',true);
+        	var view = new AN.Views.DeleteStudentView(); 
+        	return false;
+        },
+        addAssignment: function(assignment) {
+            var view = new AN.Views.AssignmentView({
+                model: assignment
+            });
+            $('#students-header tr').append(view.render().el);
+            return this;
+        },
+        editAssignmentPre: function(){       
+            var x = AN.GlobalVars.students.findWhere({selected: true});
+            x && x.set({selected: false});
+			var y = AN.GlobalVars.assignments.findWhere({selected: true});
+			y && y.set({selected: false});
+            this.editAssignment();            
+        },          
+        editAssignment: function() {     
+            $('#gradebook-interface-buttons-container').children().attr('disabled',true);
+            var view = new AN.Views.EditAssignmentView();         
+            return false;
+        },
+        sortAssignment: function(ev) {
+            var template = _.template($('#gradebook-interface-template').html(), {});
+            this.$el.html(template);
+                var x = AN.GlobalVars.cells.toJSON();  
+                x = _.where(x, {amid: parseInt(ev.get('id'))});              
+                x = _.sortBy(x, 'assign_points_earned');                                        
+                _.each(x, function(cell) {
+                    var view = new AN.Views.StudentView({
+                        model: AN.GlobalVars.students.get(cell['uid'])
+                    });
+					$('#students').append(view.render().el);                    
+                });              
+                var y = AN.GlobalVars.assignments.where({
+                    gbid: parseInt(this.model.get('id'))   //anq: why is this.model.get('id') a string to begin with??
+                });
+                _.each(y, function(assignment) {
+                    var view = new AN.Views.AssignmentView({
+                        model: assignment
+                    });
+                    $('#students-header tr').append(view.render().el);
+                });       
+            this.toggleEditDelete();                     
+            return this;
+        },
+        deleteAssignment: function() {
+            var todel = AN.GlobalVars.assignments.findWhere({
+                selected: true
+            });
+            var self = this;
+            $.post(ajaxurl, {
+                action: 'delete_assignment',
+                id: todel.get('id')
+            }, function(data, textStatus, jqXHR) {          
+                todel.set({
+                    selected: false
+                });
+                AN.GlobalVars.assignments.remove(todel.get('id'));
+                var x = AN.GlobalVars.cells.where({
+                    amid: parseInt(todel.get('id'))
+                });
+                _.each(x, function(cell) {
+                    AN.GlobalVars.cells.remove(cell);
+                });
+	            self.toggleEditDelete();                     
+            }, 'json');
+        }
+    });
+    AN.Views.App = AN.Views.Base.extend({
+        el: '#an-gradebooks',
+        events: {
+            'click button#add-course': 'editCoursePre',
+            'click button#delete-course': 'deleteCourse',
+            'click button#edit-course': 'editCourse',
+            'click .course': 'showGradebook',
+            'click #an-courses-container' : 'toggleEditDelete'
+        },
+        initialize: function() {	        
+            template = _.template($('#courses-interface-template').html(), {});
+            this.$el.html(template);
+            $('#edit-course, #delete-course').attr('disabled',true);
+            $.ajax({
+                url: ajaxurl,
+                data: {
+                    action: 'get_courses'
+                },
+                contentType: 'json',
+                dataType: 'json',
+                success: function(data) {
+                    _.each(data, function(course) {
+                        AN.GlobalVars.courses.add(course);
+                    });
+                }
+            });
+            this.listenTo(AN.GlobalVars.courses, 'add', this.addCourse);
+            return this;
+        },
+        showGradebook: function() {
+            var x = AN.GlobalVars.courses.findWhere({selected: true});
+            if (x) {
+                this.toggleEditDelete();
+                var gradebook = new AN.Views.Gradebook({
+                    model: x
+                });
+                $('#an-gradebooks').append(gradebook.render().el);
+            	gradebook.toggleEditDelete();
+            } else {
+				this.toggleEditDelete();           
+            }
+            return this;
+        },
+        toggleEditDelete: function(){
+            var x = AN.GlobalVars.courses.findWhere({selected: true});
+            if(x){
+              $('#edit-course, #delete-course').attr('disabled',false);
+            }else{
+              $('#edit-course, #delete-course').attr('disabled', true); 
+            }         
+        },    
+        editCoursePre: function(){
+            var x = AN.GlobalVars.courses.findWhere({selected: true});
+            if(x){
+            x.set({selected: false});
+            }
+            this.editCourse();            
+        },    
+        editCourse: function() {
+        	$('#myModal').show();        
+            $('#courses-interface-buttons-container').children().attr('disabled', true);
+            var view = new AN.Views.EditCourseView();
+            return false;
+        },
+        addCourse: function(course) {
+            var view = new AN.Views.CourseView({
+                model: course
+            });
+            $('#courses').append(view.render().el);
+        },
+        deleteCourse: function() {
+            var todel = AN.GlobalVars.courses.findWhere({
+                selected: true
+            });
+            var self = this;
+            $.post(ajaxurl, {
+                action: 'delete_course',
+                id: todel.get('id')
+            }, function(data, textStatus, jqXHR) {
+                todel.set({
+                    selected: false
+                });
+                AN.GlobalVars.courses.remove(todel.get('id'));
+                self.toggleEditDelete();
+            }, 'json');
+        }
+    });
+    AN.GlobalVars.app = new AN.Views.App();
 })(jQuery);
