@@ -3,8 +3,8 @@ Contributors: anevo, jamarparris
 Donate link: 
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
-Tested up to: 3.8.1
-Stable tag: 2.3.2
+Tested up to: 3.9
+Stable tag: 2.3.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +47,14 @@ Students are able to:
 6. Student view of GradeBook with an assignment selected - pie chart displays automatically.
 
 == Changelog ==
+
+Version 2.3.3:
+
+* Upgraded columns name, school, and semester in table an_gradebooks to character set utf8  and collate utf8_general_ci so that international characters can be stored correctly.
+
+Version 2.3.2:
+
+* You can now delete a student from a particular gradebook, all the gradebooks, or the wordpress database.
 
 Version 2.3.1:
 
