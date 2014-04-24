@@ -3,7 +3,7 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 2.3.2
+Version: 2.3.3
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
@@ -59,7 +59,7 @@ class AN_GradeBook_Scripts{
 
 //Create/Upgrade Database
 class AN_GradeBook_Database{
-	const an_gradebook_db_version = 2;
+	const an_gradebook_db_version = 3;
 	public function __construct(){
 		register_activation_hook(__FILE__,array($this,'database_setup'));	
 		add_action('plugins_loaded', array($this,'an_gradebook_upgrade_db'));	
@@ -75,9 +75,9 @@ class AN_GradeBook_Database{
 		if($wpdb->get_var('SHOW TABLES LIKE "'.$db_name.'"') != $db_name){
 			$sql = 'CREATE TABLE ' . $db_name . ' (
 			id int(11) NOT NULL AUTO_INCREMENT,
-			name mediumtext NOT NULL,
-			school TINYTEXT NOT NULL,
-			semester TINYTEXT NOT NULL,
+			name MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+			school TINYTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+			semester TINYTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
 			year int(11) NOT NULL,
 			PRIMARY KEY  (id) )';
 			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -143,7 +143,13 @@ class AN_GradeBook_Database{
 			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 			dbDelta($sql);
 		}
-		update_option( "an_gradebook_db_version", self::an_gradebook_db_version );
+		if(get_site_option( 'an_gradebook_db_version' )>=2 && get_site_option( 'an_gradebook_db_version' )<an_gradebook_db_version){
+			$sql = "ALTER TABLE an_gradebooks CHANGE name name MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL, 
+				CHANGE school school TINYTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL, 
+				CHANGE semester semester TINYTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
+			$wpdb->query($sql);		
+		}
+		update_option( "an_gradebook_db_version", self::an_gradebook_db_version );		
 	}	
 }
 	function build_sorter($key) {
