@@ -4,7 +4,7 @@ Donate link:
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
 Tested up to: 3.9
-Stable tag: 2.3.4
+Stable tag: 2.3.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +47,11 @@ Students are able to:
 6. Student view of GradeBook with an assignment selected - pie chart displays automatically.
 
 == Changelog ==
+
+Version 2.3.5:
+
+* Added an Assignment Statistics modal. Instead of the assignment pie chart being displayed once an assignment column is selected, you now click the Assignment Statistics button and a modal appears containing the pie chart.  This will allow for easy addition of other charts in the future.
+
 
 Version 2.3.4:
 

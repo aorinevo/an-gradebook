@@ -3,7 +3,7 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 2.3.4
+Version: 2.3.5
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
@@ -11,7 +11,7 @@ License: GPL
 
 
 
-define( "AN_GRADEBOOK_VERSION", "2.3.4");
+define( "AN_GRADEBOOK_VERSION", "2.3.5");
 
 //Load scripts
 class AN_GradeBook_Scripts{
@@ -58,120 +58,26 @@ class AN_GradeBook_Scripts{
 }
 
 //Create/Upgrade Database
-class AN_GradeBook_Database{
-	const an_gradebook_db_version = 3;
-	public function __construct(){
-		register_activation_hook(__FILE__,array($this,'database_setup'));	
-		add_action('plugins_loaded', array($this,'an_gradebook_upgrade_db'));	
-	}	
-	public function an_gradebook_upgrade_db(){
-		if(!get_site_option( 'an_gradebook_db_version' ) || self::an_gradebook_db_version > get_site_option( 'an_gradebook_db_version' )){
-			$this->database_setup();
-		}
-	}
-	public function database_setup() {
-		global $wpdb;
-	  	$db_name = 'an_gradebooks';
-		if($wpdb->get_var('SHOW TABLES LIKE "'.$db_name.'"') != $db_name){
-			$sql = 'CREATE TABLE ' . $db_name . ' (
-			id int(11) NOT NULL AUTO_INCREMENT,
-			name MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-			school TINYTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-			semester TINYTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-			year int(11) NOT NULL,
-			PRIMARY KEY  (id) )';
-			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-			dbDelta($sql);
-		}
-		$db_name1 = 'an_gradebook';
-		if($wpdb->get_var('SHOW TABLES LIKE "'.$db_name1.'"') != $db_name1){
-			$sql = 'CREATE TABLE ' . $db_name1 . ' (
-			id int(11) NOT NULL AUTO_INCREMENT,
-			uid int(11) NOT NULL,
-			gbid int(11) NOT NULL,
-			PRIMARY KEY  (id) )';
-		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-		dbDelta($sql);
-		}
-		//$db_name2 should be changed to $table_name but we'll stick with this for now
-		$db_name2 = 'an_assignments';
-		//The column headings that should be in the an_assignments table are stored in $table_columns
-		$table_columns = array('id','gbid','assign_order','assign_name','assign_date','assign_due');
-		$table_columns_specs = array(
-			'id' => 'int(11) NOT NULL AUTO_INCREMENT',
-			'gbid' => 'int(11) NOT NULL',
-			'assign_order' => 'int(11) NOT NULL',
-			'assign_name' => 'mediumtext NOT NULL',
-			'assign_date' => 'DATE NOT NULL DEFAULT "0000-00-00"',
-			'assign_due' => 'DATE NOT NULL DEFAULT "0000-00-00"');
-		if($wpdb->get_var('SHOW TABLES LIKE "'.$db_name2.'"') != $db_name2){
-			$sql = 'CREATE TABLE ' . $db_name2 . ' (
-			id int(11) NOT NULL AUTO_INCREMENT,
-			gbid int(11) NOT NULL,
-			assign_order int(11) NOT NULL,		
-			assign_name mediumtext NOT NULL,
-			assign_date DATE NOT NULL DEFAULT "0000-00-00",
-			assign_due DATE NOT NULL DEFAULT "0000-00-00",			
-			PRIMARY KEY  (id) )';
-			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-			dbDelta($sql);
-		} else {
-			//Otherwise, check if there is something to upgrade in an_assignments table
-			$an_assignments_columns = $wpdb->get_col( "SELECT column_name FROM information_schema.columns
-				WHERE table_name = 'an_assignments' ORDER BY ordinal_position" );
-			$missing_columns = array_diff($table_columns, $an_assignments_columns);
-			if(count($missing_columns)){
-				//add missing columns
-				$sql = 'ALTER TABLE an_assignments ';
-				foreach ($missing_columns as $missing_column){
-					$sql = $sql. 'ADD '. $missing_column .' '. $table_columns_specs[$missing_column] .', ';
-				}
-				$sql = rtrim(trim($sql), ',');
-				$wpdb->query($sql);	
-			}				
-		}
- 		$db_name3 = 'an_assignment';
-		if($wpdb->get_var('SHOW TABLES LIKE "'.$db_name3.'"') != $db_name3){
-			$sql = 'CREATE TABLE ' . $db_name3 . ' (
-			id int(11) NOT NULL AUTO_INCREMENT,
-			uid int(11) NOT NULL,
-			gbid int(11) NOT NULL,
-    	    amid int(11) NOT NULL,
-	        assign_order int(11) NOT NULL,
-	        assign_points_earned int(11) NOT NULL,
-			PRIMARY KEY  (id) )';
-			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-			dbDelta($sql);
-		}
-		if(get_site_option( 'an_gradebook_db_version' )>=2 && get_site_option( 'an_gradebook_db_version' )<an_gradebook_db_version){
-			$sql = "ALTER TABLE an_gradebooks CHANGE name name MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL, 
-				CHANGE school school TINYTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL, 
-				CHANGE semester semester TINYTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
-			$wpdb->query($sql);		
-		}
-		update_option( "an_gradebook_db_version", self::an_gradebook_db_version );		
-	}	
-}
+include_once( dirname( __FILE__ ) . '/an-gradebook-database.php' );
+
 	function build_sorter($key) {
    		return function ($a, $b) use ($key) {
         	return strnatcmp($a[$key], $b[$key]);
 	    };
 	}	
 	
-function gradebook_check_user_role( $role, $user_id = null ) {
- 
-    if ( is_numeric( $user_id ) ){
-	$user = get_userdata( $user_id );
+	function gradebook_check_user_role( $role, $user_id = null ) {
+ 		if ( is_numeric( $user_id ) ){
+			$user = get_userdata( $user_id );
+		}
+    	else{
+        	$user = wp_get_current_user();
+ 		}
+    	if ( empty( $user ) ){
+			return false;
+		}
+ 		return in_array( $role, (array) $user->roles );
 	}
-    else{
-        $user = wp_get_current_user();
- 	}
-    if ( empty( $user ) ){
-	return false;
-	}
- 
-    return in_array( $role, (array) $user->roles );
-}
 
 class AN_GradeBookAPI{
 	public function __construct(){
@@ -678,255 +584,23 @@ $an_gradebookapi = new AN_GradeBookAPI();
 
 function an_gradebook_menu_page(){
 
-if (gradebook_check_user_role('administrator')){	
-
-ob_start();
-?>
-    <script id="edit-student-template" type="text/template">
-    <div id="edit-student-form-container" class="media-modal wp-core-ui"> 
-    <a class="media-modal-close" title="Close"><span class="media-modal-icon"></span></a>
-    	<div class="media-modal-content">
-    	    <div class="media-frame wp-core-ui">
-				<div class="media-frame-menu">
-					<div class="media-menu">
-						<a href="#" class="media-menu-item"><%= student ? 'Edit ' : 'Create ' %>Student</a>
-						<div class="separator"></div>
-					</div>
-				</div>    	    
-    	    	<div class="media-frame-title">
-    				<h1><%= student ? 'Edit ' : 'Create ' %>Student</h1>
-    			</div>    
-    	    	<div class="media-frame-content">
-    				<form id="edit-student-form">      
-         				<input type="hidden" name="action" value="<%= student ? 'update_student' : 'add_student' %>"/>
-				        <input type="hidden" name="id" value="<%= student ? student.get('id') : '' %>"/>         
-				        <label>First Name:</label>
-				        <input type="text" name="firstname" value="<%= student ? student.get('firstname') : '' %> "/>
-				        <label>Last Name:</label>
-				        <input type="text" name="lastname" value="<%= student ? student.get('lastname') : '' %> "/>
-				        <label>ID<%= student ? ':' : ' (if student exists in the data base, use the students id to add. Otherwise a new record will be created for this student):'%></label>
-				        <%= student ? student.get('id') : '<input type="text" name="id-exists"/>' %>
-				        <p/>
-				        <%= student ? 'Update user ' + student.get('id') + ' from course ' + gradebook.get('id')  : 'Add to course ' + gradebook.get('id') %>?
-				        <input type="hidden" name="gbid" value="<%= gradebook.get('id') %>"/>
-    				</form>
-    			</div>			
-        		<div class="media-frame-toolbar">
-    				<div class="media-toolbar">         
-     					<div class="media-toolbar-secondary"></div>
-     					<div class="media-toolbar-primary">
-     						<button id="edit-student-save" class="button media-button button-primary button-large">Save</button>
-     					</div>
-       				</div>
-       			</div> 
-       		</div>
-    	</div>  
-    </div> 
-    </script>   
-    
-    <script id="delete-student-template" type="text/template">
-    <div id="delete-student-form-container" class="media-modal wp-core-ui"> 
-    <a class="media-modal-close" title="Close"><span class="media-modal-icon"></span></a>
-    	<div class="media-modal-content">
-    	    <div class="media-frame wp-core-ui">
-				<div class="media-frame-menu">
-					<div class="media-menu">
-						<a href="#" class="media-menu-item">Delete Student</a>
-						<div class="separator"></div>
-					</div>
-				</div>    	    
-    	    	<div class="media-frame-title">
-    				<h1>Delete Student</h1>
-    			</div>    
-    	    	<div class="media-frame-content">
-    				<form id="delete-student-form">      
-         				<input type="hidden" name="action" value="delete_student"/>
-				        <input type="hidden" name="id" value="<%= student ? student.get('id') : '' %>"/> 
-				        Delete <%= student.get('firstname')%> <%= student.get('lastname')%> with student id <%= student.get('id')%> from:  
-				        <br/>      
-						<select name="delete_options">
-							<option value="gradebook">this gradebook only.</option>
-							<option value="all_gradebooks">all gradebooks.</option>
-							<option value="database">the wordpress database.</option>
-						</select>
-						<br/>
-						Removing a student from the wordpress database will also remove that student from all gradebooks.
-				        <p/>
-				        <input type="hidden" name="gbid" value="<%= gradebook.get('id') %>"/>
-    				</form>
-    			</div>			
-        		<div class="media-frame-toolbar">
-    				<div class="media-toolbar">         
-     					<div class="media-toolbar-secondary"></div>
-     					<div class="media-toolbar-primary">
-     						<button id="delete-student-delete" class="button media-button button-primary button-large">Delete</button>
-     					</div>
-       				</div>
-       			</div> 
-       		</div>
-    	</div>  
-    </div> 
-    </script>      
-    
-    <script id="edit-assignment-template" type="text/template">
-    <div id="edit-assignment-form-container" class="media-modal wp-core-ui"> 
-    <a class="media-modal-close" title="Close"><span class="media-modal-icon"></span></a>
-    	<div class="media-modal-content">
-    	    <div class="media-frame wp-core-ui">
-				<div class="media-frame-menu">
-					<div class="media-menu">
-						<a href="#" class="media-menu-item"><%= assignment ? 'Edit ' : 'Create ' %>Assignment</a>
-						<div class="separator"></div>
-					</div>
-				</div>
-    	    	<div class="media-frame-title">
-    				<h1><%= assignment ? 'Edit ' : 'Create ' %>Assignment</h1>
-    			</div>    
-    	    	<div class="media-frame-content">
-    				<form id="edit-assignment-form">      
-        				<input type="hidden" name="action" value="<%= assignment ? 'update_assignments' : 'add_assignment' %>"/>
-				        <input type="hidden" name="id" value="<%= assignment ? assignment.get('id') : '' %>"/>  
-				        <label>Title:</label>
-				        <input type="text" name="assign_name" value="<%= assignment ? assignment.get('assign_name') : '' %>"/>
-				        <label>Date Assigned:</label>
-				        <input type="text" name="assign_date" id="assign-date-datepicker" />        
-				        <label>Date Due:</label>
-				        <input type="text" name="assign_due" id="assign-due-datepicker" />
-				        <%= assignment ? 'Update assignment ' + assignment.get('id') + ' from course ' + gradebook.get('id')  : 'Add to course ' + gradebook.get('id') %>?        
-				        <input type="hidden" name="gbid" value="<%= gradebook.get('id')%>"/>
-    				</form>
-    			</div>    			
-        		<div class="media-frame-toolbar">
-    				<div class="media-toolbar">         
-     					<div class="media-toolbar-secondary"></div>
-     					<div class="media-toolbar-primary">
-     						<button id="edit-assignment-save" class="button media-button button-primary button-large">Save</button>
-     					</div>
-       				</div>
-       			</div> 
-       		</div>
-    	</div>  
-    </div> 
-    </script>    
-    
-    <script id="edit-course-template" type="text/template">
-    <div id="edit-course-form-container" class="media-modal wp-core-ui"> 
-    <a class="media-modal-close" title="Close"><span class="media-modal-icon"></span></a>
-    	<div class="media-modal-content">
-    	    <div class="media-frame wp-core-ui">
-    	    	<div class="media-frame-title">
-    				<h1><%= course ? 'Edit ' : 'Create ' %> Course</h1>
-    			</div>    
-				<div class="media-frame-menu">
-					<div class="media-menu">
-						<a href="#" class="media-menu-item"><%= course ? 'Edit ' : 'Create ' %>Course</a>
-						<div class="separator"></div>
-					</div>
-				</div>       			
-    	    	<div class="media-frame-content">
-    				<form id="edit-course-form">      
-        				<input type="hidden" name="action" value="<%= course ? 'update_course' : 'add_course' %>"/>
-        				<input type="hidden" name="id" value="<%= course ? course.get('id') : '' %>"/>        
-        				<label>Course Name:</label>
-        				<input type="text" name="name" value="<%= course ? course.get('name') : '' %>"/>
-        				<label>School:</label>
-        				<input type="text" name="school" value="<%= course ? course.get('school') : '' %>"/>
-        				<label>Semester:</label>
-        				<input type="text" name="semester" value="<%= course ? course.get('semester') : '' %>"/>
-        				<label>Year:</label>
-        				<input type="text" name="year" value="<%= course ? course.get('year') : '' %>"/>
-    				</form>
-    			</div>    			
-        		<div class="media-frame-toolbar">
-    				<div class="media-toolbar">         
-     					<div class="media-toolbar-secondary"></div>
-     					<div class="media-toolbar-primary">
-     						<button id="edit-course-save" class="button media-button button-primary button-large">Save</button>
-     					</div>
-       				</div>
-       			</div> 
-       		</div>
-    	</div>  
-    </div> 
-    </script>
-    
-    <script id="gradebook-interface-template" type="text/template">
-    <hr/>
-    <div id="gradebook-interface-buttons-container">
-    <button type="button" id="add-student" class="wp-core-ui button">Add Student</button>
-    <button type="button" id="edit-student" class="wp-core-ui button">Edit Student</button>  
-    <button type="button" id="delete-student" class="wp-core-ui button">Delete Student</button>
-    <button type="button" id="add-assignment" class="wp-core-ui button">Add Assignment</button>
-    <button type="button" id="edit-assignment" class="wp-core-ui button">Edit Assignment</button>  
-    <button type="button" id="delete-assignment" class="wp-core-ui button">Delete Assignment</button>
-    </div>    
-    <hr/>
-    <table id="an-gradebook-container" class="wp-list-table widefat fixed pages">  
-    <thead id="students-header">
-      <tr>
-        <th><div><span>First Name</span> <span class="sorting-indicator"></span> </div></th><th>Last Name</th><th>ID</th>
-      </tr>
-    </thead>
-    <tbody id="students"></tbody>
-    </table>
-    <div id="chart-container">
-    	<div id="chart_div"></div>
-    </div>
-    </script>
-
-    <script id="student-gradebook-interface-template" type="text/template">   
-    <hr/>
-    <table id="an-gradebook-container" class="wp-list-table widefat fixed pages">  
-    <thead id="students-header">
-      <tr>
-        <th>First Name</th><th>Last Name</th><th>ID</th>
-      </tr>
-    </thead>
-    <tbody id="students"></tbody>
-    </table>
-    </script>    
-    
-    <script id="courses-interface-template" type="text/template">
-    <div id="courses-interface-buttons-container">
-    <button id="add-course" class="wp-core-ui button">Add Course</button>        
-    <button id="edit-course" class="wp-core-ui button">Edit Course</button>    
-    <button id="delete-course" class="wp-core-ui button">Delete Course</button>         
-    </div> 
-    <hr/>       
-    <table id="an-courses-container" class="wp-list-table widefat fixed pages">  
-       <thead>
-        <tr>
-            <th>ID</th><th>Course</th><th>School</th><th>Semester</th><th>Year</th>
-        </tr>
-       </thead>
-       <tbody id="courses">
-       </tbody>
-      </table>
-    </script>
-
-    <script id="student-courses-interface-template" type="text/template">    
-    <table id="an-courses-container" class="wp-list-table widefat fixed pages">  
-       <thead>
-        <tr>
-            <th>ID</th><th>Course</th><th>School</th><th>Semester</th><th>Year</th>
-        </tr>
-       </thead>
-       <tbody id="courses">
-       </tbody>
-      </table>
-    </script>    
-    
-
-<?php
-
-$mytemplates = ob_get_contents();
-ob_get_clean();
-
-echo $mytemplates;
-
-echo '<div class="wrap"><h2>GradeBooks</h2><div id="an-gradebooks">
-	</div></div>';
-	} elseif (get_current_user_id()>0 && !gradebook_check_user_role('administrator')){
+if (gradebook_check_user_role('administrator')){
+	include_once( dirname( __FILE__ ) . '/templates/edit-student-template.php' );	
+	include_once( dirname( __FILE__ ) . '/templates/delete-student-template.php' );
+	include_once( dirname( __FILE__ ) . '/templates/edit-assignment-template.php' );
+	include_once( dirname( __FILE__ ) . '/templates/stats-assignment-template.php' );	
+	include_once( dirname( __FILE__ ) . '/templates/gradebook-interface-template.php' );
+	include_once( dirname( __FILE__ ) . '/templates/student-courses-interface-template.php' );
+	include_once( dirname( __FILE__ ) . '/templates/edit-course-template.php' );
+	include_once( dirname( __FILE__ ) . '/templates/courses-interface-template.php' );	
+	include_once( dirname( __FILE__ ) . '/templates/student-gradebook-interface-template.php' );	
+	echo '<div class="wrap">
+			<h2>GradeBooks</h2>
+			<div id="an-gradebooks"></div>
+		  </div>';
+} elseif (get_current_user_id()>0 && !gradebook_check_user_role('administrator')){
+	include_once( dirname( __FILE__ ) . '/templates/student-courses-interface-template.php' );
+	
 ob_start();
 ?>
     <script id="student-gradebook-interface-template" type="text/template">   
@@ -939,23 +613,7 @@ ob_start();
     </thead>
     <tbody id="students"></tbody>
     </table>
-    </script>    
-    
-
-
-    <script id="student-courses-interface-template" type="text/template">    
-    <table id="an-courses-container" class="wp-list-table widefat fixed pages">  
-       <thead>
-        <tr>
-            <th>ID</th><th>Course</th><th>School</th><th>Semester</th><th>Year</th>
-        </tr>
-       </thead>
-       <tbody id="courses">
-       </tbody>
-      </table>
-    </script>    
-    
-
+    </script>       
 <?php
 
 $mytemplates = ob_get_contents();
