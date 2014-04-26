@@ -9,6 +9,7 @@ ob_start();
     <button type="button" id="delete-student" class="wp-core-ui button">Delete Student</button>
     <button type="button" id="add-assignment" class="wp-core-ui button">Add Assignment</button>
     <button type="button" id="edit-assignment" class="wp-core-ui button">Edit Assignment</button>  
+    <button type="button" id="stats-assignment" class="wp-core-ui button">Assignment Statistics</button>      
     <button type="button" id="delete-assignment" class="wp-core-ui button">Delete Assignment</button>
     </div>    
     <hr/>
@@ -20,9 +21,6 @@ ob_start();
     </thead>
     <tbody id="students"></tbody>
     </table>
-    <div id="chart-container">
-    	<div id="chart_div"></div>
-    </div>
     </script>
 <?php
 $mytemplate = ob_get_contents();

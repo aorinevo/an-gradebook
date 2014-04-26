@@ -3,7 +3,7 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 2.3.4
+Version: 2.3.5
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
@@ -11,7 +11,7 @@ License: GPL
 
 
 
-define( "AN_GRADEBOOK_VERSION", "2.3.4");
+define( "AN_GRADEBOOK_VERSION", "2.3.5");
 
 //Load scripts
 class AN_GradeBook_Scripts{
@@ -588,6 +588,7 @@ if (gradebook_check_user_role('administrator')){
 	include_once( dirname( __FILE__ ) . '/templates/edit-student-template.php' );	
 	include_once( dirname( __FILE__ ) . '/templates/delete-student-template.php' );
 	include_once( dirname( __FILE__ ) . '/templates/edit-assignment-template.php' );
+	include_once( dirname( __FILE__ ) . '/templates/stats-assignment-template.php' );	
 	include_once( dirname( __FILE__ ) . '/templates/gradebook-interface-template.php' );
 	include_once( dirname( __FILE__ ) . '/templates/student-courses-interface-template.php' );
 	include_once( dirname( __FILE__ ) . '/templates/edit-course-template.php' );
