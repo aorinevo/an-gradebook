@@ -792,40 +792,55 @@
             return false;
         }
     });
+     
+    
+    
 	AN.Views.PieChartView = AN.Views.Base.extend({
-		el: '#chart_div',
-		initialize: function(){
-		   this.listenTo(AN.GlobalVars.assignments, 'change:selected', this.toggleChart);
-		   this.listenTo(AN.GlobalVars.cells, 'change:assign_points_earned', this.reloadChart);		   
-		   return this;
-		},
-		toggleChart: function(assignment){
-			if(assignment.get('selected')){
-			$.get(ajaxurl, { 
+		id: 'stats-assignment-container-container',
+        events: {
+            'click button#stats-assignment-close': 'editCancel',        
+            'click a.media-modal-close' : 'editCancel'
+        },		
+		initialize: function(){	   
+            var assignment = AN.GlobalVars.assignments.findWhere({
+                selected: true
+            });      
+            $('body').append(this.render().el);
+            return this;   		   
+		},		
+        render: function() {
+            var self = this;
+            var assignment = AN.GlobalVars.assignments.findWhere({
+                selected: true
+            });
+            if (assignment) {
+                var template = _.template($('#stats-assignment-template').html(), {
+                    assignment: assignment
+                });
+                self.$el.html(template); 
+                $.get(ajaxurl, { 
 						action: 'get_pie_chart',
 						amid : assignment.get('id'),
 						gbid : assignment.get('gbid')
 					},
-					function(data){
-						$('#chart_div').empty()					
+					function(data){				
 						drawChart({grades: data['grades'],assign_name: assignment.get('assign_name')});
 					}, 
-					'json');
-			return this;
-			} else {
-				$('#chart_div').empty();			
-			}
-		},
-		reloadChart: function(cell){
-			var amid = cell.get('amid');
-			var assignment = AN.GlobalVars.assignments.findWhere({id: amid});			
-			var selected_assignment = AN.GlobalVars.assignments.findWhere({selected: true});
-			if(selected_assignment){ var selected_amid = selected_assignment.get('id');}
-			if(amid == selected_amid) this.toggleChart(assignment);
-		}
-	});    
-	
-	AN.GlobalVars.pieChart = new AN.Views.PieChartView();
+					'json');                             
+            } else {
+                var template = _.template($('#stats-assignment-template').html(), {
+                    assignment: null
+                });
+                self.$el.html(template);                
+            }                        
+            this.$el.append('<div class="media-modal-backdrop"></div>');           
+            return this;
+        },
+        editCancel: function() {
+            this.remove();            
+            return false;
+        }
+    });
 	
     AN.Views.Gradebook = AN.Views.Base.extend({
         id: 'an-gradebook',
@@ -898,6 +913,7 @@
             'click button#delete-student': 'deleteStudent',
             'click button#add-assignment': 'editAssignmentPre',
             'click button#edit-assignment': 'editAssignment',
+            'click button#stats-assignment': 'statsAssignment',
             'click button#delete-assignment': 'deleteAssignment',
             'click #an-gradebook-container' : 'toggleEditDelete'
         },
@@ -933,9 +949,9 @@
             }
             var y = AN.GlobalVars.assignments.findWhere({selected: true});
             if(y){
-              $('#edit-assignment, #delete-assignment').attr('disabled',false);
+              $('#edit-assignment, #delete-assignment, #stats-assignment').attr('disabled',false);
             }else{
-              $('#edit-assignment, #delete-assignment').attr('disabled',true);
+              $('#edit-assignment, #delete-assignment, #stats-assignment').attr('disabled',true);
             }            
         },
         close: function() {
@@ -986,6 +1002,10 @@
             $('#gradebook-interface-buttons-container').children().attr('disabled',true);
             var view = new AN.Views.EditAssignmentView();         
             return false;
+        },
+        statsAssignment: function(){
+            var view = new AN.Views.PieChartView(); 
+            return false;			
         },
         sortAssignment: function(ev) {
             var template = _.template($('#gradebook-interface-template').html(), {});

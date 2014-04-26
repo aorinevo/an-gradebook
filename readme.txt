@@ -3,8 +3,8 @@ Contributors: anevo, jamarparris
 Donate link: 
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
-Tested up to: 3.8.1
-Stable tag: 2.3.2
+Tested up to: 3.9
+Stable tag: 2.3.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +47,27 @@ Students are able to:
 6. Student view of GradeBook with an assignment selected - pie chart displays automatically.
 
 == Changelog ==
+
+Version 2.3.6:
+
+* uninstall.php needed a line to remove an_gradebook_db_version from wp_options table, otherwise a user that has deleted the plugin that reinstalls will not obtain all the necessary tables.
+
+Version 2.3.5:
+
+* Added an Assignment Statistics modal. Instead of the assignment pie chart being displayed once an assignment column is selected, you now click the Assignment Statistics button and a modal appears containing the pie chart.  This will allow for easy addition of other charts in the future.
+
+
+Version 2.3.4:
+
+* Started to split GradeBook.php into smaller files. Almost all templates are now in the templates folder.  AN_GradeBook_Database class is now in an-gradebook-database.php.
+
+Version 2.3.3:
+
+* Upgraded columns name, school, and semester in table an_gradebooks to character set utf8  and collate utf8_general_ci so that international characters can be stored correctly.
+
+Version 2.3.2:
+
+* You can now delete a student from a particular gradebook, all the gradebooks, or the wordpress database.
 
 Version 2.3.1:
 
