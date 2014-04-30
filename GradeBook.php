@@ -3,7 +3,7 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 2.3.6
+Version: 2.3.7
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
@@ -57,27 +57,8 @@ class AN_GradeBook_Scripts{
 	} 	
 }
 
-//Create/Upgrade Database
 include_once( dirname( __FILE__ ) . '/an-gradebook-database.php' );
-
-	function build_sorter($key) {
-   		return function ($a, $b) use ($key) {
-        	return strnatcmp($a[$key], $b[$key]);
-	    };
-	}	
-	
-	function gradebook_check_user_role( $role, $user_id = null ) {
- 		if ( is_numeric( $user_id ) ){
-			$user = get_userdata( $user_id );
-		}
-    	else{
-        	$user = wp_get_current_user();
- 		}
-    	if ( empty( $user ) ){
-			return false;
-		}
- 		return in_array( $role, (array) $user->roles );
-	}
+include_once( dirname( __FILE__ ) . '/functions.php' );
 
 class AN_GradeBookAPI{
 	public function __construct(){
