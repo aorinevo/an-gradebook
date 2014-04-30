@@ -4,7 +4,7 @@ Donate link:
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
 Tested up to: 3.9
-Stable tag: 2.3.6
+Stable tag: 2.3.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
