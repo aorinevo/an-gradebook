@@ -3,7 +3,7 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 2.4
+Version: 2.4.1
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
@@ -80,6 +80,7 @@ class AN_GradeBookAPI{
 		add_action('wp_ajax_get_gradebook', array($this, 'get_gradebook'));			
 		add_action('wp_ajax_get_pie_chart', array($this, 'get_pie_chart'));	
 		add_action('wp_ajax_get_line_chart', array($this, 'get_line_chart'));			
+		add_action('wp_ajax_get_line_chart_studentview', array($this, 'get_line_chart_studentview'));			
 		//student_gradebook
 		add_action('wp_ajax_get_student_courses', array($this, 'get_student_courses'));		
 		add_action('wp_ajax_get_student_assignments', array($this, 'get_student_assignments'));		
@@ -140,6 +141,35 @@ class AN_GradeBookAPI{
 		echo json_encode($result);	
 		die();
 	}
+	
+	public function get_line_chart_studentview(){
+		global $wpdb;
+		$uid = get_current_user_id();
+		$gbid = $_GET['gbid'];
+		$line_chart_data1 = $wpdb->get_results('SELECT * FROM an_assignment WHERE uid = '. $uid .' AND gbid = '. $gbid,ARRAY_A);	
+		$line_chart_data2 = $wpdb->get_results('SELECT * FROM an_assignments WHERE gbid = '. $gbid,ARRAY_A);
+	
+		foreach($line_chart_data1 as &$line_chart_value1){
+			$line_chart_value1['assign_order']= intval($line_chart_value1['assign_order']);		
+			$line_chart_value1['assign_points_earned'] = intval($line_chart_value1['assign_points_earned']);
+			foreach($line_chart_data2 as $line_chart_value2){
+				if($line_chart_value2['id'] === $line_chart_value1['amid']){
+					$all_homework_scores = $wpdb->get_col('SELECT assign_points_earned FROM an_assignment WHERE amid = '. $line_chart_value2['id']);
+					$class_average = array_sum($all_homework_scores)/count($all_homework_scores);
+										
+					$line_chart_value1=array_merge($line_chart_value1, array('assign_name'=>$line_chart_value2['assign_name'], 'class_average' =>$class_average));
+				}
+			}
+		} 	
+		$result = array(array("Assignment", "Student Score", "Class Average"));
+		foreach($line_chart_data1 as $line_chart_value3){
+			array_push($result, array($line_chart_value3['assign_name'],$line_chart_value3['assign_points_earned'],$line_chart_value3['class_average']));
+		}		
+				
+		
+		echo json_encode($result);	
+		die();
+	}	
 	
 	
 	public function add_student(){	
@@ -388,7 +418,8 @@ class AN_GradeBookAPI{
     	$output = array(array(
           'firstname'=> $current_user->first_name, 
           'lastname'=>$current_user->last_name, 
-          'id'=>$current_user->ID
+          'id'=>$current_user->ID,
+          'gbid' => intval($_GET['gbid'])          
         ));
     	echo json_encode($output);
     	die();
@@ -611,32 +642,17 @@ if (gradebook_check_user_role('administrator')){
 			<div id="an-gradebooks"></div>
 		  </div>';
 } elseif (get_current_user_id()>0 && !gradebook_check_user_role('administrator')){
+	include_once( dirname( __FILE__ ) . '/templates/stats-assignment-template.php' );	
+	include_once( dirname( __FILE__ ) . '/templates/stats-student-template.php' );	
 	include_once( dirname( __FILE__ ) . '/templates/student-courses-interface-template.php' );
-	
-ob_start();
-?>
-    <script id="student-gradebook-interface-template" type="text/template">   
-    <hr/>
-    <table id="an-gradebook-container" class="wp-list-table widefat fixed pages">  
-    <thead id="students-header">
-      <tr>
-      	<th></th>
-      </tr>
-    </thead>
-    <tbody id="students"></tbody>
-    </table>
-    </script>       
-<?php
+	include_once( dirname( __FILE__ ) . '/templates/student-gradebook-interface-template.php' );
 
-$mytemplates = ob_get_contents();
-ob_get_clean();
-
-echo $mytemplates;
-
-echo '<div class="wrap"><h2>GradeBooks</h2><div id="an-gradebooks">
-	</div></div>';
-	} else {	
-		echo 'You do not have premissions to view this GradeBook.';
-	}	
+	echo '<div class="wrap">
+			<h2>GradeBooks</h2>
+			<div id="an-gradebooks"></div>
+		  </div>';
+} else {	
+	echo 'You do not have premissions to view this GradeBook.';
+}	
 }
 ?>
