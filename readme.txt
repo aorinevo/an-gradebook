@@ -39,12 +39,12 @@ Students are able to:
 
 == Screenshots ==
 
-1. GradeBook with a few courses.
+1. GradeBook with two courses.
 2. GradeBook with a course selected and corresponding students displayed.
-3. Add assignment modal.
-4. GradeBook with a course and student selected.
-5. Admin view of GradeBook with an assignment selected - pie chart displays automatically.
-6. Student view of GradeBook with an assignment selected - pie chart displays automatically.
+3. Line chart for a particular student.
+4. Pie chart for a particular assignment.
+5. Create assignment modal.
+6. Student view of GradeBook.
 
 == Changelog ==
 
