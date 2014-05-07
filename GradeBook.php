@@ -3,7 +3,7 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 2.3.7
+Version: 2.4
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
@@ -79,6 +79,7 @@ class AN_GradeBookAPI{
 		add_action('wp_ajax_get_assignment', array($this, 'get_assignment'));	
 		add_action('wp_ajax_get_gradebook', array($this, 'get_gradebook'));			
 		add_action('wp_ajax_get_pie_chart', array($this, 'get_pie_chart'));	
+		add_action('wp_ajax_get_line_chart', array($this, 'get_line_chart'));			
 		//student_gradebook
 		add_action('wp_ajax_get_student_courses', array($this, 'get_student_courses'));		
 		add_action('wp_ajax_get_student_assignments', array($this, 'get_student_assignments'));		
@@ -111,6 +112,35 @@ class AN_GradeBookAPI{
 		echo json_encode($output);
 		die();
 	}
+	
+	public function get_line_chart(){
+		global $wpdb;
+		
+		$line_chart_data1 = $wpdb->get_results('SELECT * FROM an_assignment WHERE uid = '. $_GET['uid'] .' AND gbid = '. $_GET['gbid'],ARRAY_A);	
+		$line_chart_data2 = $wpdb->get_results('SELECT * FROM an_assignments WHERE gbid = '. $_GET['gbid'],ARRAY_A);
+	
+		foreach($line_chart_data1 as &$line_chart_value1){
+			$line_chart_value1['assign_order']= intval($line_chart_value1['assign_order']);		
+			$line_chart_value1['assign_points_earned'] = intval($line_chart_value1['assign_points_earned']);
+			foreach($line_chart_data2 as $line_chart_value2){
+				if($line_chart_value2['id'] === $line_chart_value1['amid']){
+					$all_homework_scores = $wpdb->get_col('SELECT assign_points_earned FROM an_assignment WHERE amid = '. $line_chart_value2['id']);
+					$class_average = array_sum($all_homework_scores)/count($all_homework_scores);
+										
+					$line_chart_value1=array_merge($line_chart_value1, array('assign_name'=>$line_chart_value2['assign_name'], 'class_average' =>$class_average));
+				}
+			}
+		} 	
+		$result = array(array("Assignment", "Student Score", "Class Average"));
+		foreach($line_chart_data1 as $line_chart_value3){
+			array_push($result, array($line_chart_value3['assign_name'],$line_chart_value3['assign_points_earned'],$line_chart_value3['class_average']));
+		}		
+				
+		
+		echo json_encode($result);	
+		die();
+	}
+	
 	
 	public function add_student(){	
     	global $wpdb;
@@ -570,6 +600,7 @@ if (gradebook_check_user_role('administrator')){
 	include_once( dirname( __FILE__ ) . '/templates/delete-student-template.php' );
 	include_once( dirname( __FILE__ ) . '/templates/edit-assignment-template.php' );
 	include_once( dirname( __FILE__ ) . '/templates/stats-assignment-template.php' );	
+	include_once( dirname( __FILE__ ) . '/templates/stats-student-template.php' );	
 	include_once( dirname( __FILE__ ) . '/templates/gradebook-interface-template.php' );
 	include_once( dirname( __FILE__ ) . '/templates/student-courses-interface-template.php' );
 	include_once( dirname( __FILE__ ) . '/templates/edit-course-template.php' );
