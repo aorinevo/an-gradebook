@@ -10,6 +10,7 @@ ob_start();
     <button type="button" id="add-assignment" class="wp-core-ui button">Add Assignment</button>
     <button type="button" id="edit-assignment" class="wp-core-ui button">Edit Assignment</button>  
     <button type="button" id="stats-assignment" class="wp-core-ui button">Assignment Statistics</button>      
+    <button type="button" id="stats-student" class="wp-core-ui button">Student Statistics</button>          
     <button type="button" id="delete-assignment" class="wp-core-ui button">Delete Assignment</button>
     </div>    
     <hr/>
