@@ -3,8 +3,8 @@ Contributors: anevo, jamarparris
 Donate link: 
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
-Tested up to: 3.8.1
-Stable tag: 2.3.2
+Tested up to: 3.9
+Stable tag: 2.4.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -39,14 +39,48 @@ Students are able to:
 
 == Screenshots ==
 
-1. GradeBook with a few courses.
+1. GradeBook with two courses.
 2. GradeBook with a course selected and corresponding students displayed.
-3. Add assignment modal.
-4. GradeBook with a course and student selected.
-5. Admin view of GradeBook with an assignment selected - pie chart displays automatically.
-6. Student view of GradeBook with an assignment selected - pie chart displays automatically.
+3. Line chart for a particular student.
+4. Pie chart for a particular assignment.
+5. Create assignment modal.
+6. Student view of GradeBook.
 
 == Changelog ==
+
+Version 2.4.1:
+
+* Added two buttons: Student Statistics and Assignment Statistics.  When a student is logged in and clicks on row heading “Grades:” the Student Statistics button becomes active.  If the student then clicks this button, a modal appears with a line chart displaying the students scores vs. class average on each assignment.  If there are no assignments then the modal will display the message: There is no content to display.  When a student is logged in and clicks on column heading for any assignment, the Assignment Statistics button becomes active.  If the student then clicks this button, a modal appears with a pie chart displaying the grade distribution for that assignment.
+
+Version 2.4:
+
+* Added a student statistics button. When a student is selected and the button is clicked a student statistics modal appears displaying student scores vs. class average for all assignments to date.  If there are no assignments, then the modal contains the message: There is no content to display.
+
+Version 2.3.7:
+
+* Added a functions.php file to hold all commonly used functions (i.e. hooks, sorting, etc...) 
+* Added a delete_user hook so that when an admin deletes a user from the database through the Users admin page, the hook deletes the user from any gradebook table that they are associated with."
+
+Version 2.3.6:
+
+* uninstall.php needed a line to remove an_gradebook_db_version from wp_options table, otherwise a user that has deleted the plugin that reinstalls will not obtain all the necessary tables.
+
+Version 2.3.5:
+
+* Added an Assignment Statistics modal. Instead of the assignment pie chart being displayed once an assignment column is selected, you now click the Assignment Statistics button and a modal appears containing the pie chart.  This will allow for easy addition of other charts in the future.
+
+
+Version 2.3.4:
+
+* Started to split GradeBook.php into smaller files. Almost all templates are now in the templates folder.  AN_GradeBook_Database class is now in an-gradebook-database.php.
+
+Version 2.3.3:
+
+* Upgraded columns name, school, and semester in table an_gradebooks to character set utf8  and collate utf8_general_ci so that international characters can be stored correctly.
+
+Version 2.3.2:
+
+* You can now delete a student from a particular gradebook, all the gradebooks, or the wordpress database.
 
 Version 2.3.1:
 

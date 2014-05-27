@@ -21,7 +21,7 @@
      google.load('visualization', '1.0', {'packages':['corechart']});
 
 
-        function drawChart(data) {
+        function drawPieChart(data) {
         // Create the data table.
         var datag = new google.visualization.DataTable();
 		datag.addColumn('string', 'Grades');
@@ -44,6 +44,23 @@
         var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
          chart.draw(datag, optionsg);
       }
+ 		function drawLineChart(data) {
+        var data = google.visualization.arrayToDataTable(data);
+
+        var options = {
+          title: 'Student Grades vs. Class Average',
+          'width': '700',
+		  'height': '300',          
+          vAxis: 
+          	{
+          	 maxValue : 100,
+          	 minValue : 0
+          	}
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+      }      
       
     $.fn.serializeObject = function() {
         var o = {};
@@ -792,40 +809,111 @@
             return false;
         }
     });
-	AN.Views.PieChartView = AN.Views.Base.extend({
-		el: '#chart_div',
-		initialize: function(){
-		   this.listenTo(AN.GlobalVars.assignments, 'change:selected', this.toggleChart);
-		   this.listenTo(AN.GlobalVars.cells, 'change:assign_points_earned', this.reloadChart);		   
-		   return this;
-		},
-		toggleChart: function(assignment){
-			if(assignment.get('selected')){
+     
+    
+    
+	AN.Views.AssignmentStatisticsView = AN.Views.Base.extend({
+		id: 'stats-assignment-container-container',
+        events: {
+            'click button#stats-assignment-close': 'editCancel',
+            'click a#an-piechart': 'displayPieChart',
+            'click a#an-linechart': 'displayLineChart',            
+            'click a.media-modal-close' : 'editCancel'
+        },		
+		initialize: function(){	   
+            var assignment = AN.GlobalVars.assignments.findWhere({
+                selected: true
+            });      
+            $('body').append(this.render().el);
+            return this;   		   
+		},		
+		displayPieChart: function(){
+			$('.media-router').children().removeClass('active');
+			$('#an-piechart').addClass('active');
+            var assignment = AN.GlobalVars.assignments.findWhere({
+                selected: true
+            });			
 			$.get(ajaxurl, { 
 						action: 'get_pie_chart',
 						amid : assignment.get('id'),
 						gbid : assignment.get('gbid')
 					},
-					function(data){
-						$('#chart_div').empty()					
-						drawChart({grades: data['grades'],assign_name: assignment.get('assign_name')});
+					function(data){		
+						//drawLineChart();		
+						drawPieChart({grades: data['grades'],assign_name: assignment.get('assign_name')});
 					}, 
-					'json');
-			return this;
-			} else {
-				$('#chart_div').empty();			
-			}
-		},
-		reloadChart: function(cell){
-			var amid = cell.get('amid');
-			var assignment = AN.GlobalVars.assignments.findWhere({id: amid});			
-			var selected_assignment = AN.GlobalVars.assignments.findWhere({selected: true});
-			if(selected_assignment){ var selected_amid = selected_assignment.get('id');}
-			if(amid == selected_amid) this.toggleChart(assignment);
-		}
-	});    
-	
-	AN.GlobalVars.pieChart = new AN.Views.PieChartView();
+					'json');    	
+			return this;					
+		},	
+        render: function() {
+            var self = this;
+            var assignment = AN.GlobalVars.assignments.findWhere({
+                selected: true
+            });
+            var template = _.template($('#stats-assignment-template').html(), {
+                    assignment: assignment
+            });
+            self.$el.html(template);             
+            this.displayPieChart();                                            
+            this.$el.append('<div class="media-modal-backdrop"></div>');           
+            return this;
+        },
+        editCancel: function() {
+            this.remove();            
+            return false;
+        }
+    });
+    
+	AN.Views.StudentStatisticsView = AN.Views.Base.extend({
+		id: 'stats-student-container-container',
+        events: {
+            'click button#stats-student-close': 'editCancel',
+            'click a#an-piechart': 'displayPieChart',
+            'click a#an-linechart': 'displayLineChart',            
+            'click a.media-modal-close' : 'editCancel'
+        },		
+		initialize: function(){	   
+            var student = AN.GlobalVars.students.findWhere({
+                selected: true
+            });      
+            $('body').append(this.render().el);
+            return this;   		   
+		},		
+		displayLineChart: function(){
+			$('.media-router').children().removeClass('active');
+			$('#an-piechart').addClass('active');
+            var student = AN.GlobalVars.students.findWhere({
+                selected: true
+            });			
+			$.get(ajaxurl, { 
+						action: 'get_line_chart',
+						uid : student.get('id'),
+						gbid : student.get('gbid')
+					},
+					function(data){	
+						data.length ==1 ? $('.media-frame-content').html('<div style="padding: 10px;"> There is no content to display </div>') : drawLineChart(data);							
+					}, 
+					'json');    	
+			return this;					
+		},	
+        render: function() {
+            var self = this;
+            var student = AN.GlobalVars.students.findWhere({
+                selected: true
+            });
+            var template = _.template($('#stats-student-template').html(), {
+                    student: student
+            });
+            self.$el.html(template);             
+            this.displayLineChart();                                            
+            this.$el.append('<div class="media-modal-backdrop"></div>');           
+            return this;
+        },
+        editCancel: function() {
+            this.remove();            
+            return false;
+        }
+    });    
 	
     AN.Views.Gradebook = AN.Views.Base.extend({
         id: 'an-gradebook',
@@ -898,6 +986,8 @@
             'click button#delete-student': 'deleteStudent',
             'click button#add-assignment': 'editAssignmentPre',
             'click button#edit-assignment': 'editAssignment',
+            'click button#stats-assignment': 'statsAssignment',
+            'click button#stats-student': 'statsStudent',            
             'click button#delete-assignment': 'deleteAssignment',
             'click #an-gradebook-container' : 'toggleEditDelete'
         },
@@ -927,15 +1017,15 @@
         toggleEditDelete: function(){
             var x = AN.GlobalVars.students.findWhere({selected: true});
             if(x){
-              $('#edit-student, #delete-student').attr('disabled',false);
+              $('#edit-student, #delete-student, #stats-student').attr('disabled',false);
             }else{
-              $('#edit-student, #delete-student').attr('disabled',true);
+              $('#edit-student, #delete-student, #stats-student').attr('disabled',true);
             }
             var y = AN.GlobalVars.assignments.findWhere({selected: true});
             if(y){
-              $('#edit-assignment, #delete-assignment').attr('disabled',false);
+              $('#edit-assignment, #delete-assignment, #stats-assignment').attr('disabled',false);
             }else{
-              $('#edit-assignment, #delete-assignment').attr('disabled',true);
+              $('#edit-assignment, #delete-assignment, #stats-assignment').attr('disabled',true);
             }            
         },
         close: function() {
@@ -987,6 +1077,14 @@
             var view = new AN.Views.EditAssignmentView();         
             return false;
         },
+        statsAssignment: function(){
+            var view = new AN.Views.AssignmentStatisticsView(); 
+            return false;			
+        },
+        statsStudent: function(){
+            var view = new AN.Views.StudentStatisticsView(); 
+            return false;			
+        },        
         sortAssignment: function(ev) {
             var template = _.template($('#gradebook-interface-template').html(), {});
             this.$el.html(template);
