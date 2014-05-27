@@ -48,6 +48,10 @@ Students are able to:
 
 == Changelog ==
 
+Version 2.4.2:
+
+* Fixed a bug where menu items with same position as GradeBook would be overwritten.
+
 Version 2.4.1:
 
 * Added two buttons: Student Statistics and Assignment Statistics.  When a student is logged in and clicks on row heading “Grades:” the Student Statistics button becomes active.  If the student then clicks this button, a modal appears with a line chart displaying the students scores vs. class average on each assignment.  If there are no assignments then the modal will display the message: There is no content to display.  When a student is logged in and clicks on column heading for any assignment, the Assignment Statistics button becomes active.  If the student then clicks this button, a modal appears with a pie chart displaying the grade distribution for that assignment.
