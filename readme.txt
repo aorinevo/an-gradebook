@@ -71,7 +71,7 @@ Version 2.3.7:
 
 Version 2.3.6:
 
-* uninstall.php needed a line to remove an_gradebook_db_version from wp_options table, otherwise a user that has deleted the plugin that reinstalls will not obtain all the necessary tables.
+* uninstall.php needed a line to remove an_gradebook_db_version  from wp_options table, otherwise a user that has deleted the plugin that reinstalls will not obtain all the necessary tables.
 
 Version 2.3.5:
 
