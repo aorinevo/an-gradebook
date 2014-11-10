@@ -3,8 +3,8 @@ Contributors: anevo, jamarparris
 Donate link: 
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
-Tested up to: 3.9
-Stable tag: 2.4.2
+Tested up to: 4.0
+Stable tag: 2.4.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +47,11 @@ Students are able to:
 6. Student view of GradeBook.
 
 == Changelog ==
+
+Version 2.4.4:
+
+* Added module code pattern.
+* Fixed bug where gradebook was not displaying.
 
 Version 2.4.2:
 
