@@ -1,4 +1,4 @@
-AN.Views.CellView = (function(my){
+AN.Views.CellView = (function($, my){
    my = AN.Views.Base.extend({
         tagName: 'td',
         events: {
@@ -103,4 +103,4 @@ AN.Views.CellView = (function(my){
         }
     });
 return my;
-})(AN.Views.CellView ||{});
+})(jQuery, AN.Views.CellView ||{});

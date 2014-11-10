@@ -1,5 +1,5 @@
-
-	AN.Views.StudentStatisticsView = AN.Views.Base.extend({
+AN.Views.StudentStatisticsView = (function($,my){
+	my = AN.Views.Base.extend({
 		id: 'stats-student-container-container',
         events: {
             'click button#stats-student-close': 'editCancel',
@@ -48,5 +48,7 @@
             this.remove();            
             return false;
         }
-    });    
+    });
+    return my;
+})(jQuery, AN.Views.StudentStatisticsView || {});   
 	

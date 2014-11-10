@@ -1,6 +1,5 @@
-   
-        
-    AN.Views.EditAssignmentView = AN.Views.Base.extend({
+AN.Views.EditAssignmentView = (function($,my){
+	my = AN.Views.Base.extend({
         id: 'edit-assignment-form-container-container',
         events: {
             'click button#edit-assignment-cancel': 'editCancel',
@@ -99,3 +98,5 @@
             return false;
         }
     });
+    return my;
+})(jQuery, AN.Views.EditAssignmentView || {});    

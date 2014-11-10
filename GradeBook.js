@@ -1,5 +1,4 @@
 (function($,AN) {
-    console.log(AN);
     AN.GlobalVars.cells = new AN.Collections.Cells([]);
     AN.GlobalVars.assignments = new AN.Collections.Assignments([]);      
     AN.GlobalVars.students = new AN.Collections.Students([]);      

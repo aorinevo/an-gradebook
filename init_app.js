@@ -15,12 +15,9 @@
   AN.Views.Base = Backbone.View.extend();
   AN.Routers.Base = Backbone.Router.extend();
 
-(function($){  
-  
-     google.load('visualization', '1.0', {'packages':['corechart']});
-
-
-        function drawPieChart(data) {
+ google.load('visualization', '1.0', {'packages':['corechart']});  
+ 
+     function drawPieChart(data) {
         // Create the data table.
         var datag = new google.visualization.DataTable();
 		datag.addColumn('string', 'Grades');
@@ -60,7 +57,8 @@
         var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
         chart.draw(data, options);
       }      
-      
+
+(function($){    
     $.fn.serializeObject = function() {
         var o = {};
         var a = this.serializeArray();

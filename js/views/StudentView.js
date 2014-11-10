@@ -1,4 +1,5 @@
-    AN.Views.StudentView = AN.Views.Base.extend({
+AN.Views.StudentView = (function($,my){
+	my = AN.Views.Base.extend({
         tagName: 'tr',
         events: {
             'click .student': 'selectStudent'
@@ -84,3 +85,5 @@
             }
         }
     });
+    return my;
+})(jQuery, AN.Views.StudentView || {});

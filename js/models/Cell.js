@@ -1,5 +1,4 @@
 AN.Models.Cell = (function(my){
-	console.log(my);
     my = AN.Models.Base.extend({
         defaults: {
             uid: null,
@@ -19,6 +18,5 @@ AN.Models.Cell = (function(my){
             });
         }
     });
-	console.log(my);
 	return my;
 })(AN.Models.Cell || {});

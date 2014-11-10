@@ -1,5 +1,5 @@
-   
-	AN.Views.AssignmentStatisticsView = AN.Views.Base.extend({
+AN.Views.AssignmentStatisticsView = (function($, my){
+	my = AN.Views.Base.extend({
 		id: 'stats-assignment-container-container',
         events: {
             'click button#stats-assignment-close': 'editCancel',
@@ -50,4 +50,5 @@
             return false;
         }
     });
-    
+    return my;
+})(jQuery, AN.Views.AssignmentStatisticsView);

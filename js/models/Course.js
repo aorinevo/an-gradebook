@@ -1,4 +1,4 @@
-    AN.Models.Course = AN.Models.Base.extend({
+AN.Models.Course = AN.Models.Base.extend({
         defaults: {
             name: 'Calculus I',
             school: 'Bergen',
@@ -6,4 +6,4 @@
             year: '2014',
             selected: false
         }
-    });  
+});  
