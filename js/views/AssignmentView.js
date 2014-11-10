@@ -1,4 +1,5 @@
-    AN.Views.AssignmentView = AN.Views.Base.extend({
+AN.Views.AssignmentView = (function($,my){
+	my = AN.Views.Base.extend({
         tagName: 'th',
         className: 'assignment manage-column sortable asc',
         events: {
@@ -70,3 +71,5 @@
             }
         }
     });
+	return my;
+})(jQuery, AN.Views.AssignmentView ||{});

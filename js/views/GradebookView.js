@@ -1,5 +1,5 @@
-
-    AN.Views.Gradebook = AN.Views.Base.extend({
+AN.Views.Gradebook = (function($,my){
+      my = AN.Views.Base.extend({
         id: 'an-gradebook',
         initialize: function() {
             var self = this;
@@ -216,3 +216,5 @@
             }, 'json');
         }
     });
+    return my;
+})(jQuery, AN.Views.Gradebook || {});

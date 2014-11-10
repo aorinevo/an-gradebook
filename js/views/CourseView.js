@@ -1,5 +1,5 @@
-       
-    AN.Views.CourseView = AN.Views.Base.extend({
+AN.Views.CourseView = (function($,my){
+	my = AN.Views.Base.extend({
         tagName: 'tr',
         events: {
             'click .course': 'selectCourse'
@@ -52,4 +52,6 @@
             }
         }
     });
+    return my;
+})(jQuery, AN.Views.CourseView || {});    
     

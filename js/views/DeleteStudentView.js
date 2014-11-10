@@ -1,4 +1,5 @@
-    AN.Views.DeleteStudentView = AN.Views.Base.extend({
+AN.Views.DeleteStudentView = (function($,my){
+	my = AN.Views.Base.extend({
         id: 'delete-student-form-container-container',
         events: {
             'click button#delete-student-cancel': 'deleteCancel',
@@ -73,3 +74,5 @@
             return false;
         }
     });
+    return my;
+})(jQuery, AN.Views.DeleteStudentView || {});

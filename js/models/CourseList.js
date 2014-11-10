@@ -1,3 +1,3 @@
-    AN.Collections.Courses = AN.Collections.Base.extend({
-        model: AN.Models.Course
-    });
+AN.Collections.Courses = AN.Collections.Base.extend({
+	model: AN.Models.Course
+});

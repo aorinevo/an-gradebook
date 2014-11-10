@@ -1,5 +1,5 @@
-
-    AN.Views.EditStudentView = AN.Views.Base.extend({
+AN.Views.EditStudentView = (function($,my){
+	my = AN.Views.Base.extend({
         id: 'edit-student-form-container-container',
         events: {
             'click button#edit-student-cancel': 'editCancel',
@@ -89,3 +89,5 @@
             return false;
         }
     });
+	return my;
+})(jQuery, AN.Views.EditStudentView || {});	

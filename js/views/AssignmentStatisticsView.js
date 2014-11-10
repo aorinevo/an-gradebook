@@ -1,7 +1,4 @@
-   
-AN.Views.AssignmentStatisticsView = (function(google, my){
-   console.log(my);
-   console.log(google);
+AN.Views.AssignmentStatisticsView = (function($, my){
 	my = AN.Views.Base.extend({
 		id: 'stats-assignment-container-container',
         events: {
@@ -54,4 +51,4 @@ AN.Views.AssignmentStatisticsView = (function(google, my){
         }
     });
     return my;
-})(google, AN.Views.AssignmentStatisticsView);
+})(jQuery, AN.Views.AssignmentStatisticsView);

@@ -4,7 +4,7 @@ Donate link:
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
 Tested up to: 4.0
-Stable tag: 2.4.5
+Stable tag: 2.4.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -51,6 +51,10 @@ Students are able to:
 * plugin icon: https://www.iconfinder.com/icons/175285/edit_property_icon#size=256
 
 == Changelog ==
+
+Version 2.4.6:
+
+* Removed images directory and jquery-1.11.0.min.js file. The directory contained images related to jquery-ui v1.11.0, which was not being used. jquery v1.10+ is sufficient for this plugin and is now loaded from wp-includes directory but for this to work, the global jQuery variable had to be passed into all the modules.
 
 Version 2.4.5:
 
