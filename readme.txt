@@ -4,7 +4,7 @@ Donate link:
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
 Tested up to: 4.0
-Stable tag: 2.4.4
+Stable tag: 2.4.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -46,7 +46,15 @@ Students are able to:
 5. Create assignment modal.
 6. Student view of GradeBook.
 
+== Credits ==
+
+* plugin icon: https://www.iconfinder.com/icons/175285/edit_property_icon#size=256
+
 == Changelog ==
+
+Version 2.4.5:
+
+* Fix: v2.4.4 broke statistic views for instructors.
 
 Version 2.4.4:
 

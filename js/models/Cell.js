@@ -18,6 +18,5 @@ AN.Models.Cell = (function(my){
             });
         }
     });
-	console.log(my);
 	return my;
 })(AN.Models.Cell || {});
