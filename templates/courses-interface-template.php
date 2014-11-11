@@ -1,6 +1,3 @@
-<?php
-ob_start();
-?>
     <script id="courses-interface-template" type="text/template">
     <div id="courses-interface-buttons-container">
     <button id="add-course" class="wp-core-ui button">Add Course</button>        
@@ -18,8 +15,3 @@ ob_start();
        </tbody>
       </table>
     </script>    
-<?php
-$mytemplate = ob_get_contents();
-ob_get_clean();
-echo $mytemplate;
-?>

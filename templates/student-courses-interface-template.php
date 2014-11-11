@@ -1,6 +1,4 @@
-<?php
-ob_start();
-?>
+
     <script id="student-courses-interface-template" type="text/template">    
     <table id="an-courses-container" class="wp-list-table widefat fixed pages">  
        <thead>
@@ -12,8 +10,3 @@ ob_start();
        </tbody>
       </table>
     </script> 
-<?php
-$mytemplate = ob_get_contents();
-ob_get_clean();
-echo $mytemplate;
-?>

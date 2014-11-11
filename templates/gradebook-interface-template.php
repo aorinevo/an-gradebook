@@ -1,6 +1,3 @@
-<?php
-ob_start();
-?>
     <script id="gradebook-interface-template" type="text/template">
     <hr/>
     <div id="gradebook-interface-buttons-container">
@@ -23,8 +20,3 @@ ob_start();
     <tbody id="students"></tbody>
     </table>
     </script>
-<?php
-$mytemplate = ob_get_contents();
-ob_get_clean();
-echo $mytemplate;
-?>

@@ -1,7 +1,4 @@
-<?php
-ob_start();
-?>
-    <script id="edit-course-template" type="text/template">
+<script id="edit-course-template" type="text/template">
     <div id="edit-course-form-container" class="media-modal wp-core-ui"> 
     <a class="media-modal-close" title="Close"><span class="media-modal-icon"></span></a>
     	<div class="media-modal-content">
@@ -41,8 +38,3 @@ ob_start();
     	</div>  
     </div> 
     </script> 
-<?php
-$mytemplate = ob_get_contents();
-ob_get_clean();
-echo $mytemplate;
-?>
