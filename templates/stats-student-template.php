@@ -1,6 +1,3 @@
-<?php
-ob_start();
-?>
     <script id="stats-student-template" type="text/template">
     <div id="stats-student-form-container" class="media-modal wp-core-ui"> 
     <a class="media-modal-close" title="Close"><span class="media-modal-icon"></span></a>
@@ -35,8 +32,3 @@ ob_start();
     	</div>  
     </div> 
     </script>     
-<?php
-$mytemplate = ob_get_contents();
-ob_get_clean();
-echo $mytemplate;
-?>

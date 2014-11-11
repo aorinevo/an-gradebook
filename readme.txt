@@ -4,7 +4,7 @@ Donate link:
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
 Tested up to: 4.0
-Stable tag: 2.4.5
+Stable tag: 2.4.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -51,6 +51,9 @@ Students are able to:
 * plugin icon: https://www.iconfinder.com/icons/175285/edit_property_icon#size=256
 
 == Changelog ==
+
+Version 2.4.7:
+* Removed call to ob_start, ob_get_contents, and ob_get_clean.
 
 Version 2.4.6:
 
