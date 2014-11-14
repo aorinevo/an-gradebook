@@ -3,7 +3,7 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 2.4.7
+Version: 2.4.8
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
@@ -84,9 +84,8 @@ class AN_GradeBook_Scripts{
 		wp_enqueue_script( 'googlejsapi' ); 	
     	wp_enqueue_script( 'backbone' );
     	wp_enqueue_script( 'underscore' );	
-		wp_enqueue_script( 'jquery' );
-//		wp_enqueue_script( 'jquery-ui-button' );			
-		wp_enqueue_script( 'jquery-ui-datepicker' );	
+		wp_enqueue_script( 'jquery' );			
+		wp_enqueue_script( 'jquery-ui-datepicker',null,array('jquery') );	
 	} else {
 	  return;
 	}	
@@ -556,7 +555,7 @@ if (!gradebook_check_user_role('administrator')){
 		$assignmentDetail['amid'] = intval($assignmentDetail['amid']);		
 		$assignmentDetail['uid'] = intval($assignmentDetail['uid']);				
 		$assignmentDetail['assign_order'] = intval($assignmentDetail['assign_order']);			
-		$assignmentDetail['assign_points_earned'] = intval($assignmentDetail['assign_points_earned']);		
+		$assignmentDetail['assign_points_earned'] = floatval($assignmentDetail['assign_points_earned']);		
 		$assignmentDetail['gbid'] = intval($assignmentDetail['gbid']);	
 		$assignmentDetail['id'] = intval($assignmentDetail['id']);
 	}    
