@@ -84,9 +84,8 @@ class AN_GradeBook_Scripts{
 		wp_enqueue_script( 'googlejsapi' ); 	
     	wp_enqueue_script( 'backbone' );
     	wp_enqueue_script( 'underscore' );	
-		wp_enqueue_script( 'jquery' );
-//		wp_enqueue_script( 'jquery-ui-button' );			
-		wp_enqueue_script( 'jquery-ui-datepicker' );	
+		wp_enqueue_script( 'jquery' );			
+		wp_enqueue_script( 'jquery-ui-datepicker',null,array('jquery') );	
 	} else {
 	  return;
 	}	

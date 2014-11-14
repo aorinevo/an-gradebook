@@ -1,6 +1,6 @@
 <?php
 class AN_GradeBook_Database{
-	const an_gradebook_db_version = 3;
+	const an_gradebook_db_version = 3.1;
 	public function __construct(){
 		register_activation_hook(__FILE__,array($this,'database_setup'));	
 		add_action('plugins_loaded', array($this,'an_gradebook_upgrade_db'));	
@@ -37,12 +37,13 @@ class AN_GradeBook_Database{
 		//$db_name2 should be changed to $table_name but we'll stick with this for now
 		$db_name2 = 'an_assignments';
 		//The column headings that should be in the an_assignments table are stored in $table_columns
-		$table_columns = array('id','gbid','assign_order','assign_name','assign_date','assign_due');
+		$table_columns = array('id','gbid','assign_order','assign_name','assign_category','assign_date','assign_due');
 		$table_columns_specs = array(
 			'id' => 'int(11) NOT NULL AUTO_INCREMENT',
 			'gbid' => 'int(11) NOT NULL',
 			'assign_order' => 'int(11) NOT NULL',
 			'assign_name' => 'mediumtext NOT NULL',
+			'assign_category' => 'mediumtext NOT NULL',			
 			'assign_date' => 'DATE NOT NULL DEFAULT "0000-00-00"',
 			'assign_due' => 'DATE NOT NULL DEFAULT "0000-00-00"');
 		if($wpdb->get_var('SHOW TABLES LIKE "'.$db_name2.'"') != $db_name2){
@@ -51,6 +52,7 @@ class AN_GradeBook_Database{
 			gbid int(11) NOT NULL,
 			assign_order int(11) NOT NULL,		
 			assign_name mediumtext NOT NULL,
+			assign_category mediumtext NOT NULL,			
 			assign_date DATE NOT NULL DEFAULT "0000-00-00",
 			assign_due DATE NOT NULL DEFAULT "0000-00-00",			
 			PRIMARY KEY  (id) )';
