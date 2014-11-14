@@ -4,7 +4,7 @@ Donate link:
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
 Tested up to: 4.0
-Stable tag: 2.4.8
+Stable tag: 2.4.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,6 +13,7 @@ A simple gradebook built on backbone, underscore, jQuery, JS, mySQL, and php.
 == Description == 
 
 Administrators are able to
+
 * Add/delete students
 * Add/delete courses
 * Add/delete assignments
