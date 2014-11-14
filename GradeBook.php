@@ -555,7 +555,7 @@ if (!gradebook_check_user_role('administrator')){
 		$assignmentDetail['amid'] = intval($assignmentDetail['amid']);		
 		$assignmentDetail['uid'] = intval($assignmentDetail['uid']);				
 		$assignmentDetail['assign_order'] = intval($assignmentDetail['assign_order']);			
-		$assignmentDetail['assign_points_earned'] = intval($assignmentDetail['assign_points_earned']);		
+		$assignmentDetail['assign_points_earned'] = floatval($assignmentDetail['assign_points_earned']);		
 		$assignmentDetail['gbid'] = intval($assignmentDetail['gbid']);	
 		$assignmentDetail['id'] = intval($assignmentDetail['id']);
 	}    

@@ -17,7 +17,7 @@ AN.Views.CellView = (function($, my){
             });
         },
         render: function() {
-            this.$el.html('<div class="view">' + this.model.get('assign_points_earned') + '</div> <input class="edit" type="text" value="' + this.model.get('assign_points_earned') + '"></input>');
+            this.$el.html('<div class="view">' + this.model.get('assign_points_earned') + '</div> <input class="edit" type="text" value="' + parseFloat(this.model.get('assign_points_earned')) + '"></input>');
             this.input = this.$('.edit');
             return this;
         },
@@ -40,7 +40,7 @@ AN.Views.CellView = (function($, my){
                 assign_points_earned: value
             }, function(data) {
                 if(data) self.model.set({
-                    assign_points_earned: parseInt(data['assign_points_earned'])
+                    assign_points_earned: parseFloat(data['assign_points_earned'])
                 });
             }, 'json');
             this.$el.removeClass("editing");
@@ -93,13 +93,6 @@ AN.Views.CellView = (function($, my){
             } else {
                 this.$el.removeClass('selected');
             }
-        }
-    });
-    AN.Models.Assignment = AN.Models.Base.extend({
-        defaults: {
-            assign_name: 'assign name',
-            sorted: '',
-            selected: false
         }
     });
 return my;

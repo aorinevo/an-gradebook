@@ -1,16 +1,44 @@
 <?php
 class AN_GradeBook_Database{
-	const an_gradebook_db_version = 3.1;
+	const an_gradebook_db_version = 3.14;
 	public function __construct(){
-		register_activation_hook(__FILE__,array($this,'database_setup'));	
+		register_activation_hook(__FILE__,array($this,'database_init'));	
+		register_activation_hook(__FILE__,array($this,'database_alter'));			
 		add_action('plugins_loaded', array($this,'an_gradebook_upgrade_db'));	
 	}	
 	public function an_gradebook_upgrade_db(){
-		if(!get_site_option( 'an_gradebook_db_version' ) || self::an_gradebook_db_version > get_site_option( 'an_gradebook_db_version' )){
-			$this->database_setup();
+		if(!get_site_option( 'an_gradebook_db_version' )){
+			$this->database_init();
+		}
+		if(self::an_gradebook_db_version > get_site_option( 'an_gradebook_db_version' )){
+		    $this->database_alter();
 		}
 	}
-	public function database_setup() {
+	public function database_alter(){
+		//Any alterations to the table after they have been created in a previous version should take place here.  This works
+		//by looping through the necessary db alterations based on the current version of the db. To add an alteration use the following  
+		//template code block:
+		//if(get_site_option( 'an_gradebook_db_version' )==[current_db_version]){ 
+		//    do stuff to tables 
+		//    update_option( "an_gradebook_db_version", self::an_gradebook_db_version);
+		// }
+		//where the constant an_gradebook_db_version should be changed to a larger number.
+				
+		global $wpdb;		
+		if(get_site_option( 'an_gradebook_db_version' )==2){
+			$sql = "ALTER TABLE an_gradebooks CHANGE name name MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL, 
+				CHANGE school school TINYTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL, 
+				CHANGE semester semester TINYTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
+			$wpdb->query($sql);		
+			update_option( "an_gradebook_db_version", 3.1 );				
+		}		
+		if(get_site_option( 'an_gradebook_db_version' )==3.1){
+			$sql = "ALTER TABLE an_assignment CHANGE assign_points_earned assign_points_earned decimal(7,2) NOT NULL";
+			$wpdb->query($sql);		
+			update_option( "an_gradebook_db_version", self::an_gradebook_db_version );				
+		}
+	}
+	public function database_init() {
 		global $wpdb;
 	  	$db_name = 'an_gradebooks';
 		if($wpdb->get_var('SHOW TABLES LIKE "'.$db_name.'"') != $db_name){
@@ -59,7 +87,8 @@ class AN_GradeBook_Database{
 			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 			dbDelta($sql);
 		} else {
-			//Otherwise, check if there is something to upgrade in an_assignments table
+			//Otherwise, check if there is something to upgrade in an_assignments table		
+			//anfixme: this needs to move to the database_alter
 			$an_assignments_columns = $wpdb->get_col( "SELECT column_name FROM information_schema.columns
 				WHERE table_name = 'an_assignments' ORDER BY ordinal_position" );
 			$missing_columns = array_diff($table_columns, $an_assignments_columns);
@@ -81,18 +110,12 @@ class AN_GradeBook_Database{
 			gbid int(11) NOT NULL,
     	    amid int(11) NOT NULL,
 	        assign_order int(11) NOT NULL,
-	        assign_points_earned int(11) NOT NULL,
+	        assign_points_earned decimal(7,2) NOT NULL,
 			PRIMARY KEY  (id) )';
 			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 			dbDelta($sql);
-		}
-		if(get_site_option( 'an_gradebook_db_version' )>=2 && get_site_option( 'an_gradebook_db_version' )< self::an_gradebook_db_version){
-			$sql = "ALTER TABLE an_gradebooks CHANGE name name MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL, 
-				CHANGE school school TINYTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL, 
-				CHANGE semester semester TINYTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
-			$wpdb->query($sql);		
-		}
-		update_option( "an_gradebook_db_version", self::an_gradebook_db_version );		
+		}	
+		update_option( "an_gradebook_db_version", self::an_gradebook_db_version );							
 	}	
 }
 ?>
