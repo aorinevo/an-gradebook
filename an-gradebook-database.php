@@ -30,9 +30,9 @@ class AN_GradeBook_Database{
 				CHANGE school school TINYTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL, 
 				CHANGE semester semester TINYTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL";
 			$wpdb->query($sql);		
-			update_option( "an_gradebook_db_version", 3.1 );				
+			update_option( "an_gradebook_db_version", 3 );				
 		}		
-		if(get_site_option( 'an_gradebook_db_version' )==3.1){
+		if(get_site_option( 'an_gradebook_db_version' )==3){
 			$sql = "ALTER TABLE an_assignment CHANGE assign_points_earned assign_points_earned decimal(7,2) NOT NULL";
 			$wpdb->query($sql);		
 			update_option( "an_gradebook_db_version", self::an_gradebook_db_version );				
