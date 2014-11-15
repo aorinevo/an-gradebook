@@ -3,6 +3,7 @@
     AN.GlobalVars.assignments = new AN.Collections.Assignments([]);      
     AN.GlobalVars.students = new AN.Collections.Students([]);      
     AN.GlobalVars.courses = new AN.Collections.Courses([]); 
+    AN.GlobalVars.courseGradebook = new AN.Models.CourseGradebook();
 	AN.GlobalVars.anGradebooks = new AN.Collections.ANGradebooks([]);
 	
     AN.Views.App = AN.Views.Base.extend({
@@ -18,19 +19,7 @@
             template = _.template($('#courses-interface-template').html(), {});
             this.$el.html(template);
             $('#edit-course, #delete-course').attr('disabled',true);
-            $.ajax({
-                url: ajaxurl,
-                data: {
-                    action: 'get_courses'
-                },
-                contentType: 'json',
-                dataType: 'json',
-                success: function(data) {
-                    _.each(data, function(course) {
-                        AN.GlobalVars.courses.add(course);
-                    });
-                }
-            });
+            AN.GlobalVars.courses.fetch();
             this.listenTo(AN.GlobalVars.courses, 'add', this.addCourse);
             return this;
         },

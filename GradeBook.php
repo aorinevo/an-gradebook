@@ -32,6 +32,7 @@ class AN_GradeBook_Scripts{
 		wp_register_script( 'models/StudentList', plugins_url('js/models/StudentList.js',__File__),array( 'init_app','jquery','backbone','underscore' ), null, true );					
 		wp_register_script( 'models/Course', plugins_url('js/models/Course.js',__File__),array( 'init_app','jquery','backbone','underscore' ), null, true );			
 		wp_register_script( 'models/CourseList', plugins_url('js/models/CourseList.js',__File__),array( 'init_app','jquery','backbone','underscore' ), null, true );					
+		wp_register_script( 'models/CourseGradebook', plugins_url('js/models/CourseGradebook.js',__File__),array( 'init_app','jquery','backbone','underscore' ), null, true );					
 		wp_register_script( 'models/ANGradebook', plugins_url('js/models/ANGradebook.js',__File__),array( 'init_app','jquery','backbone','underscore' ), null, true );			
 		wp_register_script( 'models/ANGradebookList', plugins_url('js/models/ANGradebookList.js',__File__),array( 'init_app','jquery','backbone','underscore' ), null, true );							
 //views
@@ -47,7 +48,7 @@ class AN_GradeBook_Scripts{
 		wp_register_script( 'views/AssignmentStatisticsView', plugins_url('js/views/AssignmentStatisticsView.js',__File__),array( 'init_app','jquery','backbone','underscore' ), null, true );																		
 		wp_register_script( 'views/StudentStatisticsView', plugins_url('js/views/StudentStatisticsView.js',__File__),array( 'init_app','jquery','backbone','underscore' ), null, true );																		
 //other scripts		
-		wp_register_script( 'GradeBook_js', plugins_url('GradeBook.js',__File__),array( 'jquery','models/Cell','models/CellList', 'backbone','underscore' ), null, true );
+		wp_register_script( 'GradeBook_js', plugins_url('GradeBook.js',__File__),array( 'jquery','models/Cell','models/CellList','models/Assignment','models/AssignmentList','models/Student','models/StudentList','models/CourseGradebook', 'backbone','underscore' ), null, true );
 		wp_register_script( 'init_app', plugins_url('init_app.js',__File__),array( 'jquery', 'backbone','underscore' ), null, true );		
 		wp_register_script( 'GradeBook_student_js', plugins_url('GradeBook_student.js',__File__),array( 'jquery', 'backbone','underscore' ), null, true );
 	}
@@ -65,6 +66,7 @@ class AN_GradeBook_Scripts{
     	wp_enqueue_script( 'models/StudentList' );    	
     	wp_enqueue_script( 'models/Course' );    	
     	wp_enqueue_script( 'models/CourseList' );     
+    	wp_enqueue_script( 'models/CourseGradebook' );      	
     	wp_enqueue_script( 'models/ANGradebook' );    	
     	wp_enqueue_script( 'models/ANGradebookList' );     		
 //views
@@ -90,17 +92,67 @@ class AN_GradeBook_Scripts{
 	  return;
 	}	
 	
-		if (gradebook_check_user_role('administrator')){			
+	if (gradebook_check_user_role('administrator')){			
 			wp_enqueue_script('GradeBook_js');
  		} else {
 			wp_enqueue_script('GradeBook_student_js');
  		}
  	}	
+	public function an_gradebook_admin_help_tab(){
+   		$screen = get_current_screen();
+		$screen->add_help_tab( array( 
+	   	'id' => 'an_gradebook_display_course',     
+	   	'title' => 'GradeBook',     
+	   	'content' => '<ul>
+	   	  <li>Create a gradebook by clicking on the Add Course button.</li>
+	   	  <li>To show the gradebook, click on the Course name.</li>
+	   	  </ul>' 
+		) );
+		$screen->add_help_tab( array( 
+	   	'id' => 'an_gradebook_display_student_statistics',       
+	   	'title' => 'Student Statistics',     
+	   	'content' => '<ul>
+	   	  <li>Click on student\'s name</li>
+	   	  <li>Click on the Student Statistics button</li>
+	   	</ul>' 
+		) );	
+	} 	
+	public function an_gradebook_student_help_tab(){
+   		$screen = get_current_screen();
+		$screen->add_help_tab( array( 
+	   	'id' => 'an_gradebook_display_course',     
+	   	'title' => 'GradeBook',     
+	   	'content' => '<ul>
+	   	  <li>To show the gradebook, click on the Course name.</li>
+	   	  </ul>' 
+		) );
+		$screen->add_help_tab( array( 
+	   	'id' => 'an_gradebook_display_student_statistics',           
+	   	'title' => 'Student Statistics',      
+	   	'content' => '<ul>
+	   	  <li>Click on the Grades: cell</li>
+	   	  <li>Click on the Student Statistics button</li>
+	   	</ul>'  
+		) );	
+		$screen->add_help_tab( array( 
+	   	'id' => 'an_gradebook_display_assignment_statistics',   
+	   	'title' => 'Assignment Statistics',    
+	   	'content' => '<ul>
+	   	  <li>Click on an assignment header cell</li>
+	   	  <li>Click on the Assignment Statistics button</li>
+	   	</ul>'  
+		) );		
+	} 		
 	public function register_an_gradebook_menu_page(){	
 		if (gradebook_check_user_role('administrator')){
-    		add_menu_page( 'GradeBook', 'GradeBooks', 'administrator', 'an_gradebook_page', 'an_gradebook_menu_page', 'dashicons-book-alt', '6.12' ); 
+    		$gradebook_page = add_menu_page( 'GradeBook', 'GradeBooks', 'administrator', 'an_gradebook_page', 'an_gradebook_menu_page', 'dashicons-book-alt', '6.12' ); 
+    		add_action('load-'.$gradebook_page,array($this, 'an_gradebook_admin_help_tab'));			    		
+			//add_submenu_page( 'an_gradebook_page', 'GradeBook','All GradeBooks', 'administrator', 'an_gradebook_page');
+			//$settings_help = add_submenu_page( 'an_gradebook_page', 'Setting','Settings', 'administrator', 'an_gradebook_settings_page','an_gradebook_settings_page' );     	
+    		//add_action('load-'.$settings_help, 'an_gradebook_settings_add_help_tab');			
 		} else {
-    		add_menu_page( 'GradeBook', 'GradeBooks', 'subscriber', 'an_gradebook_page', 'an_gradebook_menu_page', 'dashicons-book-alt', '6.12' ); 
+    		$gradebook_page = add_menu_page( 'GradeBook', 'GradeBooks', 'subscriber', 'an_gradebook_page', 'an_gradebook_menu_page', 'dashicons-book-alt', '6.12' ); 
+    		add_action('load-'.$gradebook_page,array($this, 'an_gradebook_student_help_tab'));		
 		}
 	} 	
 }
@@ -126,6 +178,7 @@ class AN_GradeBookAPI{
 		add_action('wp_ajax_get_assignments',array($this, 'get_assignments'));
 		add_action('wp_ajax_get_assignment', array($this, 'get_assignment'));	
 		add_action('wp_ajax_get_gradebook', array($this, 'get_gradebook'));			
+		add_action('wp_ajax_get_gradebook_entire', array($this, 'get_gradebook_entire'));			
 		add_action('wp_ajax_get_pie_chart', array($this, 'get_pie_chart'));	
 		add_action('wp_ajax_get_line_chart', array($this, 'get_line_chart'));			
 		add_action('wp_ajax_get_line_chart_studentview', array($this, 'get_line_chart_studentview'));			
@@ -531,6 +584,58 @@ if (!gradebook_check_user_role('administrator')){
    die();
 }
 
+//This function is not registered.  It is here just as an idea of another function that may be useful.
+public function get_gradebook_info(){
+   global $wpdb;
+   $wpdb->show_errors();
+if (!gradebook_check_user_role('administrator')){	
+		echo json_encode(array("status" => "Not Allowed."));
+		die();
+	}    
+   $gradebookDetails = $wpdb->get_results('SELECT * FROM an_gradebook WHERE gbid = '. $_GET['gbid'], ARRAY_A);
+   echo json_encode($gradebookDetails);
+   die();
+}
+
+public function get_gradebook_entire(){
+	global $wpdb;
+	$gbid = $_GET['gbid'];
+	if (!gradebook_check_user_role('administrator')){	
+		echo json_encode(array("status" => "Not Allowed."));
+		die();
+	}    	
+    $gradebook_students = $wpdb->get_results('SELECT * FROM an_gradebook WHERE gbid = '. $_GET['gbid'], ARRAY_A);	
+	$assignments = $wpdb->get_results('SELECT * FROM an_assignments WHERE gbid = '. $gbid, ARRAY_A);
+	$student_assignments = $wpdb->get_results('SELECT * FROM an_assignment WHERE gbid = '. $_GET['gbid'], ARRAY_A);
+	$students = $wpdb->get_results('SELECT uid FROM an_gradebook WHERE gbid = '. $_GET['gbid'], ARRAY_N);
+   	foreach($students as &$value){
+        $studentData = get_userdata($value[0]);
+        $value = array(
+          	'firstname'=> $studentData->first_name, 
+          	'lastname'=>$studentData->last_name, 
+          	'id'=>$studentData->ID,
+          	'gbid' => intval($_GET['gbid'])
+          	);
+    }
+    usort($student_assignments, build_sorter('assign_order')); 
+	foreach($student_assignments as &$student_assignment){
+		$student_assignment['amid'] = intval($student_assignment['amid']);		
+		$student_assignment['uid'] = intval($student_assignment['uid']);				
+		$student_assignment['assign_order'] = intval($student_assignment['assign_order']);			
+		$student_assignment['assign_points_earned'] = floatval($student_assignment['assign_points_earned']);		
+		$student_assignment['gbid'] = intval($student_assignment['gbid']);	
+		$student_assignment['id'] = intval($student_assignment['id']);
+	}  
+   echo json_encode(
+   array(
+   		"gradebooks_students"=>$gradebook_students,
+   		"assignments"=>$assignments, 
+   		"student_assignments" => $student_assignments, 
+   		"students"=>$students
+   ));
+   die();
+}
+
 public function get_student_gradebook(){
    global $wpdb;
    $wpdb->show_errors();   
@@ -671,6 +776,18 @@ if (!gradebook_check_user_role('administrator')){
 $an_gradebook_scripts = new AN_GradeBook_Scripts();
 $an_gradebook_database = new AN_GradeBook_Database();
 $an_gradebookapi = new AN_GradeBookAPI();
+
+/*
+function an_gradebook_settings_page(){
+	if (gradebook_check_user_role('administrator')){	
+	echo '<div class="wrap">
+			<h2>Settings</h2>
+			<div id="an-gradebooks-settings"></div>
+		  </div>';
+	}
+}
+*/
+
 
 function an_gradebook_menu_page(){
 if (gradebook_check_user_role('administrator')){

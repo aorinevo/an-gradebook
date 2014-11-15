@@ -31,6 +31,7 @@ The password will be set to *password*.
 *Note: If students are added using their user_id, then their username and password remains unchanged, provided that the respective information exists in the database.*
 
 Students are able to:
+
 * View their grades
 * View basic statistics for assignments;  a pie chart corresponding to the grade distribution of a particular assignment is provided when an assignment header cell is selected; a line graph comparing student performance to class average is provided when a row header cell is selected.
 
