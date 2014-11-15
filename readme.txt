@@ -4,7 +4,7 @@ Donate link:
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
 Tested up to: 4.0
-Stable tag: 2.4.9
+Stable tag: 2.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -31,6 +31,7 @@ The password will be set to *password*.
 *Note: If students are added using their user_id, then their username and password remains unchanged, provided that the respective information exists in the database.*
 
 Students are able to:
+
 * View their grades
 * View basic statistics for assignments;  a pie chart corresponding to the grade distribution of a particular assignment is provided when an assignment header cell is selected; a line graph comparing student performance to class average is provided when a row header cell is selected.
 
@@ -59,6 +60,11 @@ Students are able to:
 * plugin icon: https://www.iconfinder.com/icons/175285/edit_property_icon#size=256
 
 == Changelog ==
+
+Version 2.5:
+
+* Added Help menu located at the top right of the page.  There you’ll find information on how to interact with the gradebook.
+* Reduced the amount of ajax calls when building the gradebook for a particular course.  Before 4 ajax calls took place, and the page had to wait till all calls returned successfully before rendering.  Now there is just one ajax call.  This had a significant impact on the load times.
 
 Version 2.4.8:
 

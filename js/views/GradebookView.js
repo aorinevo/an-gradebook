@@ -3,63 +3,29 @@ AN.Views.Gradebook = (function($,my){
         id: 'an-gradebook',
         initialize: function() {
             var self = this;
-			var aj1 = $.ajax({
-                url: ajaxurl,
-                data: {
-                    action: 'get_students',
-                    gbid: this.model.id
-                },
-                contentType: 'json',
-                dataType: 'json'
-            });
-            var aj2 = $.ajax({
-                url: ajaxurl,
-                data: {
-                    action: 'get_assignments',
-                    gbid: this.model.id
-                },
-                contentType: 'json',
-                dataType: 'json'
-            });
-            var aj3 = $.ajax({
-                url: ajaxurl,
-                data: {
-                    action: 'get_assignment',
-                    gbid: this.model.id
-                },
-                contentType: 'json',
-                dataType: 'json'
-            });
-			var aj4 = $.ajax({
-                url: ajaxurl,
-                data: {
-                    action: 'get_gradebook',
-                    gbid: this.model.id
-                },
-                contentType: 'json',
-                dataType: 'json'
-            });   
-            this.AjaxRequests = [aj1,aj2,aj3,aj4];                           
-            $.when(aj1,aj2,aj3,aj4).done(function(a1, a2, a3, a4) { 
+            var courseGradebook = new AN.Models.CourseGradebook();
+            courseGradebook.fetch({
+            	success: function(data){
             		AN.GlobalVars.students.reset();   
 					AN.GlobalVars.cells.reset();               		            		
-					AN.GlobalVars.assignments.reset();               		            							
-                _.each(a1[0], function(student) {
+					AN.GlobalVars.assignments.reset();              		            							
+                _.each(courseGradebook.get('students'), function(student) {
                     AN.GlobalVars.students.add(student);
                 });
-                _.each(a2[0], function(assignment) {
+                _.each(courseGradebook.get('assignments'), function(assignment) {
                     AN.GlobalVars.assignments.add(assignment);
                 }); 
-                _.each(a3[0], function(cell) {                	
+                _.each(courseGradebook.get('student_assignments'), function(cell) {                	
                     AN.GlobalVars.cells.add(cell);
                 });                                
-                _.each(a4[0], function(gradebook) {
+                _.each(courseGradebook.get('gradebook_students'), function(gradebook) {
                     AN.GlobalVars.anGradebooks.add(gradebook);
-                });                                          
+                });                                       
                 self.render();
                 self.listenTo(AN.GlobalVars.anGradebooks, 'add', self.addStudent);
                 self.listenTo(AN.GlobalVars.assignments, 'add', self.addAssignment);
-            	self.listenTo(AN.GlobalVars.assignments, 'change:sorted', self.sortAssignment);                
+            	self.listenTo(AN.GlobalVars.assignments, 'change:sorted', self.sortAssignment);              		
+            	}
             });
             this.listenTo(this.model, 'change:selected', this.close);
             return this;
@@ -87,7 +53,7 @@ AN.Views.Gradebook = (function($,my){
 					$('#students').append(view.render().el);                    
                 });              
                 var y = AN.GlobalVars.assignments.where({
-                    gbid: parseInt(this.model.get('id'))   //anq: why is this.model.get('id') a string to begin with??
+                    gbid: this.model.get('id') 
                 });
                 _.each(y, function(assignment) {
                     var view = new AN.Views.AssignmentView({
@@ -112,9 +78,7 @@ AN.Views.Gradebook = (function($,my){
               $('#edit-assignment, #delete-assignment, #stats-assignment').attr('disabled',true);
             }            
         },
-        close: function() {
-            for(var i = 0; i < this.AjaxRequests.length; i++)
-    			this.AjaxRequests[i].abort();	        
+        close: function() {	        
             !this.model.get('selected') && this.remove();
         },
         addStudent: function(studentgradebook) {
@@ -182,7 +146,7 @@ AN.Views.Gradebook = (function($,my){
 					$('#students').append(view.render().el);                    
                 });              
                 var y = AN.GlobalVars.assignments.where({
-                    gbid: parseInt(this.model.get('id'))   //anq: why is this.model.get('id') a string to begin with??
+                    gbid: this.model.get('id') 
                 });
                 _.each(y, function(assignment) {
                     var view = new AN.Views.AssignmentView({
