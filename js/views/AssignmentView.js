@@ -22,8 +22,9 @@ AN.Views.AssignmentView = (function($,my){
         	this.$el.removeClass('hover');	
         	this.model.set({hover: false});	
         },
-        render: function() {   
-            this.$el.html('<div class="column-frame"><div class="column-title">' + this.model.get('assign_name') + '</div><div class="column-sort an-sorting-indicator dashicons dashicons-arrow-down"></div></div>');
+        render: function() {  
+        	var order = this.model.get('sorted') === 'asc' ? 'down' : 'up';
+            this.$el.html('<div class="column-frame"><div class="column-title">' + this.model.get('assign_name') + '</div><div class="column-sort an-sorting-indicator dashicons dashicons-arrow-'+order+'"></div></div>');
             return this;
         },
         sortColumn: function(ev){
@@ -46,10 +47,10 @@ AN.Views.AssignmentView = (function($,my){
         sortColumnCSS: function() {
             if (this.model.get('sorted')) {
         		var desc = this.$el.hasClass('desc');
-        		this.$el.toggleClass( "desc", !desc ).toggleClass( "asc", desc );              	
+        		this.$el.toggleClass( "desc", !desc ).toggleClass( "asc", desc );   
             } else {
                 this.$el.removeClass('asc desc');
-                this.$el. addClass('asc');
+                this.$el. addClass('asc');			
             }
         },        
         selectColumn: function(ev) {

@@ -76,23 +76,21 @@ AN.Views.EditAssignmentView = (function($,my){
         editSave: function(ev) {
             ev.preventDefault();
             var assignmentInformation = $(ev.currentTarget).serializeObject(); //action: "add_assignment" or action: "update_assignments" is hidden in the edit-course-template 
-            $.post(ajaxurl, assignmentInformation, function(data, textStatus, jqXHR) {
-                if(assignmentInformation['action']=='update_assignments'){
-                	var x = AN.GlobalVars.assignments.get(data['id']);
-                	_.each(data, function(valz, keyz){
-                	   var y = JSON.parse('{"' + keyz + '":"' + valz + '"}');
-                	   x.set(y);
-                	});
-                } else {
-                	var x = _.map(data['assignmentDetails'], function(y){
-                		return isNaN(y) ? y : parseInt(y);
-                	});
-                	AN.GlobalVars.assignments.add(data['assignmentDetails']);
-                	_.each(data['assignmentStudents'], function(cell) {
+			var x = $(ev.currentTarget).serializeObject().id;           
+            var toadd = AN.GlobalVars.assignments.findWhere({id : x});
+            if(toadd){
+            	toadd.save(assignmentInformation,{wait: true});
+            } else {
+             	delete(assignmentInformation['id']);
+            	var toadds = new AN.Models.Assignment(assignmentInformation);
+            	toadds.save(assignmentInformation,{success: function(model,response){
+            		AN.GlobalVars.assignments.add(response['assignmentDetails']); 
+                	_.each(response['assignmentStudents'], function(cell) {
                     	AN.GlobalVars.cells.add(cell)
-                	});              
-                }               
-            }, 'json');
+                	});             		 
+            		}
+            	});            	
+            }
             this.remove();
 			this.toggleEditDelete();       
             return false;

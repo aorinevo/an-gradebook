@@ -3,15 +3,13 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 2.5
+Version: 2.6
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
 */
 
-
-
-define( "AN_GRADEBOOK_VERSION", "2.4.9");
+define( "AN_GRADEBOOK_VERSION", "2.6");
 //Load scripts
 class AN_GradeBook_Scripts{
 	public function __construct(){
@@ -160,19 +158,50 @@ class AN_GradeBook_Scripts{
 include_once( dirname( __FILE__ ) . '/an-gradebook-database.php' );
 include_once( dirname( __FILE__ ) . '/functions.php' );
 
+
+/*********************************
+* Use the following template to extend api
+*
+*	public function name_of_api(){
+*		global $wpdb;
+*   	$wpdb->show_errors();  		
+*		if (!gradebook_check_user_role('administrator')){	
+*			echo json_encode(array("status" => "Not Allowed."));
+*			die();
+*		}   		
+*		switch ($_SERVER['REQUEST_METHOD']){
+*			case 'DELETE' :  
+*	  			echo json_encode(array('delete'=>'deleting'));
+*	  			break;
+*	  		case 'PUT' :
+*	  			echo json_encode(array('put'=>'putting'));
+*				break;
+*	  		case 'UPDATE' :
+*				echo json_encode(array("update" => "updating"));				
+*				break;
+*	  		case 'PATCH' :
+*				echo json_encode(array("patch" => "patching"));				
+*				break;
+*	  		case 'GET' :
+*				echo json_encode(array("get" => "getting"));	
+*				break;
+*	  		case 'POST' :				
+*				echo json_encode(array("post" => "posting"));		  		
+*				break;
+*	  	}
+*	  	die();
+*	}
+*********************************/
+
+
 class AN_GradeBookAPI{
 	public function __construct(){
 		//admin_gradebook
-		add_action('wp_ajax_add_student', array($this,'add_student'));
-		add_action('wp_ajax_update_student', array($this, 'update_student'));
-		add_action('wp_ajax_delete_student', array($this, 'delete_student'));		
-		add_action('wp_ajax_add_course', array($this, 'add_course'));
-		add_action('wp_ajax_update_course', array($this, 'update_course'));
-		add_action('wp_ajax_delete_course', array($this, 'delete_course'));
-		add_action('wp_ajax_add_assignment', array($this,'add_assignment'));
-		add_action('wp_ajax_update_assignments', array($this, 'update_assignments'));					
-		add_action('wp_ajax_update_assignment', array($this, 'update_assignment'));
-		add_action('wp_ajax_delete_assignment', array($this, 'delete_assignment'));					
+		add_action('wp_ajax_course', array($this, 'course'));		
+		add_action('wp_ajax_student', array($this,'student'));		
+		add_action('wp_ajax_assignment', array($this, 'assignment'));			
+		add_action('wp_ajax_cell', array($this, 'cell'));		
+		add_action('wp_ajax_update_assignments', array($this, 'update_assignments'));										
 		add_action('wp_ajax_get_courses', array($this, 'get_courses'));
 		add_action('wp_ajax_get_students', array($this, 'get_students'));
 		add_action('wp_ajax_get_assignments',array($this, 'get_assignments'));
@@ -271,155 +300,6 @@ class AN_GradeBookAPI{
 		echo json_encode($result);	
 		die();
 	}	
-	
-	
-	public function add_student(){	
-    	global $wpdb;
-    	$wpdb->show_errors(); 
-		if (!gradebook_check_user_role('administrator')){	
-			echo json_encode(array("status" => "Not Allowed."));
-			die();
-		}   
-		if(!$_POST['id-exists']){ 		   
-		$result = wp_insert_user(array(
-			'user_login' => strtolower($_POST['firstname'][1].$_POST['lastname']),
-			'first_name' => $_POST['firstname'],
-			'last_name'  => $_POST['lastname'],
-			'user_pass'  => 'password',
-		));
-		$wpdb->update($wpdb->users,
-    		array('user_login' => strtolower($_POST['firstname'][1].$_POST['lastname']).$result), 
-    		array('ID'=> $result));	
-    	$assignmentDetails = $wpdb->get_results('SELECT * FROM an_assignments WHERE gbid = '. $_POST['gbid'], ARRAY_A);
-    	foreach( $assignmentDetails as $assignment){
-       		$wpdb->insert('an_assignment', array('gbid'=> $_POST['gbid'], 'amid'=> $assignment['id'], 
-          		'uid' => $result, 'assign_order' => $assignment['assign_order']));
-    		};
-		$gbid = $_POST["gbid"];
-		if( !is_wp_error($result) ){
-			$studentDetails = get_user_by('id',$result);
-			$studentgbids = $wpdb->get_row('SELECT * FROM an_gradebook WHERE uid = '. $result .' AND gbid = '. $gbid);
-			$wpdb->insert('an_gradebook', 
-				array('uid' => $studentDetails->ID,'gbid' => $gbid)
-			);
-			$assignments = $wpdb->get_results('SELECT * FROM an_assignment WHERE uid = '. $result, ARRAY_A);	
-			$anGradebook = $wpdb->get_results('SELECT * FROM an_gradebook WHERE id = '. $wpdb->insert_id, ARRAY_A);					
-			usort($assignments, build_sorter('assign_order'));
-			foreach($assignments as &$assignmentDetail){
-				$assignmentDetail['amid'] = intval($assignmentDetail['amid']);		
-				$assignmentDetail['uid'] = intval($assignmentDetail['uid']);				
-				$assignmentDetail['assign_order'] = intval($assignmentDetail['assign_order']);			
-				$assignmentDetail['assign_points_earned'] = intval($assignmentDetail['assign_points_earned']);		
-				$assignmentDetail['gbid'] = intval($assignmentDetail['gbid']);	
-				$assignmentDetail['id'] = intval($assignmentDetail['id']);
-			} 			
-			echo json_encode(array(
-	      		'student'=> array('firstname' => $studentDetails -> first_name,
-	      		'lastname' => $studentDetails -> last_name,
-	      		'gbid' => intval($_POST['gbid']),
-	      		'id' => intval($result)),
-	      		'assignment' => $assignments,
-	      		'anGradebook' => $anGradebook
-			));
-			die();
-		}else{
-			echo $result->get_error_message();
-			die();
-		}
-		}else {
-			$studentDetails = get_user_by('id',$_POST['id-exists']);
-			if($studentDetails){
-				$result = $wpdb->insert('an_gradebook', 
-					array('uid' => $_POST['id-exists'],'gbid' => $_POST['gbid']), 
-					array('%d','%d') 
-				);
-    			$assignmentDetails = $wpdb->get_results('SELECT * FROM an_assignments WHERE gbid = '. $_POST['gbid'], ARRAY_A);
-    	foreach( $assignmentDetails as $assignment){
-       		$wpdb->insert('an_assignment', array('gbid'=> $_POST['gbid'], 'amid'=> $assignment['id'], 
-          		'uid' => $studentDetails->ID, 'assign_order' => $assignment['assign_order']));
-    		};    			
-			$anGradebook = $wpdb->get_results('SELECT * FROM an_gradebook WHERE id = '. $wpdb->insert_id, ARRAY_A);	
-			foreach($anGradebook as &$value){
-				$value['gbid'] = intval($value['gbid']);
-			}
-			$assignments = $wpdb->get_results('SELECT * FROM an_assignment WHERE uid = '. $studentDetails->ID .' AND gbid = '. $_POST['gbid'], ARRAY_A);										
-				usort($assignments, build_sorter('assign_order'));
-			foreach($assignments as &$assignmentDetail){
-				$assignmentDetail['amid'] = intval($assignmentDetail['amid']);		
-				$assignmentDetail['uid'] = intval($assignmentDetail['uid']);				
-				$assignmentDetail['assign_order'] = intval($assignmentDetail['assign_order']);			
-				$assignmentDetail['assign_points_earned'] = intval($assignmentDetail['assign_points_earned']);		
-				$assignmentDetail['gbid'] = intval($assignmentDetail['gbid']);	
-				$assignmentDetail['id'] = intval($assignmentDetail['id']);
-			} 				
-				echo json_encode(array(
-	      			'student'=> array('firstname' => $studentDetails -> first_name,
-	      			'lastname' => $studentDetails -> last_name,
-	      			'gbid' => intval($_POST['gbid']),
-	      			'id' => $studentDetails -> ID),
-	      			'assignment' => $assignments,
-	      			'anGradebook' => $anGradebook
-				));
-				die();			
-			}
-		} 
-	}
-
-	public function update_student(){
-   		global $wpdb;
-	    $wpdb->show_errors();
-		if (!gradebook_check_user_role('administrator')){	
-			echo json_encode(array("status" => "Not Allowed."));
-			die();
-		}    
-		$result = wp_update_user( array ( 'ID' => $_POST['id'], 'first_name' => $_POST['firstname'], 'last_name' => $_POST['lastname'] ) ) ;
-		$studentDetails = get_user_by('id',$result);		  
-	    echo json_encode(array(
-			'student' => array(firstname => $studentDetails -> first_name,
-	    	'lastname' => $studentDetails -> last_name,
-	    	'id' => $result)
-		));
-   		die();
-	}
-
-
-	public function add_course(){
-    	global $wpdb;
-    	$wpdb->show_errors();
-		if (!gradebook_check_user_role('administrator')){	
-			echo json_encode(array("status" => "Not Allowed."));
-			die();
-		}     
-    	$wpdb->insert('an_gradebooks', 
-    		array('name' => $_POST['name'], 'school' => $_POST['school'], 'semester' => $_POST['semester'], 'year' => $_POST['year']), 
-			array('%s', '%s', '%s', '%d') 
-		);
-		if( !is_wp_error($wpdb->insert_id) ){
-			$courseDetails = $wpdb->get_row("SELECT * FROM an_gradebooks WHERE id = $wpdb->insert_id", ARRAY_A);
-			echo json_encode($courseDetails);
-			die();
-		}else{
-			echo $result->get_error_message();
-			die();
-		}
-	}
-
-
-	public function update_course(){
-   		global $wpdb;
-   		$wpdb->show_errors();
-		if (!gradebook_check_user_role('administrator')){	
-			echo json_encode(array("status" => "Not Allowed."));
-			die();
-		}    
-   	$wpdb->update('an_gradebooks', 
-		array( 'name' => $_POST['name'], 'school' => $_POST['school'], 'semester' => $_POST['semester'], 'year' => $_POST['year']),
-		array('id' => $_POST['id'] )
-   	);   
-   	$courseDetails = $wpdb->get_row('SELECT * FROM an_gradebooks WHERE id = '. $_POST['id'] , ARRAY_A);
-   		echo json_encode($courseDetails);
-   		die();
-	}
 
 	public function get_courses(){
   		global $wpdb;
@@ -441,51 +321,339 @@ class AN_GradeBookAPI{
   		die();
 	}	
 
+/*************************
+*
+*   course api
+*
+**************************/
 
-	public function delete_course(){
+	public function course(){
   		global $wpdb;
+    	$wpdb->show_errors();  		
 		if (!gradebook_check_user_role('administrator')){	
 			echo json_encode(array("status" => "Not Allowed."));
 			die();
-		}   
-  		$wpdb->delete('an_gradebooks',array('id'=>$_POST['id']));
-  		$wpdb->delete('an_gradebook',array('gbid'=>$_POST['id']));  
-  		$wpdb->delete('an_assignments',array('gbid'=>$_POST['id']));
-  		$wpdb->delete('an_assignment',array('gbid'=>$_POST['id']));  
-  		echo json_encode(array('delete_course'=>'Success'));
-  		die();
+		}   		
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'DELETE' : 
+				$id = $_REQUEST['id'];
+				$gbid = $id;		
+	  			$wpdb->delete('an_gradebooks',array('id'=>$id));
+	  			$wpdb->delete('an_gradebook',array('gbid'=>$gbid));  
+	  			$wpdb->delete('an_assignments',array('gbid'=>$gbid));
+	  			$wpdb->delete('an_assignment',array('gbid'=>$gbid));  
+	  			echo json_encode(array('delete_course'=>'Success'));
+	  			break;
+	  		case 'PUT' :
+				$params = json_decode(file_get_contents('php://input'),true);			
+   				$wpdb->update('an_gradebooks', array( 
+   					'name' => $params['name'], 'school' => $params['school'], 'semester' => $params['semester'], 
+   					'year' => $params['year']),
+					array('id' => $params['id'])
+				);   
+   				$courseDetails = $wpdb->get_row('SELECT * FROM an_gradebooks WHERE id = '. $params['id'] , ARRAY_A);
+   				echo json_encode($courseDetails);	
+				break;
+	  		case 'UPDATE' :
+				echo json_encode(array("update" => "updating"));				
+				break;
+	  		case 'PATCH' :
+				echo json_encode(array("patch" => "patching"));				
+				break;
+	  		case 'GET' :
+				echo json_encode(array("get" => "getting"));	
+				break;
+	  		case 'POST' :
+				$params = json_decode(file_get_contents('php://input'),true);		  		
+    			$wpdb->insert('an_gradebooks', 
+		    		array('name' => $params['name'], 'school' => $params['school'], 'semester' => $params['semester'], 'year' => $params['year']), 
+					array('%s', '%s', '%s', '%d') 
+				);
+				if( !is_wp_error($wpdb->insert_id) ){
+					$courseDetails = $wpdb->get_row("SELECT * FROM an_gradebooks WHERE id = $wpdb->insert_id", ARRAY_A);
+					echo json_encode($courseDetails);
+					die();
+				}else{
+					echo $result->get_error_message();
+					die();
+				}						
+				break;
+	  	}
+	  	die();
+	}
+	
+/*************************
+*
+*   student api
+*
+**************************/
+
+	public function student(){
+  		global $wpdb;
+    	$wpdb->show_errors();  		
+		if (!gradebook_check_user_role('administrator')){	
+			echo json_encode(array("status" => "Not Allowed."));
+			die();
+		}   		
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'DELETE' :  
+				parse_str($_SERVER['QUERY_STRING'],$params);				
+				$delete_options = $params['delete_options'];
+				$x = $params['id'];
+				$y = $params['gbid'];	
+				switch($delete_options){
+					case 'gradebook':
+						$results1 = $wpdb->delete('an_gradebook',array('uid'=>$x, 'gbid'=>$y));
+						$results2 = $wpdb->delete('an_assignment',array('uid'=>$x, 'gbid'=>$y));
+						echo json_encode('student deleted from gradebook');							
+						break;
+					case 'all_gradebooks':
+						echo json_encode('student deleted from all gradebooks');						
+						$results1 = $wpdb->delete('an_gradebook',array('uid'=>$x));
+						$results2 = $wpdb->delete('an_assignment',array('uid'=>$x));	
+						echo json_encode('student deleted from all gradebooks');	
+						break;
+					case 'database':
+						$results1 = $wpdb->delete('an_gradebook',array('uid'=>$x));
+						$results2 = $wpdb->delete('an_assignment',array('uid'=>$x));				
+						require_once(ABSPATH.'wp-admin/includes/user.php' );
+						wp_delete_user($x);			
+						echo json_encode('student removed from wordpress database');					
+						break;
+				} 
+				die();	  			
+	  			break;
+	  		case 'PUT' :
+				$params = json_decode(file_get_contents('php://input'),true);		  		
+				$result = wp_update_user( array ( 'ID' => $params['id'], 'first_name' => $params['firstname'], 'last_name' => $params['lastname'] ) ) ;
+				$studentDetails = get_user_by('id',$result);		  
+	    		echo json_encode(array(
+					'student' => array("firstname" => $studentDetails -> first_name,
+	    			'lastname' => $studentDetails -> last_name,
+	    			'id' => $result)
+				));
+   				die();	  		
+				break;
+	  		case 'UPDATE' :
+				echo json_encode(array("update" => "updating"));				
+				break;
+	  		case 'PATCH' :
+				echo json_encode(array("patch" => "patching"));				
+				break;
+	  		case 'GET' :
+				echo json_encode(array("get" => "getting"));	
+				break;
+	  		case 'POST' :			
+				$params = json_decode(file_get_contents('php://input'),true);		  			
+				if(!$params['id-exists']){ 		   
+					$result = wp_insert_user(array(
+						'user_login' => strtolower($params['firstname'][1].$params['lastname']),
+						'first_name' => $params['firstname'],
+						'last_name'  => $params['lastname'],							'user_pass'  => 'password',
+					));
+					$wpdb->update($wpdb->users, array('user_login' => strtolower($params['firstname'][1].$params['lastname']).$result), 
+						array('ID'=> $result)
+		    		);	
+			    	$assignmentDetails = $wpdb->get_results('SELECT * FROM an_assignments WHERE gbid = '. $params['gbid'], ARRAY_A);
+			    	foreach( $assignmentDetails as $assignment){
+			       		$wpdb->insert('an_assignment', array('gbid'=> $params['gbid'], 'amid'=> $assignment['id'],           						'uid' => $result, 'assign_order' => $assignment['assign_order'])
+          					);
+			   		};
+					$gbid = $params["gbid"];
+					if( !is_wp_error($result) ){
+						$studentDetails = get_user_by('id',$result);
+						$studentgbids = $wpdb->get_row('SELECT * FROM an_gradebook WHERE uid = '. $result .' AND gbid = '. $gbid);
+						$wpdb->insert('an_gradebook', array('uid' => $studentDetails->ID,'gbid' => $gbid));
+						$assignments = $wpdb->get_results('SELECT * FROM an_assignment WHERE uid = '. $result, ARRAY_A);	
+						$anGradebook = $wpdb->get_results('SELECT * FROM an_gradebook WHERE id = '. $wpdb->insert_id, ARRAY_A);					
+						usort($assignments, build_sorter('assign_order'));
+						foreach($assignments as &$assignmentDetail){
+							$assignmentDetail['amid'] = intval($assignmentDetail['amid']);		
+							$assignmentDetail['uid'] = intval($assignmentDetail['uid']);				
+							$assignmentDetail['assign_order'] = intval($assignmentDetail['assign_order']);			
+							$assignmentDetail['assign_points_earned'] = intval($assignmentDetail['assign_points_earned']);		
+							$assignmentDetail['gbid'] = intval($assignmentDetail['gbid']);	
+							$assignmentDetail['id'] = intval($assignmentDetail['id']);
+						} 			
+						echo json_encode(array(
+			      			'student'=> array('firstname' => $studentDetails -> first_name,
+    						'lastname' => $studentDetails -> last_name,
+			    	  		'gbid' => intval($params['gbid']),
+				     		'id' => intval($result)),
+				      		'assignment' => $assignments,
+				      		'anGradebook' => $anGradebook
+						));
+						die();
+					}else{
+						echo $result->get_error_message();
+						die();
+					}
+				}else {
+					$studentDetails = get_user_by('id',$params['id-exists']);
+					if($studentDetails){
+						$result = $wpdb->insert('an_gradebook', array('uid' => $params['id-exists'],'gbid' => $params['gbid']), 
+						array('%d','%d') 
+					);
+    				$assignmentDetails = $wpdb->get_results('SELECT * FROM an_assignments WHERE gbid = '. $params['gbid'], ARRAY_A);
+			    	foreach( $assignmentDetails as $assignment){
+		       		$wpdb->insert('an_assignment', array('gbid'=> $params['gbid'], 'amid'=> $assignment['id'], 
+		          		'uid' => $studentDetails->ID, 'assign_order' => $assignment['assign_order']));
+    				};    			
+					$anGradebook = $wpdb->get_results('SELECT * FROM an_gradebook WHERE id = '. $wpdb->insert_id, ARRAY_A);	
+					foreach($anGradebook as &$value){
+						$value['gbid'] = intval($value['gbid']);
+					}
+					$assignments = $wpdb->get_results('SELECT * FROM an_assignment WHERE uid = '. $studentDetails->ID .' AND gbid = '. $params['gbid'], ARRAY_A);										
+					usort($assignments, build_sorter('assign_order'));
+					foreach($assignments as &$assignmentDetail){
+						$assignmentDetail['amid'] = intval($assignmentDetail['amid']);		
+						$assignmentDetail['uid'] = intval($assignmentDetail['uid']);				
+						$assignmentDetail['assign_order'] = intval($assignmentDetail['assign_order']);			
+						$assignmentDetail['assign_points_earned'] = intval($assignmentDetail['assign_points_earned']);		
+						$assignmentDetail['gbid'] = intval($assignmentDetail['gbid']);	
+						$assignmentDetail['id'] = intval($assignmentDetail['id']);
+					} 				
+					echo json_encode(array(
+	    	  			'student'=> array('firstname' => $studentDetails -> first_name,
+						'lastname' => $studentDetails -> last_name,
+		      			'gbid' => intval($params['gbid']),
+	    	  			'id' => $studentDetails -> ID),
+	  					'assignment' => $assignments,
+		      			'anGradebook' => $anGradebook
+					));
+					die();			
+					}
+				} 	  		
+				break;
+			}
+			die();
+			}	
+
+	
+/*************************
+*
+*   assignment api
+*
+**************************/
+
+	public function assignment(){
+		global $wpdb;
+   	$wpdb->show_errors();  		
+		if (!gradebook_check_user_role('administrator')){	
+			echo json_encode(array("status" => "Not Allowed."));
+			die();
+		}   		
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'DELETE' :  
+				parse_str($_SERVER['QUERY_STRING'],$params);				
+ 				$wpdb->delete('an_assignment', array('amid'=> $params['id']));
+ 				$wpdb->delete('an_assignments', array('id'=> $params['id'])); 	
+ 				echo json_encode(array('id'=> $params['id']));  
+ 				die();			
+	  			break;
+	  		case 'PUT' :
+	  			$params = json_decode(file_get_contents('php://input'),true);	
+   				$wpdb->update('an_assignments', array( 'assign_name' => $params['assign_name'], 'assign_date' => $params['assign_date'],
+   					'assign_due' => $params['assign_due']), array('id' => $params['id'] )
+   				);   
+   				$assignmentDetails = $wpdb->get_row('SELECT * FROM an_assignments WHERE id = '. $params['id'] , ARRAY_A);
+   				echo json_encode($assignmentDetails);
+  				die();
+				break;
+	  		case 'UPDATE' :
+				echo json_encode(array("update" => "updating"));				
+				break;
+	  		case 'PATCH' :
+				echo json_encode(array("patch" => "patching"));				
+				break;
+	  		case 'GET' :
+				echo json_encode(array("get" => "getting"));	
+				break;
+	  		case 'POST' :	
+				$params = json_decode(file_get_contents('php://input'),true);		  		
+    			$assignOrders = $wpdb->get_col('SELECT assign_order FROM an_assignments WHERE gbid = '. $params['gbid']);    
+    			if(!$assignOrders){
+    				$assignOrders = array(0);
+    			}
+    			$assignOrder = max($assignOrders)+1;
+				$wpdb->insert('an_assignments', array( 
+					'assign_name' => $params['assign_name'],
+					'assign_date' => $params['assign_date'],					
+					'assign_due' => $params['assign_due'],					
+					'gbid' => $params['gbid'],
+					'assign_order'=> $assignOrder
+				), array( '%s','%s','%s','%d','%d') 
+				);
+				$assignID = $wpdb->insert_id;
+			    $studentIDs = $wpdb->get_results('SELECT uid FROM an_gradebook WHERE gbid = '. $params['gbid'], ARRAY_N);
+			    foreach($studentIDs as $value){
+					$wpdb->insert('an_assignment', array( 
+						'amid' => $assignID,
+						'uid' => $value[0],
+						'gbid' => $params['gbid'],
+						'assign_order' => $assignOrder,
+						'assign_points_earned' => 0
+					), array( '%d','%d','%d','%d') 
+					);
+				}
+				$assignmentDetails = $wpdb->get_row("SELECT * FROM an_assignments WHERE id = $assignID", ARRAY_A);
+				$assignmentDetails['assign_order'] = intval($assignmentDetails['assign_order']);					
+				$assignmentDetails['gbid'] = intval($assignmentDetails['gbid']);	
+				$assignmentDetails['id'] = intval($assignmentDetails['id']);
+		
+				$assignmentStudents = $wpdb->get_results("SELECT * FROM an_assignment WHERE amid = $assignID", ARRAY_A);
+				foreach($assignmentStudents as &$assignmentDetail){
+					$assignmentDetail['amid'] = intval($assignmentDetail['amid']);		
+					$assignmentDetail['uid'] = intval($assignmentDetail['uid']);				
+					$assignmentDetail['assign_order'] = intval($assignmentDetail['assign_order']);			
+					$assignmentDetail['assign_points_earned'] = intval($assignmentDetail['assign_points_earned']);		
+					$assignmentDetail['gbid'] = intval($assignmentDetail['gbid']);	
+					$assignmentDetail['id'] = intval($assignmentDetail['id']);
+				} 		
+					$data = array("assignmentDetails"=>$assignmentDetails,"assignmentStudents"=>$assignmentStudents);
+					echo json_encode($data);
+					die();
+   				}	  						  		
+				break;
+	  	die();
 	}
 
-
-	public function delete_student(){
+	public function cell(){
 		global $wpdb;
+   		$wpdb->show_errors();  		
 		if (!gradebook_check_user_role('administrator')){	
 			echo json_encode(array("status" => "Not Allowed."));
 			die();
-		}  
-		$delete_options = $_POST['delete_options'];
-		$x = $_POST['id'];
-		$y = $_POST['gbid'];		
-		switch($delete_options){
-			case 'gradebook':
-				$results1 = $wpdb->delete('an_gradebook',array('uid'=>$x, 'gbid'=>$y));
-				$results2 = $wpdb->delete('an_assignment',array('uid'=>$x, 'gbid'=>$y));
-				echo json_encode('student deleted from gradebook');							
-			break;
-			case 'all_gradebooks':
-				$results1 = $wpdb->delete('an_gradebook',array('uid'=>$x));
-				$results2 = $wpdb->delete('an_assignment',array('uid'=>$x));	
-				echo json_encode('student deleted from all gradebooks');	
-			break;
-			case 'database':
-				$results1 = $wpdb->delete('an_gradebook',array('uid'=>$x));
-				$results2 = $wpdb->delete('an_assignment',array('uid'=>$x));				
-				require_once(ABSPATH.'wp-admin/includes/user.php' );
-				wp_delete_user($x);			
-				echo json_encode('student removed from wordpress database');					
-			break;
-		} 
-		die();
+		}   		
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'DELETE' :  
+	  			echo json_encode(array('delete'=>'deleting'));
+	  			break;
+	  		case 'PUT' :
+	  			echo json_encode(array('put'=>'putting'));
+	  			$params = json_decode(file_get_contents('php://input'),true);		  			
+	  			echo json_encode($params);
+   				$wpdb->update('an_assignment', array( 'assign_points_earned' => $params['assign_points_earned']),
+					array( 'uid' => $params['uid'], 'amid' => $params['amid'] )
+   				);   
+   				$assign_points_earned = $wpdb->get_row('SELECT assign_points_earned FROM an_assignment WHERE uid = '. $params['uid'] . ' AND amid = '. $params['amid'] , ARRAY_A);
+   				echo json_encode($assign_points_earned);
+   				die();	  			
+				break;
+	  		case 'UPDATE' :
+				echo json_encode(array("update" => "updating"));				
+				break;
+	  		case 'PATCH' :
+				echo json_encode(array("patch" => "patching"));				
+				break;
+	  		case 'GET' :
+				echo json_encode(array("get" => "getting"));	
+				break;
+	  		case 'POST' :				
+				echo json_encode(array("post" => "posting"));		  		
+				break;
+	  	}
+	  	die();
 	}
 
 
@@ -604,16 +772,27 @@ public function get_gradebook_entire(){
 		echo json_encode(array("status" => "Not Allowed."));
 		die();
 	}    	
-    $gradebook_students = $wpdb->get_results('SELECT * FROM an_gradebook WHERE gbid = '. $_GET['gbid'], ARRAY_A);	
+    $gradebook_students = $wpdb->get_results('SELECT * FROM an_gradebook WHERE gbid = '. $gbid, ARRAY_A);	
+    foreach($gradebook_students as &$student){
+    	$student['uid'] = intval($student['uid']);
+    	$student['gbid'] = intval($student['gbid']);    	
+    }
 	$assignments = $wpdb->get_results('SELECT * FROM an_assignments WHERE gbid = '. $gbid, ARRAY_A);
-	$student_assignments = $wpdb->get_results('SELECT * FROM an_assignment WHERE gbid = '. $_GET['gbid'], ARRAY_A);
-	$students = $wpdb->get_results('SELECT uid FROM an_gradebook WHERE gbid = '. $_GET['gbid'], ARRAY_N);
+    foreach($assignments as &$assignment){
+    	$assignment['id'] = intval($assignment['id']);
+    	$assignment['gbid'] = intval($assignment['gbid']);    	
+    }	
+	$student_assignments = $wpdb->get_results('SELECT * FROM an_assignment WHERE gbid = '. $gbid, ARRAY_A);
+    foreach($student_assignments as &$student_assignment){
+    	$student_assignment['gbid'] = intval($student_assignment['gbid']);
+    }		
+	$students = $wpdb->get_results('SELECT uid FROM an_gradebook WHERE gbid = '. $gbid, ARRAY_N);
    	foreach($students as &$value){
         $studentData = get_userdata($value[0]);
         $value = array(
           	'firstname'=> $studentData->first_name, 
           	'lastname'=>$studentData->last_name, 
-          	'id'=>$studentData->ID,
+          	'id'=>intval($studentData->ID),
           	'gbid' => intval($_GET['gbid'])
           	);
     }
@@ -691,86 +870,6 @@ if (!gradebook_check_user_role('administrator')){
 	die();
 }
 
-public function update_assignment(){
-   global $wpdb;
-   $wpdb->show_errors();
-if (!gradebook_check_user_role('administrator')){	
-		echo json_encode(array("status" => "Not Allowed."));
-		die();
-	}    
-   $wpdb->update( 
-	'an_assignment', 
-	array( 'assign_points_earned' => $_POST['assign_points_earned']),
-	array( 'uid' => $_POST['uid'], 'amid' => $_POST['amid'] )
-   );   
-   $assign_points_earned = $wpdb->get_row('SELECT assign_points_earned FROM an_assignment WHERE uid = '. $_POST['uid'] . ' AND amid = '. $_POST['amid'] , ARRAY_A);
-   echo json_encode($assign_points_earned);
-   die();
-}
-
-public function add_assignment(){
-    global $wpdb;
-    $wpdb->show_errors();
-if (!gradebook_check_user_role('administrator')){	
-		echo json_encode(array("status" => "Not Allowed."));
-		die();
-	}     
-    $assignOrders = $wpdb->get_col('SELECT assign_order FROM an_assignments WHERE gbid = '. $_POST['gbid']);    
-    $assignOrder = max($assignOrders)+1;
-	$wpdb->insert('an_assignments', 
-				array( 
-					'assign_name' => $_POST['assign_name'],
-					'assign_date' => $_POST['assign_date'],					
-					'assign_due' => $_POST['assign_due'],					
-					'gbid' => $_POST['gbid'],
-					'assign_order'=> $assignOrder
-				), 
-				array( 
-					'%s',
-					'%s',
-					'%s', 
-					'%d',
-					'%d'
-				) 
-	);
-	$assignID = $wpdb->insert_id;
-    $studentIDs = $wpdb->get_results('SELECT uid FROM an_gradebook WHERE gbid = '. $_POST['gbid'], ARRAY_N);
-    foreach($studentIDs as $value){
-	$wpdb->insert('an_assignment', 
-				array( 
-					'amid' => $assignID,
-					'uid' => $value[0],
-					'gbid' => $_POST['gbid'],
-					'assign_order' => $assignOrder,
-					'assign_points_earned' => 0
-				), 
-				array( 
-					'%d', 
-					'%d',
-					'%d',
-					'%d'
-				) 
-	);
-	}
-	$assignmentDetails = $wpdb->get_row("SELECT * FROM an_assignments WHERE id = $assignID", ARRAY_A);
-	$assignmentDetails['assign_order'] = intval($assignmentDetails['assign_order']);					
-	$assignmentDetails['gbid'] = intval($assignmentDetails['gbid']);	
-	$assignmentDetails['id'] = intval($assignmentDetails['id']);
-		
-	$assignmentStudents = $wpdb->get_results("SELECT * FROM an_assignment WHERE amid = $assignID", ARRAY_A);
-	foreach($assignmentStudents as &$assignmentDetail){
-				$assignmentDetail['amid'] = intval($assignmentDetail['amid']);		
-				$assignmentDetail['uid'] = intval($assignmentDetail['uid']);				
-				$assignmentDetail['assign_order'] = intval($assignmentDetail['assign_order']);			
-				$assignmentDetail['assign_points_earned'] = intval($assignmentDetail['assign_points_earned']);		
-				$assignmentDetail['gbid'] = intval($assignmentDetail['gbid']);	
-				$assignmentDetail['id'] = intval($assignmentDetail['id']);
-	} 		
-	$data = array("assignmentDetails"=>$assignmentDetails,
-			"assignmentStudents"=>$assignmentStudents);
-	echo json_encode($data);
-	die();
-   }
 }
 
 $an_gradebook_scripts = new AN_GradeBook_Scripts();

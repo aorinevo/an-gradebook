@@ -14,12 +14,11 @@
     			</div>    
     	    	<div class="media-frame-content">
     				<form id="edit-student-form">      
-         				<input type="hidden" name="action" value="<%= student ? 'update_student' : 'add_student' %>"/>
 				        <input type="hidden" name="id" value="<%= student ? student.get('id') : '' %>"/>         
 				        <label>First Name:</label>
-				        <input type="text" name="firstname" value="<%= student ? student.get('firstname') : '' %> "/>
+				        <input type="text" name="firstname" value="<%= student ? student.get('firstname') : '' %>"/>
 				        <label>Last Name:</label>
-				        <input type="text" name="lastname" value="<%= student ? student.get('lastname') : '' %> "/>
+				        <input type="text" name="lastname" value="<%= student ? student.get('lastname') : '' %>"/>
 				        <label>ID<%= student ? ':' : ' (if student exists in the data base, use the students id to add. Otherwise a new record will be created for this student):'%></label>
 				        <%= student ? student.get('id') : '<input type="text" name="id-exists"/>' %>
 				        <p/>

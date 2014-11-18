@@ -408,7 +408,6 @@ AN.Views.StudentStatisticsView = AN.Views.Base.extend({
             var student = AN.GlobalVars.students.findWhere({
                 selected: true
             });		
-            console.log(student);	
 			$.get(ajaxurl, { 
 						action: 'get_line_chart_studentview',
 						uid : student.get('id'),

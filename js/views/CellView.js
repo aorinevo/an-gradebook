@@ -33,16 +33,7 @@ AN.Views.CellView = (function($, my){
         hideInput: function() { //this gets called twice.
             var value = this.input.val();
             var self = this;
-            $.post(ajaxurl, {
-                action: 'update_assignment',
-                uid: this.model.get('uid'),
-                amid: this.model.get('amid'),
-                assign_points_earned: value
-            }, function(data) {
-                if(data) self.model.set({
-                    assign_points_earned: parseFloat(data['assign_points_earned'])
-                });
-            }, 'json');
+            this.model.save({assign_points_earned: value});
             this.$el.removeClass("editing");
         },
         edit: function() {

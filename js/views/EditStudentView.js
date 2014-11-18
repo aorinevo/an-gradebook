@@ -68,22 +68,24 @@ AN.Views.EditStudentView = (function($,my){
           $('#edit-student-form').submit();
         },        
         editSave: function(ev) {
-            var studentInformation = $(ev.currentTarget).serializeObject(); //action: "add_student" or action: "update_student" is hidden in the edit-student-template 
-            $.post(ajaxurl, studentInformation, function(data, textStatus, jqXHR) { 
-                if(studentInformation['action']=='update_student'){
-                	var x = AN.GlobalVars.students.get(data['student']['id']);
-                	_.each(data['student'], function(valz, keyz){
-                	   var y = JSON.parse('{"' + keyz + '":"' + valz + '"}');
-                	   x.set(y);
-                	});
-                } else {
-                	_.each(data['assignment'], function(assignment) {
+            var studentInformation = $(ev.currentTarget).serializeObject();
+			var x = $(ev.currentTarget).serializeObject().id;
+            var toadd = AN.GlobalVars.students.findWhere({id : parseInt(x)});
+            if(toadd){
+            	studentInformation.id = parseInt(x);
+            	toadd.save(studentInformation,{wait: true});
+            } else {
+             	delete(studentInformation['id']);
+            	var toadds = new AN.Models.Student(studentInformation);
+            	toadds.save(studentInformation,{success: function(model,response){
+                	_.each(response['assignment'], function(assignment) {
                   	  	AN.GlobalVars.cells.add(assignment);
               		});
-                	AN.GlobalVars.students.add(data['student']);
-                	AN.GlobalVars.anGradebooks.add(data['anGradebook']);                            	
-                }                                                        
-            }, 'json');
+                	AN.GlobalVars.students.add(response['student']);
+                	AN.GlobalVars.anGradebooks.add(response['anGradebook']);                            	 
+            		}
+            	});            	
+            }
             this.remove();
             this.toggleEditDelete();
             return false;

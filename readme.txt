@@ -4,7 +4,7 @@ Donate link:
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
 Tested up to: 4.0
-Stable tag: 2.5
+Stable tag: 2.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,6 +60,16 @@ Students are able to:
 * plugin icon: https://www.iconfinder.com/icons/175285/edit_property_icon#size=256
 
 == Changelog ==
+
+Version 2.6:
+
+* Removed jquery post/get calls and replaced them with backbone fetch,destroy,save. 
+* Added pointer to .course and .student cells to indicate selectable cells.
+* Added default cursor to all other td cells.
+* Bug fix: When adding an assignment to a new course, the assignment gets created but does not render.
+* Added sorting in both directions: dec and asc.
+* General performance enhancements (reduce function calls and http requests).
+
 
 Version 2.5:
 

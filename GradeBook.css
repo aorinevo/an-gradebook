@@ -2,6 +2,14 @@
 	text-align: center;
 }
 
+td {
+	cursor: default;
+}
+
+td.course, td.student {
+	cursor: pointer;
+}
+
 #chart_div{
 	display: inline-block;
 	margin-left:auto;

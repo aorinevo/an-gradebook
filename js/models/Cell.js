@@ -16,6 +16,13 @@ AN.Models.Cell = (function(my){
             this.set({
                 selected: !this.get('selected')
             });
+        },
+        url: function(){
+        	if(this.get('id')){
+        		return ajaxurl + '?action=cell&id='+this.get('id');
+        	} else {
+        		return ajaxurl + '?action=cell';
+        	}
         }
     });
 	return my;

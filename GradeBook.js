@@ -69,17 +69,16 @@
                 selected: true
             });
             var self = this;
-            $.post(ajaxurl, {
-                action: 'delete_course',
-                id: todel.get('id')
-            }, function(data, textStatus, jqXHR) {
-                todel.set({
+			todel.destroy(
+        	{success: function (){
+	            todel.set({
                     selected: false
-                });
-                AN.GlobalVars.courses.remove(todel.get('id'));
-                self.toggleEditDelete();
-            }, 'json');
+                });       
+                AN.GlobalVars.courses.remove(todel.get('id'));                
+                self.toggleEditDelete();                 		
+        	}}
+            );
         }
     });
-    AN.GlobalVars.app = new AN.Views.App();
-})(jQuery,AN);
+    new AN.Views.App();
+})(jQuery, AN || {});

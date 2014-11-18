@@ -14,7 +14,6 @@
 				</div>       			
     	    	<div class="media-frame-content">
     				<form id="edit-course-form">      
-        				<input type="hidden" name="action" value="<%= course ? 'update_course' : 'add_course' %>"/>
         				<input type="hidden" name="id" value="<%= course ? course.get('id') : '' %>"/>        
         				<label>Course Name:</label>
         				<input type="text" name="name" value="<%= course ? course.get('name') : '' %>"/>

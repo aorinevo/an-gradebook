@@ -56,19 +56,22 @@ AN.Views.DeleteStudentView = (function($,my){
           $('#delete-student-form').submit();
         },        
         deleteSave: function(ev) {
-            var studentInformation = $(ev.currentTarget).serializeObject(); //action: "delete_student" is hidden in the delete-student-template 
-            console.log(studentInformation);
-            $.post(ajaxurl, studentInformation, function(data, textStatus, jqXHR) {
-                var x = AN.GlobalVars.students.get(studentInformation['id']);       
-                console.log(x);     
-                x.set({
+            var studentInformation = $(ev.currentTarget).serializeObject();
+			var x = studentInformation.id;
+            var todel = AN.GlobalVars.students.findWhere({
+                selected: true
+            });
+            todel.set({delete_options: studentInformation.delete_options});
+            var self = this;
+			todel.destroy(studentInformation,
+        	{success: function (){
+	            todel.set({
                     selected: false
-                });
-                console.log(x);
-                var z = AN.GlobalVars.anGradebooks.findWhere({uid: x.get('id').toString(), gbid: x.get('gbid').toString()});
-                console.log(z);
-                AN.GlobalVars.anGradebooks.remove(z.get('id'));              
-            }, 'json');            
+                });       
+                AN.GlobalVars.courses.remove(todel.get('id'));                
+                self.toggleEditDelete();                 		
+        	}}
+            );           
             this.remove();
             this.toggleEditDelete();
             return false;

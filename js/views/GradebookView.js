@@ -53,7 +53,7 @@ AN.Views.Gradebook = (function($,my){
 					$('#students').append(view.render().el);                    
                 });              
                 var y = AN.GlobalVars.assignments.where({
-                    gbid: this.model.get('id') 
+                    gbid: parseInt(this.model.get('id'))
                 });
                 _.each(y, function(assignment) {
                     var view = new AN.Views.AssignmentView({
@@ -136,17 +136,25 @@ AN.Views.Gradebook = (function($,my){
         sortAssignment: function(ev) {
             var template = _.template($('#gradebook-interface-template').html(), {});
             this.$el.html(template);
-                var x = AN.GlobalVars.cells.toJSON();  
-                x = _.where(x, {amid: parseInt(ev.get('id'))});              
-                x = _.sortBy(x, 'assign_points_earned');                                        
+                var x = AN.GlobalVars.cells.toJSON();               
+                x = _.where(x, {amid: parseInt(ev.get('id'))});            
+                x = _.sortBy(x,
+                	function(x_cell){
+                		if (ev.get('sorted')==='asc'){
+                			return x_cell['assign_points_earned'];
+                		} else {
+                			return -1*x_cell['assign_points_earned'];
+                		}
+                	}
+                );                                 
                 _.each(x, function(cell) {
                     var view = new AN.Views.StudentView({
                         model: AN.GlobalVars.students.get(cell['uid'])
                     });
 					$('#students').append(view.render().el);                    
-                });              
+                });             
                 var y = AN.GlobalVars.assignments.where({
-                    gbid: this.model.get('id') 
+                    gbid: parseInt(this.model.get('id'))
                 });
                 _.each(y, function(assignment) {
                     var view = new AN.Views.AssignmentView({
@@ -162,22 +170,21 @@ AN.Views.Gradebook = (function($,my){
                 selected: true
             });
             var self = this;
-            $.post(ajaxurl, {
-                action: 'delete_assignment',
-                id: todel.get('id')
-            }, function(data, textStatus, jqXHR) {          
-                todel.set({
+			todel.destroy(
+        	{success: function (){
+	            todel.set({
                     selected: false
-                });
-                AN.GlobalVars.assignments.remove(todel.get('id'));
+                });       
+                AN.GlobalVars.assignments.remove(todel.get('id'));   
                 var x = AN.GlobalVars.cells.where({
                     amid: parseInt(todel.get('id'))
                 });
                 _.each(x, function(cell) {
                     AN.GlobalVars.cells.remove(cell);
-                });
-	            self.toggleEditDelete();                     
-            }, 'json');
+                });                             
+                self.toggleEditDelete();                 		
+        	}}
+            );        
         }
     });
     return my;

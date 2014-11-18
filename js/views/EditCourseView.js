@@ -64,17 +64,18 @@ AN.Views.EditCourseView = (function($,my){
         },
         editSave: function(ev) {
             var courseInformation = $(ev.currentTarget).serializeObject(); //action: "add_course" or action: "update_course" is hidden in the edit-course-template 
-            $.post(ajaxurl, courseInformation, function(data, textStatus, jqXHR) {
-                if(courseInformation['action']=='update_course'){
-                	var x = AN.GlobalVars.courses.get(data['id']);
-                	_.each(data, function(valz, keyz){
-                	   var y = JSON.parse('{"' + keyz + '":"' + valz + '"}');
-                	   x.set(y);
-                	});
-                } else {
-	                AN.GlobalVars.courses.add(data);                
-                }
-            }, 'json');
+			var x = $(ev.currentTarget).serializeObject().id;           
+            var toadd = AN.GlobalVars.courses.findWhere({id : x});
+            if(toadd){
+            	toadd.save(courseInformation,{wait: true});
+            } else {
+             	delete(courseInformation['id']);
+            	var toadds = new AN.Models.Course(courseInformation);
+            	toadds.save(courseInformation,{success: function(model){
+            		 AN.GlobalVars.courses.add(model);  
+            		}
+            	});            	
+            }
 			this.toggleEditDelete();       
             this.remove();
             return false;
