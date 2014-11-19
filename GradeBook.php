@@ -3,7 +3,7 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 2.6
+Version: 2.6.1
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
@@ -557,6 +557,7 @@ class AN_GradeBookAPI{
    					'assign_due' => $params['assign_due']), array('id' => $params['id'] )
    				);   
    				$assignmentDetails = $wpdb->get_row('SELECT * FROM an_assignments WHERE id = '. $params['id'] , ARRAY_A);
+   				$assignmentDetails['id'] = intval($assignmentDetails['id']);   				
    				echo json_encode($assignmentDetails);
   				die();
 				break;

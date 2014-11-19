@@ -75,9 +75,9 @@ AN.Views.EditAssignmentView = (function($,my){
         },
         editSave: function(ev) {
             ev.preventDefault();
-            var assignmentInformation = $(ev.currentTarget).serializeObject(); //action: "add_assignment" or action: "update_assignments" is hidden in the edit-course-template 
+            var assignmentInformation = $(ev.currentTarget).serializeObject(); 
 			var x = $(ev.currentTarget).serializeObject().id;           
-            var toadd = AN.GlobalVars.assignments.findWhere({id : x});
+            var toadd = AN.GlobalVars.assignments.findWhere({id : parseInt(x)});
             if(toadd){
             	toadd.save(assignmentInformation,{wait: true});
             } else {
