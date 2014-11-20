@@ -14,7 +14,6 @@
     			</div>    
     	    	<div class="media-frame-content">
     				<form id="edit-assignment-form">      
-        				<input type="hidden" name="action" value="<%= assignment ? 'update_assignments' : 'add_assignment' %>"/>
 				        <input type="hidden" name="id" value="<%= assignment ? assignment.get('id') : '' %>"/>  
 				        <label>Title:</label>
 				        <input type="text" name="assign_name" value="<%= assignment ? assignment.get('assign_name') : '' %>"/>
@@ -22,6 +21,8 @@
 				        <input type="text" name="assign_date" id="assign-date-datepicker" />        
 				        <label>Date Due:</label>
 				        <input type="text" name="assign_due" id="assign-due-datepicker" />
+				        <label>Assignment Category:</label>
+				        <input type="text" name="assign_category" value="<%= assignment ? assignment.get('assign_category') : '' %>"/>		        
 				        <%= assignment ? 'Update assignment ' + assignment.get('id') + ' from course ' + gradebook.get('id')  : 'Add to course ' + gradebook.get('id') %>?        
 				        <input type="hidden" name="gbid" value="<%= gradebook.get('id')%>"/>
     				</form>

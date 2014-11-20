@@ -11,7 +11,8 @@ AN.Views.AssignmentView = (function($,my){
         initialize: function() {
 			this.listenTo(this.model, 'change:assign_name', this.render);         
             this.listenTo(this.model, 'change:selected', this.selectColumnCSS);
-            this.listenTo(this.model, 'change:sorted', this.sortColumnCSS);            
+            this.listenTo(this.model, 'change:sorted', this.sortColumnCSS);
+            this.listenTo(this.model, 'change:visibility', this.visibilityColumnCSS);            
             this.listenTo(this.model, 'remove', function() { this.remove(); });
         },
         mouseEnter: function(){
@@ -23,6 +24,7 @@ AN.Views.AssignmentView = (function($,my){
         	this.model.set({hover: false});	
         },
         render: function() {  
+            this.visibilityColumnCSS();             
         	var order = this.model.get('sorted') === 'asc' ? 'down' : 'up';
             this.$el.html('<div class="column-frame"><div class="column-title">' + this.model.get('assign_name') + '</div><div class="column-sort an-sorting-indicator dashicons dashicons-arrow-'+order+'"></div></div>');
             return this;
@@ -31,7 +33,7 @@ AN.Views.AssignmentView = (function($,my){
         	var y = AN.GlobalVars.assignments.findWhere({selected: true});
         	y && y.set({selected: false});
             if (this.model.get('sorted')) {
-            	if (this.model.get('sorted')=='desc') {
+            	if (this.model.get('sorted')=== 'desc') {
                 	this.model.set({sorted: 'asc'});
             	} else {
                 	this.model.set({sorted: 'desc'});            
@@ -70,7 +72,14 @@ AN.Views.AssignmentView = (function($,my){
             } else {
                 this.$el.removeClass('selected');
             }
-        }
+        },
+        visibilityColumnCSS: function(ev) {
+            if (this.model.get('visibility')) {
+                this.$el.removeClass('hidden');
+            } else {
+                this.$el.addClass('hidden');
+            }
+        }         
     });
 	return my;
 })(jQuery, AN.Views.AssignmentView ||{});

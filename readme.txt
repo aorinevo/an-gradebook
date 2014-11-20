@@ -4,7 +4,7 @@ Donate link:
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
 Tested up to: 4.0
-Stable tag: 2.6.1
+Stable tag: 2.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,6 +60,11 @@ Students are able to:
 * plugin icon: https://www.iconfinder.com/icons/175285/edit_property_icon#size=256
 
 == Changelog ==
+
+Version 2.7:
+
+* Performance enhancements on JS side.  Some function looped over a larger set of elements then necessary.  
+* New Feature: Added filter button.  Filter will only recognize assignments that are categorized.  You can add a category by editing an assignment already in the gradebook or when adding a new assignment.
 
 Version 2.6.1:
 

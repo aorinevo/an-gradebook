@@ -10,13 +10,16 @@ AN.Views.CellView = (function($, my){
             this.listenTo(this.model, 'change:assign_points_earned', this.render);
             this.listenTo(AN.GlobalVars.assignments, 'change:selected', this.selectCell);
             this.listenTo(AN.GlobalVars.assignments, 'change:hover', this.hoverCell);            
+            this.listenTo(AN.GlobalVars.assignments, 'change:visibility', this.visibilityCell);               
             this.listenTo(this.model, 'change:selected', this.selectCellCSS);
             this.listenTo(this.model, 'change:hover', this.hoverCellCSS);            
+            this.listenTo(this.model, 'change:visibility', this.visibilityCellCSS);             
             this.listenTo(this.model, 'remove', function() {
                 this.remove();
             });
         },
         render: function() {
+            this.visibilityCellCSS();        
             this.$el.html('<div class="view">' + this.model.get('assign_points_earned') + '</div> <input class="edit" type="text" value="' + parseFloat(this.model.get('assign_points_earned')) + '"></input>');
             this.input = this.$('.edit');
             return this;
@@ -44,18 +47,11 @@ AN.Views.CellView = (function($, my){
             this.input.focus();
         },
         hoverCell: function(ev) {
-            var x = AN.GlobalVars.assignments.findWhere({
-                hover: true
-            });
-            if (x && this.model.get('amid') == x.get('id')) {
+            if (this.model.get('amid') === ev.get('id')) {
                 this.model.set({
-                    hover: true
+                    hover: ev.get('hover')
                 });
-            } else {
-                this.model.set({
-                    hover: false
-                });
-            }
+ 			} 
         },
         hoverCellCSS: function() {
             if (this.model.get('hover')) {
@@ -65,18 +61,11 @@ AN.Views.CellView = (function($, my){
             }
         },        
         selectCell: function(ev) {
-            var x = AN.GlobalVars.assignments.findWhere({
-                selected: true
-            });
-            if (x && this.model.get('amid') == x.get('id')) {
+            if (this.model.get('amid') === ev.get('id')) {
                 this.model.set({
-                    selected: true
+                    selected: ev.get('selected')
                 });
-            } else {
-                this.model.set({
-                    selected: false
-                });
-            }
+ 			}
         },
         selectCellCSS: function() {
             if (this.model.get('selected')) {
@@ -84,7 +73,21 @@ AN.Views.CellView = (function($, my){
             } else {
                 this.$el.removeClass('selected');
             }
-        }
+        },
+        visibilityCell: function(ev) {
+            if (this.model.get('amid') === ev.get('id')) {
+                this.model.set({
+                    visibility: ev.get('visibility')
+                });
+ 			}
+        },        
+        visibilityCellCSS: function(ev) {
+            if (this.model.get('visibility')) {
+                this.$el.removeClass('hidden');
+            } else {
+                this.$el.addClass('hidden');
+            }
+        }        
     });
 return my;
 })(jQuery, AN.Views.CellView ||{});

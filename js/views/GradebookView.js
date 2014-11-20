@@ -36,6 +36,7 @@ AN.Views.Gradebook = (function($,my){
             'click button#delete-student': 'deleteStudent',
             'click button#add-assignment': 'editAssignmentPre',
             'click button#edit-assignment': 'editAssignment',
+            'click button#filter-assignments': 'filterAssignments',            
             'click button#stats-assignment': 'statsAssignment',
             'click button#stats-student': 'statsStudent',            
             'click button#delete-assignment': 'deleteAssignment',
@@ -164,6 +165,10 @@ AN.Views.Gradebook = (function($,my){
                 });       
             this.toggleEditDelete();                     
             return this;
+        },
+        filterAssignments: function(){
+            var view = new AN.Views.FilterAssignmentsView();         
+            return false;
         },
         deleteAssignment: function() {
             var todel = AN.GlobalVars.assignments.findWhere({

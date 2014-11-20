@@ -3,13 +3,13 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 2.6.1
+Version: 2.7
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
 */
 
-define( "AN_GRADEBOOK_VERSION", "2.6");
+define( "AN_GRADEBOOK_VERSION", "2.7");
 //Load scripts
 class AN_GradeBook_Scripts{
 	public function __construct(){
@@ -43,6 +43,7 @@ class AN_GradeBook_Scripts{
 		wp_register_script( 'views/DeleteStudentView', plugins_url('js/views/DeleteStudentView.js',__File__),array( 'init_app','jquery','backbone','underscore' ), null, true );																
 		wp_register_script( 'views/EditAssignmentView', plugins_url('js/views/EditAssignmentView.js',__File__),array( 'init_app','jquery','backbone','underscore' ), null, true );																		
 		wp_register_script( 'views/EditCourseView', plugins_url('js/views/EditCourseView.js',__File__),array( 'init_app','jquery','backbone','underscore' ), null, true );																		
+		wp_register_script( 'views/FilterAssignmentsView', plugins_url('js/views/FilterAssignmentsView.js',__File__),array( 'init_app','jquery','backbone','underscore' ), null, true );																				
 		wp_register_script( 'views/AssignmentStatisticsView', plugins_url('js/views/AssignmentStatisticsView.js',__File__),array( 'init_app','jquery','backbone','underscore' ), null, true );																		
 		wp_register_script( 'views/StudentStatisticsView', plugins_url('js/views/StudentStatisticsView.js',__File__),array( 'init_app','jquery','backbone','underscore' ), null, true );																		
 //other scripts		
@@ -76,7 +77,7 @@ class AN_GradeBook_Scripts{
     	wp_enqueue_script( 'views/DeleteStudentView');     	    	
     	wp_enqueue_script( 'views/EditAssignmentView');     	    	    	
     	wp_enqueue_script( 'views/EditCourseView');     	    	    	    	
-    	wp_enqueue_script( 'views/EditCourseView');     	    	    	    	    	
+    	wp_enqueue_script( 'views/FilterAssignmentsView');     	    	    	    	    	
     	wp_enqueue_script( 'views/AssignmentStatisticsView' );  
     	wp_enqueue_script( 'views/StudentStatisticsView' );  
     	wp_enqueue_script( 'views/GradebookView' );      	
@@ -146,7 +147,7 @@ class AN_GradeBook_Scripts{
     		$gradebook_page = add_menu_page( 'GradeBook', 'GradeBooks', 'administrator', 'an_gradebook_page', 'an_gradebook_menu_page', 'dashicons-book-alt', '6.12' ); 
     		add_action('load-'.$gradebook_page,array($this, 'an_gradebook_admin_help_tab'));			    		
 			//add_submenu_page( 'an_gradebook_page', 'GradeBook','All GradeBooks', 'administrator', 'an_gradebook_page');
-			//$settings_help = add_submenu_page( 'an_gradebook_page', 'Setting','Settings', 'administrator', 'an_gradebook_settings_page','an_gradebook_settings_page' );     	
+			//add_submenu_page( 'an_gradebook_page', 'Setting','Settings', 'administrator', 'an_gradebook_settings_page','an_gradebook_settings_page' );     	
     		//add_action('load-'.$settings_help, 'an_gradebook_settings_add_help_tab');			
 		} else {
     		$gradebook_page = add_menu_page( 'GradeBook', 'GradeBooks', 'subscriber', 'an_gradebook_page', 'an_gradebook_menu_page', 'dashicons-book-alt', '6.12' ); 
@@ -554,7 +555,7 @@ class AN_GradeBookAPI{
 	  		case 'PUT' :
 	  			$params = json_decode(file_get_contents('php://input'),true);	
    				$wpdb->update('an_assignments', array( 'assign_name' => $params['assign_name'], 'assign_date' => $params['assign_date'],
-   					'assign_due' => $params['assign_due']), array('id' => $params['id'] )
+   					'assign_due' => $params['assign_due'], 'assign_category' => $params['assign_category']), array('id' => $params['id'] )
    				);   
    				$assignmentDetails = $wpdb->get_row('SELECT * FROM an_assignments WHERE id = '. $params['id'] , ARRAY_A);
    				$assignmentDetails['id'] = intval($assignmentDetails['id']);   				
@@ -581,9 +582,10 @@ class AN_GradeBookAPI{
 					'assign_name' => $params['assign_name'],
 					'assign_date' => $params['assign_date'],					
 					'assign_due' => $params['assign_due'],					
+					'assign_category' => $params['assign_category'],						
 					'gbid' => $params['gbid'],
 					'assign_order'=> $assignOrder
-				), array( '%s','%s','%s','%d','%d') 
+				), array( '%s','%s','%s','%s','%d','%d') 
 				);
 				$assignID = $wpdb->insert_id;
 			    $studentIDs = $wpdb->get_results('SELECT uid FROM an_gradebook WHERE gbid = '. $params['gbid'], ARRAY_N);
@@ -877,21 +879,24 @@ $an_gradebook_scripts = new AN_GradeBook_Scripts();
 $an_gradebook_database = new AN_GradeBook_Database();
 $an_gradebookapi = new AN_GradeBookAPI();
 
-/*
+
 function an_gradebook_settings_page(){
 	if (gradebook_check_user_role('administrator')){	
+	ob_start();		
+	include( dirname( __FILE__ ) . '/templates/settings/grade-range.php' );	
+	$mytemplates = ob_get_clean();	
 	echo '<div class="wrap">
-			<h2>Settings</h2>
-			<div id="an-gradebooks-settings"></div>
-		  </div>';
+			<h2>Settings</h2>'.
+			$mytemplates.'
+		  </div>';			
 	}
 }
-*/
+
 
 
 function an_gradebook_menu_page(){
 if (gradebook_check_user_role('administrator')){
-	ob_start();
+	ob_start();	
 	include( dirname( __FILE__ ) . '/templates/edit-student-template.php' );	
 	include( dirname( __FILE__ ) . '/templates/delete-student-template.php' );
 	include( dirname( __FILE__ ) . '/templates/edit-assignment-template.php' );
@@ -900,6 +905,7 @@ if (gradebook_check_user_role('administrator')){
 	include( dirname( __FILE__ ) . '/templates/gradebook-interface-template.php' );
 	include( dirname( __FILE__ ) . '/templates/student-courses-interface-template.php' );
 	include( dirname( __FILE__ ) . '/templates/edit-course-template.php' );
+	include( dirname( __FILE__ ) . '/templates/filter-assignments-template.php' );	
 	include( dirname( __FILE__ ) . '/templates/courses-interface-template.php' );	
 	include( dirname( __FILE__ ) . '/templates/student-gradebook-interface-template.php' );	
 	$mytemplates = ob_get_clean();	

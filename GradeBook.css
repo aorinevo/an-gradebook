@@ -23,6 +23,10 @@ td.course, td.student {
  	text-align: center;
 }
 
+#an-gradebook #gradebook-interface-buttons-container li{
+	display: inline-block;
+}
+
 #an-gradebook button{
   display: inline-block;
 }
@@ -117,7 +121,7 @@ background-color: #f9f9f9;
     display: block;
 }
 
-#edit-assignment-form, #edit-student-form, #edit-course-form{
+#edit-assignment-form, #edit-student-form, #edit-course-form, #filter-assignments-form{
 	padding: 10px;
 }
 /*! jQuery UI - v1.10.4 - 2014-02-13

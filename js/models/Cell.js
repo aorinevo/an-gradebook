@@ -10,6 +10,7 @@ AN.Models.Cell = (function(my){
             assign_points_earned: 0,
             selected: false,
             hover: false,
+            visibility: true,
             display: false
         },
         toggleSelected: function() {
