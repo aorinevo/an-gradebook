@@ -3,8 +3,8 @@ Contributors: anevo, jamarparris
 Donate link: 
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
-Tested up to: 4.0
-Stable tag: 2.7.1
+Tested up to: 4.0.1
+Stable tag: 2.7.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,6 +60,12 @@ Students are able to:
 * plugin icon: https://www.iconfinder.com/icons/175285/edit_property_icon#size=256
 
 == Changelog ==
+
+Version 2.7.2:
+
+* Having a modal to manage filtering of assignments really didn’t make sense.  Now you can filter within the gradebook view. 
+* Rerendering the gradebook after adding an assignment seems to take care of the disappearing assignment header. 
+* Gradebook also rerenders on adding students, that way students are resorted according to last name.
 
 Version 2.7.1:
 

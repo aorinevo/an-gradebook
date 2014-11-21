@@ -35,15 +35,22 @@ AN.Views.Gradebook = (function($,my){
             'click button#edit-student': 'editStudent',
             'click button#delete-student': 'deleteStudent',
             'click button#add-assignment': 'editAssignmentPre',
-            'click button#edit-assignment': 'editAssignment',
-            'click button#filter-assignments': 'filterAssignments',            
+            'click button#edit-assignment': 'editAssignment',            
             'click button#stats-assignment': 'statsAssignment',
             'click button#stats-student': 'statsStudent',            
             'click button#delete-assignment': 'deleteAssignment',
-            'click #an-gradebook-container' : 'toggleEditDelete'
+            'click #an-gradebook-container' : 'toggleEditDelete',
+            'click button#filter-assignments': 'filterAssignments'
         },
         render: function() {
-            var template = _.template($('#gradebook-interface-template').html(), {});
+			var course = AN.GlobalVars.courses.findWhere({
+                selected: true
+            });
+            var _x = _.map(AN.GlobalVars.assignments.models, function(model){return model.get('assign_category');});
+            var _assign_categories = _.without(_.uniq(_x),"");                                           
+            var template = _.template($('#gradebook-interface-template').html(), {
+                    assign_categories: _assign_categories
+                });
             this.$el.html(template);
                 var x = AN.GlobalVars.students.toJSON();  
                 x = _.sortBy(x, 'lastname');                                        
@@ -82,13 +89,37 @@ AN.Views.Gradebook = (function($,my){
         close: function() {	 
         	this.xhr.abort();      
             !this.model.get('selected') && this.remove();
-        },
+        },     
+        filterAssignments: function() {       
+        	var _x = $('#filter-assignments-select').val();	           
+            var _toHide = AN.GlobalVars.assignments.filter(
+	            function(assign){
+               		return assign.get('assign_category') != _x;
+            	}
+        	);
+            var _toShow = AN.GlobalVars.assignments.filter(
+	            function(assign){
+               		return assign.get('assign_category') === _x;
+            	}
+        	);  
+        	if( _x === "-1"){
+        		AN.GlobalVars.assignments.each(function(assign){
+                	assign.set({visibility: true});
+				});
+        	} else {      	
+        		_.each(_toHide,function(assign){
+                	assign.set({visibility: false});
+            	});
+            	_.each(_toShow,function(assign){
+                	assign.set({visibility: true});
+            	});
+            }        
+            return false;
+        },        
         addStudent: function(studentgradebook) {
             student = AN.GlobalVars.students.get({id: parseInt(studentgradebook.get('uid'))});
-            var view = new AN.Views.StudentView({
-                model: student
-            });
-            $('#students').append(view.render().el);
+            new AN.Views.StudentView({model: student});
+			this.render();
             return this;
         },
         editStudentPre: function(){
@@ -109,10 +140,8 @@ AN.Views.Gradebook = (function($,my){
         	return false;
         },
         addAssignment: function(assignment) {
-            var view = new AN.Views.AssignmentView({
-                model: assignment
-            });
-            $('#students-header tr').append(view.render().el);
+            new AN.Views.AssignmentView({model: assignment});
+            this.render();
             return this;
         },
         editAssignmentPre: function(){       
@@ -134,10 +163,19 @@ AN.Views.Gradebook = (function($,my){
         statsStudent: function(){
             var view = new AN.Views.StudentStatisticsView(); 
             return false;			
-        },        
+        },               
         sortAssignment: function(ev) {
-            var template = _.template($('#gradebook-interface-template').html(), {});
+			var course = AN.GlobalVars.courses.findWhere({
+                selected: true
+            });
+            var _x = _.map(AN.GlobalVars.assignments.models, function(model){return model.get('assign_category');});
+            var _assign_categories = _.without(_.uniq(_x),""); 
+			var _y = $('#filter-assignments-select').val();	                
+            var template = _.template($('#gradebook-interface-template').html(), {
+                    assign_categories: _assign_categories
+                });        
             this.$el.html(template);
+            $('#filter-assignments-select').val(_y);
                 var x = AN.GlobalVars.cells.toJSON();               
                 x = _.where(x, {amid: parseInt(ev.get('id'))});            
                 x = _.sortBy(x,
@@ -166,10 +204,6 @@ AN.Views.Gradebook = (function($,my){
                 });       
             this.toggleEditDelete();                     
             return this;
-        },
-        filterAssignments: function(){
-            var view = new AN.Views.FilterAssignmentsView();         
-            return false;
         },
         deleteAssignment: function() {
             var todel = AN.GlobalVars.assignments.findWhere({

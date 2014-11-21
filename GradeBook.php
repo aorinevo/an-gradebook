@@ -3,13 +3,13 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 2.7.1
+Version: 2.7.2
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
 */
 
-define( "AN_GRADEBOOK_VERSION", "2.7.1");
+define( "AN_GRADEBOOK_VERSION", "2.7.2");
 //Load scripts
 class AN_GradeBook_Scripts{
 	public function __construct(){
@@ -43,7 +43,6 @@ class AN_GradeBook_Scripts{
 		wp_register_script( 'views/DeleteStudentView', plugins_url('js/views/DeleteStudentView.js',__File__),array( 'init_app','jquery','backbone','underscore' ), null, true );																
 		wp_register_script( 'views/EditAssignmentView', plugins_url('js/views/EditAssignmentView.js',__File__),array( 'init_app','jquery','backbone','underscore' ), null, true );																		
 		wp_register_script( 'views/EditCourseView', plugins_url('js/views/EditCourseView.js',__File__),array( 'init_app','jquery','backbone','underscore' ), null, true );																		
-		wp_register_script( 'views/FilterAssignmentsView', plugins_url('js/views/FilterAssignmentsView.js',__File__),array( 'init_app','jquery','backbone','underscore' ), null, true );																				
 		wp_register_script( 'views/AssignmentStatisticsView', plugins_url('js/views/AssignmentStatisticsView.js',__File__),array( 'init_app','jquery','backbone','underscore' ), null, true );																		
 		wp_register_script( 'views/StudentStatisticsView', plugins_url('js/views/StudentStatisticsView.js',__File__),array( 'init_app','jquery','backbone','underscore' ), null, true );																		
 //other scripts		
@@ -76,8 +75,7 @@ class AN_GradeBook_Scripts{
     	wp_enqueue_script( 'views/EditStudentView');     	
     	wp_enqueue_script( 'views/DeleteStudentView');     	    	
     	wp_enqueue_script( 'views/EditAssignmentView');     	    	    	
-    	wp_enqueue_script( 'views/EditCourseView');     	    	    	    	
-    	wp_enqueue_script( 'views/FilterAssignmentsView');     	    	    	    	    	
+    	wp_enqueue_script( 'views/EditCourseView');     	    	    	    	   	    	    	    	    	
     	wp_enqueue_script( 'views/AssignmentStatisticsView' );  
     	wp_enqueue_script( 'views/StudentStatisticsView' );  
     	wp_enqueue_script( 'views/GradebookView' );      	
@@ -905,7 +903,6 @@ if (gradebook_check_user_role('administrator')){
 	include( dirname( __FILE__ ) . '/templates/gradebook-interface-template.php' );
 	include( dirname( __FILE__ ) . '/templates/student-courses-interface-template.php' );
 	include( dirname( __FILE__ ) . '/templates/edit-course-template.php' );
-	include( dirname( __FILE__ ) . '/templates/filter-assignments-template.php' );	
 	include( dirname( __FILE__ ) . '/templates/courses-interface-template.php' );	
 	include( dirname( __FILE__ ) . '/templates/student-gradebook-interface-template.php' );	
 	$mytemplates = ob_get_clean();	

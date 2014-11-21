@@ -10,9 +10,17 @@
     <li><button type="button" id="stats-student" class="wp-core-ui button">Student Statistics</button></li>          
     <li><button type="button" id="delete-assignment" class="wp-core-ui button">Delete Assignment</button></li>   
     </ul>    
-    <ul>
-    <li><button type="button" id="filter-assignments" class="wp-core-ui button">Filter Assignments</button></li>     
-    </ul>
+    <div>
+						<select name="filter_option" id="filter-assignments-select">
+        				  <option value="-1">Show all</option>						
+        				<% 
+ 						for (var i in assign_categories){
+ 						   print('<option value='+assign_categories[i]+'>'+assign_categories[i]+'</option>');
+ 						}
+        				%>    			      
+        				</select>
+		<button type="button" id="filter-assignments" class="wp-core-ui button">Filter Assignments</button>    				
+    </div>
     <hr/>
     <table id="an-gradebook-container" class="wp-list-table widefat fixed pages">  
     <thead id="students-header">
