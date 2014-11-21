@@ -4,7 +4,7 @@ Donate link:
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
 Tested up to: 4.0
-Stable tag: 2.7
+Stable tag: 2.7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,6 +60,10 @@ Students are able to:
 * plugin icon: https://www.iconfinder.com/icons/175285/edit_property_icon#size=256
 
 == Changelog ==
+
+Version 2.7.1:
+
+* Bug fix: Switch grade-books fires an ajax request and unless aborted would render the response from the server.  This may not have been noticeable because the plugin will render the responses in the order in which they were sent and so eventually the right gradebook would be rendered.  This fix kills the unnecessary and outstanding ajax requests.
 
 Version 2.7:
 

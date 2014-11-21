@@ -4,7 +4,7 @@ AN.Views.Gradebook = (function($,my){
         initialize: function() {
             var self = this;
             var courseGradebook = new AN.Models.CourseGradebook();
-            courseGradebook.fetch({
+            this.xhr = courseGradebook.fetch({
             	success: function(data){
             		AN.GlobalVars.students.reset();   
 					AN.GlobalVars.cells.reset();               		            		
@@ -79,7 +79,8 @@ AN.Views.Gradebook = (function($,my){
               $('#edit-assignment, #delete-assignment, #stats-assignment').attr('disabled',true);
             }            
         },
-        close: function() {	        
+        close: function() {	 
+        	this.xhr.abort();      
             !this.model.get('selected') && this.remove();
         },
         addStudent: function(studentgradebook) {
