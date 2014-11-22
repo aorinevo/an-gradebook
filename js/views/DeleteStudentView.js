@@ -63,15 +63,17 @@ AN.Views.DeleteStudentView = (function($,my){
             });
             todel.set({delete_options: studentInformation.delete_options});
             var self = this;
-			todel.destroy(studentInformation,
-        	{success: function (){
-	            todel.set({
+			todel.destroy({success: function (model,response){
+	        	model.set({
                     selected: false
-                });       
-                AN.GlobalVars.courses.remove(todel.get('id'));                
-                self.toggleEditDelete();                 		
-        	}}
-            );           
+                });                    
+                AN.GlobalVars.students.remove(model);                         
+                var _y = AN.GlobalVars.cells.where({uid: model.get('id')});
+                _.each(_y, function(cell){
+                	AN.GlobalVars.cells.remove(cell);                               
+        		});
+                self.toggleEditDelete();                 		        		
+        	}});           
             this.remove();
             this.toggleEditDelete();
             return false;

@@ -10,25 +10,18 @@ AN.Views.CellView = (function($, my){
             this.listenTo(this.model, 'change:assign_points_earned', this.render);
             this.listenTo(AN.GlobalVars.assignments, 'change:selected', this.selectCell);
             this.listenTo(AN.GlobalVars.assignments, 'change:hover', this.hoverCell);            
-            this.listenTo(AN.GlobalVars.assignments, 'change:visibility', this.visibilityCell);               
-            this.listenTo(this.model, 'change:selected', this.selectCellCSS);
-            this.listenTo(this.model, 'change:hover', this.hoverCellCSS);            
-            this.listenTo(this.model, 'change:visibility', this.visibilityCellCSS);             
-            this.listenTo(this.model, 'remove', function() {
-                this.remove();
-            });
+            this.listenTo(AN.GlobalVars.assignments, 'change:visibility', this.visibilityCell); 
+            this.listenTo(this.model, 'remove', this.close);                                    
         },
         render: function() {
-            this.visibilityCellCSS();        
+        	var self = this;
+            this.$el.toggleClass('hidden', !self.model.get('visibility'));           
             this.$el.html('<div class="view">' + this.model.get('assign_points_earned') + '</div> <input class="edit" type="text" value="' + parseFloat(this.model.get('assign_points_earned')) + '"></input>');
             this.input = this.$('.edit');
             return this;
         },
-        hoverCell: function(){
-        	
-        },
-        close: function() {
-            this.remove();
+        close: function(ev) {
+        	this.remove();
         },
         updateOnEnter: function(e) {
             if (e.keyCode == 13) this.hideInput();
@@ -51,43 +44,25 @@ AN.Views.CellView = (function($, my){
                 this.model.set({
                     hover: ev.get('hover')
                 });
+                this.$el.toggleClass('hover',ev.get('hover'));                
  			} 
-        },
-        hoverCellCSS: function() {
-            if (this.model.get('hover')) {
-                this.$el.addClass('hover');
-            } else {
-                this.$el.removeClass('hover');
-            }
-        },        
+        },      
         selectCell: function(ev) {
             if (this.model.get('amid') === ev.get('id')) {
                 this.model.set({
                     selected: ev.get('selected')
                 });
+                this.$el.toggleClass('selected',ev.get('selected'));
  			}
-        },
-        selectCellCSS: function() {
-            if (this.model.get('selected')) {
-                this.$el.addClass('selected');
-            } else {
-                this.$el.removeClass('selected');
-            }
         },
         visibilityCell: function(ev) {
             if (this.model.get('amid') === ev.get('id')) {
                 this.model.set({
                     visibility: ev.get('visibility')
                 });
+                this.render();
  			}
-        },        
-        visibilityCellCSS: function(ev) {
-            if (this.model.get('visibility')) {
-                this.$el.removeClass('hidden');
-            } else {
-                this.$el.addClass('hidden');
-            }
-        }        
+        }       
     });
 return my;
 })(jQuery, AN.Views.CellView ||{});

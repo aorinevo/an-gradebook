@@ -3,13 +3,13 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 2.7.2
+Version: 2.8
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
 */
 
-define( "AN_GRADEBOOK_VERSION", "2.7.2");
+define( "AN_GRADEBOOK_VERSION", "2.8");
 //Load scripts
 class AN_GradeBook_Scripts{
 	public function __construct(){
@@ -416,11 +416,10 @@ class AN_GradeBookAPI{
 						$results1 = $wpdb->delete('an_gradebook',array('uid'=>$x));
 						$results2 = $wpdb->delete('an_assignment',array('uid'=>$x));				
 						require_once(ABSPATH.'wp-admin/includes/user.php' );
-						wp_delete_user($x);			
-						echo json_encode('student removed from wordpress database');					
+						wp_delete_user($x);	
+						die();												
 						break;
-				} 
-				die();	  			
+				} 	  			
 	  			break;
 	  		case 'PUT' :
 				$params = json_decode(file_get_contents('php://input'),true);		  		
@@ -557,6 +556,8 @@ class AN_GradeBookAPI{
    				);   
    				$assignmentDetails = $wpdb->get_row('SELECT * FROM an_assignments WHERE id = '. $params['id'] , ARRAY_A);
    				$assignmentDetails['id'] = intval($assignmentDetails['id']);   				
+   				$assignmentDetails['gbid'] = intval($assignmentDetails['gbid']);  
+   				$assignmentDetails['assign_order'] = intval($assignmentDetails['assign_order']);    				  				
    				echo json_encode($assignmentDetails);
   				die();
 				break;
@@ -782,6 +783,7 @@ public function get_gradebook_entire(){
     foreach($assignments as &$assignment){
     	$assignment['id'] = intval($assignment['id']);
     	$assignment['gbid'] = intval($assignment['gbid']);    	
+    	$assignment['assign_order'] = intval($assignment['assign_order']);       	
     }	
 	$student_assignments = $wpdb->get_results('SELECT * FROM an_assignment WHERE gbid = '. $gbid, ARRAY_A);
     foreach($student_assignments as &$student_assignment){

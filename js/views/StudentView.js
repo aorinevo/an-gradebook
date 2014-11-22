@@ -30,6 +30,7 @@ AN.Views.StudentView = (function($,my){
             	uid: parseInt(this.model.get('id')),		//anq: why is this not already an integer??
             	gbid: gbid
             	});
+            x.sort('order');
             var self = this;
             _.each(x, function(cell) {
                 var view = new AN.Views.CellView({

@@ -13,11 +13,14 @@ AN.Views.AssignmentView = (function($,my){
             this.listenTo(this.model, 'change:selected', this.selectColumnCSS);
             this.listenTo(this.model, 'change:sorted', this.sortColumnCSS);
             this.listenTo(this.model, 'change:visibility', this.visibilityColumnCSS);            
-            this.listenTo(this.model, 'remove', function() { this.remove(); });
+            this.listenTo(this.model, 'remove', this.close);
         },
         mouseEnter: function(){
         	this.$el.addClass('hover');
         	this.model.set({hover: true});
+        },
+        close: function(){
+			this.remove();			
         },
         mouseLeave: function(){
         	this.$el.removeClass('hover');	
