@@ -1,5 +1,5 @@
-AN.Models.Course = (function(my){
-	my = AN.Models.Base.extend({
+(function(AN){
+	AN.Models.Course = AN.Models.Base.extend({
         defaults: {
             name: 'Calculus I',
             school: 'Bergen',
@@ -15,5 +15,4 @@ AN.Models.Course = (function(my){
         	}
         }
 	});
-	return my
-})(AN.Models.Course || {});
+})(AN || {});

@@ -4,7 +4,7 @@ Donate link:
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
 Tested up to: 4.0.1
-Stable tag: 2.8
+Stable tag: 2.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,6 +60,13 @@ Students are able to:
 * plugin icon: https://www.iconfinder.com/icons/175285/edit_property_icon#size=256
 
 == Changelog ==
+
+Version 2.9:
+
+* Fixed Firefox bug where student list would not display.
+* Added assignment menus to assignment headers and removed the corresponding buttons from grade-book view.
+* Added student menus to student row headers and removed the corresponding buttons from grade-book view.
+* Cleaned up code.
 
 Version 2.8:
 

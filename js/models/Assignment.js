@@ -1,5 +1,5 @@
-AN.Models.Assignment = (function(my){
-    my = AN.Models.Base.extend({
+(function(AN){
+	AN.Models.Assignment = AN.Models.Base.extend({
         defaults: {   
         	assign_category: '',  
             assign_name: 'assign name',
@@ -18,5 +18,4 @@ AN.Models.Assignment = (function(my){
         	}
         }
     });
-    return my;
-})(AN.Models.Assignment || {});
+})(AN || {});

@@ -1,4 +1,5 @@
-AN.Models.Student = AN.Models.Base.extend({
+(function(AN) {
+	AN.Models.Student = AN.Models.Base.extend({
         defaults: {
             firstname: 'john',
             lastname: 'doe',
@@ -11,4 +12,5 @@ AN.Models.Student = AN.Models.Base.extend({
         		return ajaxurl + '?action=student';
         	}
         }
-});  
+	});
+})(AN || {});

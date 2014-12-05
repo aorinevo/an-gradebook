@@ -1,5 +1,5 @@
-AN.Views.Gradebook = (function($,my){
-      my = AN.Views.Base.extend({
+(function($,AN){
+      AN.Views.Gradebook = AN.Views.Base.extend({
         id: 'an-gradebook',
         initialize: function() {
             var self = this;
@@ -19,13 +19,11 @@ AN.Views.Gradebook = (function($,my){
                 }); 
                 _.each(courseGradebook.get('student_assignments'), function(cell) {     	
                     AN.GlobalVars.cells.add(cell);
-                });                                
-                _.each(courseGradebook.get('gradebook_students'), function(gradebook) {
-                    AN.GlobalVars.anGradebooks.add(gradebook);
                 });                                       
                 self.render();
-                self.listenTo(AN.GlobalVars.anGradebooks, 'add', self.render);
+                self.listenTo(AN.GlobalVars.courses, 'add', self.render);
                 self.listenTo(AN.GlobalVars.assignments, 'add', self.render);
+                self.listenTo(AN.GlobalVars.cells, 'add', self.render);                
                 self.listenTo(AN.GlobalVars.assignments, 'change:assign_category', self.render);                
             	self.listenTo(AN.GlobalVars.assignments, 'change:sorted', self.sortAssignment);              		
             	}
@@ -34,16 +32,22 @@ AN.Views.Gradebook = (function($,my){
             return this;
         },
         events: {
-            'click button#add-student': 'editStudent',
-            'click button#edit-student': 'editStudent',
-            'click button#delete-student': 'deleteStudent',
-            'click button#add-assignment': 'editAssignment',
-            'click button#edit-assignment': 'editAssignment',        
-            'click button#delete-assignment': 'deleteAssignment',                
-            'click button#stats-assignment': 'statsAssignment',
-            'click button#stats-student': 'statsStudent',            
-            'click #an-gradebook-container' : 'toggleEditDelete',
-            'click button#filter-assignments': 'filterAssignments'
+            'click button#add-student': 'addStudent',
+            'click button#add-assignment': 'addAssignment', //Need to add function for adding assignments          
+            'click button#filter-assignments': 'filterAssignments',
+            'click #cb-select-all-1': 'selectAllStudents'
+        },
+        selectAllStudents: function(ev){
+        	var _selected = $('#cb-select-all-1').is(':checked');
+        	if(_selected){
+        		_.each(AN.GlobalVars.students.models, function(student){
+        			student.set({selected: true});
+        		});
+        	} else {
+        		_.each(AN.GlobalVars.students.models, function(student){
+        			student.set({selected: false});
+        		});        	
+        	}
         },
         render: function() {
         	var course = AN.GlobalVars.courses.findWhere({
@@ -97,23 +101,8 @@ AN.Views.Gradebook = (function($,my){
                 	$('#students-header tr').append(view.render().el);
             		});  
             		break;             	
-            }                                   
-            this.toggleEditDelete();                        
+            }                                                     
             return this;
-        },
-        toggleEditDelete: function(){
-            var x = AN.GlobalVars.students.findWhere({selected: true});
-            if(x){
-              $('#edit-student, #delete-student, #stats-student').attr('disabled',false);
-            }else{
-              $('#edit-student, #delete-student, #stats-student').attr('disabled',true);
-            }
-            var y = AN.GlobalVars.assignments.findWhere({selected: true});
-            if(y){
-              $('#edit-assignment, #delete-assignment, #stats-assignment').attr('disabled',false);
-            }else{
-              $('#edit-assignment, #delete-assignment, #stats-assignment').attr('disabled',true);
-            }            
         },
         close: function() {	 
         	this.xhr.abort();      
@@ -144,8 +133,12 @@ AN.Views.Gradebook = (function($,my){
             	});
             }        
             return false;
-        },      
-        editStudent: function(ev) {       
+        },     
+        addAssignment: function(ev) {    
+            var view = new AN.Views.EditAssignmentView({});           
+            return this;
+        },    
+        addStudent: function(ev) {       
         	if(ev.currentTarget.id === "add-student"){
             	var x = AN.GlobalVars.students.findWhere({selected: true});
             	x && x.set({selected: false});
@@ -155,32 +148,7 @@ AN.Views.Gradebook = (function($,my){
             $('#gradebook-interface-buttons-container').children().attr('disabled',true);
             var view = new AN.Views.EditStudentView();      
             return false;
-        },
-        deleteStudent: function() {
-        	$('#gradebook-interface-buttons-container').children().attr('disabled',true);
-        	var view = new AN.Views.DeleteStudentView();      	
-        	this.render;
-        	return false;
-        },     
-        editAssignment: function(ev) {    
-        	if(ev.currentTarget.id ==='add-assignment'){
-        		var x = AN.GlobalVars.students.findWhere({selected: true});
-            	x && x.set({selected: false});
-				var y = AN.GlobalVars.assignments.findWhere({selected: true});
-				y && y.set({selected: false});
-			}
-            $('#gradebook-interface-buttons-container').children().attr('disabled',true);
-            var view = new AN.Views.EditAssignmentView();  
-            return this;
-        },
-        statsAssignment: function(){
-            var view = new AN.Views.AssignmentStatisticsView(); 
-            return this;			
-        },
-        statsStudent: function(){
-            var view = new AN.Views.StudentStatisticsView(); 
-            return this;			
-        },               
+        },                
         sortAssignment: function(ev) {
             var x = AN.GlobalVars.cells.where({amid: parseInt(ev.get('id'))});         			
 			this.sort_column = _.sortBy(x,function(cell){
@@ -191,30 +159,8 @@ AN.Views.Gradebook = (function($,my){
 				}
 			});             		
 			this.sort_key = 'cell';                                                
-           	this.render();       
-            this.toggleEditDelete();                     
+           	this.render();                          
             return this;
-        },
-        deleteAssignment: function() {
-            var todel = AN.GlobalVars.assignments.findWhere({
-                selected: true
-            });
-            var self = this;
-			todel.destroy(
-        	{success: function (model){
-	            model.set({ selected: false });       
-                AN.GlobalVars.assignments.remove(model);   
-                var x = AN.GlobalVars.cells.where({
-                    amid: parseInt(model.get('id'))
-                });
-                _.each(x, function(cell) {
-                    AN.GlobalVars.cells.remove(cell);
-                });               
-                self.render();              
-                self.toggleEditDelete();                 		
-        	}}
-            );        
         }
     });
-    return my;
-})(jQuery, AN.Views.Gradebook || {});
+})(jQuery, AN || {});

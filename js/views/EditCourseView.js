@@ -1,5 +1,5 @@
-AN.Views.EditCourseView = (function($,my){
-	my = AN.Views.Base.extend({
+(function($,my){
+	AN.Views.EditCourseView = AN.Views.Base.extend({
         id: 'edit-course-form-container-container',
         events: {
             'click button#edit-course-cancel': 'editCancel',
@@ -81,7 +81,6 @@ AN.Views.EditCourseView = (function($,my){
             return false;
         }
     });
-    return my;
-})(jQuery, AN.Views.EditCourseView || {});
+})(jQuery, AN || {});
      
     

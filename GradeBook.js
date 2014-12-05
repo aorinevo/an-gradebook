@@ -4,13 +4,12 @@
     AN.GlobalVars.students = new AN.Collections.Students([]);      
     AN.GlobalVars.courses = new AN.Collections.Courses([]); 
     AN.GlobalVars.courseGradebook = new AN.Models.CourseGradebook();
-	AN.GlobalVars.anGradebooks = new AN.Collections.ANGradebooks([]);
 	
     AN.Views.App = AN.Views.Base.extend({
         el: '#an-gradebooks',
         events: {
-            'click button#add-course': 'editCoursePre',
             'click button#delete-course': 'deleteCourse',
+            'click button#add-course': 'editCourse',            
             'click button#edit-course': 'editCourse',
             'click .course': 'showGradebook',
             'click #an-courses-container' : 'toggleEditDelete'
@@ -30,8 +29,7 @@
                 var gradebook = new AN.Views.Gradebook({
                     model: x
                 });
-                $('#an-gradebooks').append(gradebook.render().el);
-            	gradebook.toggleEditDelete();
+                $('#an-gradebooks').append(gradebook.render().el);            
             } else {
 				this.toggleEditDelete();           
             }
@@ -45,14 +43,13 @@
               $('#edit-course, #delete-course').attr('disabled', true); 
             }         
         },    
-        editCoursePre: function(){
-            var x = AN.GlobalVars.courses.findWhere({selected: true});
-            if(x){
-            x.set({selected: false});
+        editCourse: function(ev) {
+        	if($(ev.currentTarget)[0]['id']==='add-course'){
+            	var x = AN.GlobalVars.courses.findWhere({selected: true});
+            	if(x){
+            	x.set({selected: false});
+            	}
             }
-            this.editCourse();            
-        },    
-        editCourse: function() {
         	$('#myModal').show();        
             $('#courses-interface-buttons-container').children().attr('disabled', true);
             var view = new AN.Views.EditCourseView();
@@ -73,8 +70,7 @@
         	{success: function (){
 	            todel.set({
                     selected: false
-                });       
-                AN.GlobalVars.courses.remove(todel.get('id'));                
+                });                     
                 self.toggleEditDelete();                 		
         	}}
             );

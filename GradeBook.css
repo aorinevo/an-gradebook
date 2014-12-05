@@ -6,9 +6,10 @@ td {
 	cursor: default;
 }
 
-td.course, td.student {
+td.course{
 	cursor: pointer;
 }
+
 
 #chart_div{
 	display: inline-block;
@@ -37,13 +38,13 @@ form, input {
 }
 
 #students .selected td, 
+#students .selected th,
 #students .selected, #courses .selected td{
    background-color: #f7fcfe;
 }
 
-#students-header tr th.selected{
-	background-color: #f7fcfe;
-	border-top: 4px solid #2ea2cc;
+#students-header tr th{
+	cursor: default;
 }
 
 #courses tr.selected > td:first-child{
@@ -76,7 +77,7 @@ form, input {
 
 
 #students tr:nth-of-type(odd), #courses tr:nth-of-type(odd) {
-background-color: #f9f9f9;
+	background-color: #f9f9f9;
 }
 
 #students td.editing .view {
@@ -95,7 +96,7 @@ background-color: #f9f9f9;
 
 #students-header .column-title {
 	display: inline-block;
-	cursor: pointer;
+	cursor: default;
 	padding-left: 0px;
 	padding-bottom: 0px;
 	padding-top: 0px;
@@ -124,6 +125,21 @@ background-color: #f9f9f9;
 #edit-assignment-form, #edit-student-form, #edit-course-form, #filter-assignments-form{
 	padding: 10px;
 }
+
+th div[id^="column-assign-id"]{
+	position:absolute;
+	display: none;
+	background-color: white;
+}
+
+th div[id^="column-assign-id"] li{
+	cursor: pointer;
+}
+
+th div[id^="column-assign-id"] li:hover{
+	background-color: #f7fcfe;
+}
+
 /*! jQuery UI - v1.10.4 - 2014-02-13
 * http://jqueryui.com
 * Includes: jquery.ui.core.css, jquery.ui.resizable.css, jquery.ui.selectable.css, jquery.ui.accordion.css, jquery.ui.autocomplete.css, jquery.ui.

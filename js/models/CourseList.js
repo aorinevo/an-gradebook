@@ -1,10 +1,9 @@
-AN.Collections.Courses = (function(my){
-	my = AN.Collections.Base.extend({
+(function(AN){
+	AN.Collections.Courses = AN.Collections.Base.extend({
 	model: AN.Models.Course,
   	url: function(){
   	     	return ajaxurl + '?action=get_courses';
   		}
 	});
-	return my;	
-})(AN.Collections.Courses||{});
+})(AN || {});
 	

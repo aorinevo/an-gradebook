@@ -1,5 +1,5 @@
-AN.Views.EditStudentView = (function($,my){
-	my = AN.Views.Base.extend({
+(function($,my){
+	AN.Views.EditStudentView = AN.Views.Base.extend({
         id: 'edit-student-form-container-container',
         events: {
             'click button#edit-student-cancel': 'editCancel',
@@ -8,18 +8,13 @@ AN.Views.EditStudentView = (function($,my){
             'click #edit-student-save': 'submitForm',            
             'submit #edit-student-form': 'editSave'
         },
-        initialize: function(){
-            var student = AN.GlobalVars.students.findWhere({
-                selected: true
-            });       
+        initialize: function(){   
             $('body').append(this.render().el);     	
             return this;
         },        
         render: function() {
             var self = this;
-            var student = AN.GlobalVars.students.findWhere({
-                selected: true
-            });
+            var student = this.model;
             var gradebook = AN.GlobalVars.courses.findWhere({
         		selected: true
             });
@@ -82,7 +77,7 @@ AN.Views.EditStudentView = (function($,my){
                   	  	AN.GlobalVars.cells.add(assignment);
               		});
                 	AN.GlobalVars.students.add(response['student']);
-                	AN.GlobalVars.anGradebooks.add(response['anGradebook']);                            	 
+                	AN.GlobalVars.courses.add(response['anGradebook']);                            	 
             		}
             	});            	
             }
@@ -91,5 +86,4 @@ AN.Views.EditStudentView = (function($,my){
             return false;
         }
     });
-	return my;
-})(jQuery, AN.Views.EditStudentView || {});	
+})(jQuery, AN || {});	

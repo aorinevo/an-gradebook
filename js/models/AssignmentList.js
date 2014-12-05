@@ -1,6 +1,5 @@
-AN.Collections.Assignments = (function(my){
-  my = AN.Collections.Base.extend({
+(function(AN){
+	AN.Collections.Assignments = AN.Collections.Base.extend({
         model: AN.Models.Assignment
     });
-return my;
-})(AN.Collections.Assignments || {});
+})(AN || {});

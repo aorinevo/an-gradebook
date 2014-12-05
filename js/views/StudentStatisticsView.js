@@ -1,5 +1,5 @@
-AN.Views.StudentStatisticsView = (function($,my){
-	my = AN.Views.Base.extend({
+(function($,my){
+	AN.Views.StudentStatisticsView = AN.Views.Base.extend({
 		id: 'stats-student-container-container',
         events: {
             'click button#stats-student-close': 'editCancel',
@@ -22,8 +22,8 @@ AN.Views.StudentStatisticsView = (function($,my){
             });			
 			$.get(ajaxurl, { 
 						action: 'get_line_chart',
-						uid : student.get('id'),
-						gbid : student.get('gbid')
+						uid : this.model.get('id'),
+						gbid : this.model.get('gbid')
 					},
 					function(data){	
 						data.length ==1 ? $('.media-frame-content').html('<div style="padding: 10px;"> There is no content to display </div>') : drawLineChart(data);							
@@ -49,6 +49,5 @@ AN.Views.StudentStatisticsView = (function($,my){
             return false;
         }
     });
-    return my;
-})(jQuery, AN.Views.StudentStatisticsView || {});   
+})(jQuery, AN || {});   
 	

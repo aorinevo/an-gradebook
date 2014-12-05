@@ -1,5 +1,5 @@
-AN.Views.CourseView = (function($,my){
-	my = AN.Views.Base.extend({
+(function($,my){
+	AN.Views.CourseView = AN.Views.Base.extend({
         tagName: 'tr',
         events: {
             'click .course': 'selectCourse'
@@ -7,9 +7,10 @@ AN.Views.CourseView = (function($,my){
         initialize: function() {
 			this.listenTo(this.model, 'change:name change:school change:semester change:year', this.render);
             this.listenTo(this.model, 'change:selected', this.selectCourseCSS);
-            this.listenTo(this.model, 'remove', function() {
-                this.remove();
-            });
+            this.listenTo(this.model, 'remove', this.close);
+        },
+        close: function() {
+        	this.remove();
         },
         render: function() {
             this.$el.html('<td>' + this.model.get("id") + '</td><td class="course">' + this.model.get("name") + '</td><td>' + this.model.get("school") + '</td>' + '</td><td>' + this.model.get("semester") + '</td>' + '</td><td>' + this.model.get("year") + '</td>');
@@ -52,6 +53,5 @@ AN.Views.CourseView = (function($,my){
             }
         }
     });
-    return my;
-})(jQuery, AN.Views.CourseView || {});    
+})(jQuery, AN || {});    
     

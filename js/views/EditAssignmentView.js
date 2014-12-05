@@ -1,5 +1,5 @@
-AN.Views.EditAssignmentView = (function($,my){
-	my = AN.Views.Base.extend({
+(function($,AN){
+	AN.Views.EditAssignmentView = AN.Views.Base.extend({
         id: 'edit-assignment-form-container-container',
         events: {
             'click button#edit-assignment-cancel': 'editCancel',
@@ -23,12 +23,12 @@ AN.Views.EditAssignmentView = (function($,my){
         },
         render: function() {
             var self = this;
-            var assignment = AN.GlobalVars.assignments.findWhere({
-                selected: true
-            });
-            var gradebook = AN.GlobalVars.courses.findWhere({
-                selected: true
-            });
+            var assignment = this.model;
+            if(this.model){
+                var gradebook = AN.GlobalVars.courses.findWhere({id : this.model.get('gbid')+""});            
+            } else {
+            	var gradebook = AN.GlobalVars.courses.findWhere({selected: true});            
+            }
             if (assignment) {
                 var template = _.template($('#edit-assignment-template').html(), {
                     assignment: assignment,
@@ -96,5 +96,4 @@ AN.Views.EditAssignmentView = (function($,my){
             return false;
         }
     });
-    return my;
-})(jQuery, AN.Views.EditAssignmentView || {});    
+})(jQuery, AN || {});    

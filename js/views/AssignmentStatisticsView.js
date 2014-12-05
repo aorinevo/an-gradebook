@@ -1,25 +1,21 @@
-AN.Views.AssignmentStatisticsView = (function($, my){
-	my = AN.Views.Base.extend({
+(function($, AN){
+	AN.Views.AssignmentStatisticsView = AN.Views.Base.extend({
 		id: 'stats-assignment-container-container',
         events: {
             'click button#stats-assignment-close': 'editCancel',
             'click a#an-piechart': 'displayPieChart',
-            'click a#an-linechart': 'displayLineChart',            
+            'click a#an-linechart': 'displayLineChart',     
+			'keyup'  : 'keyPressHandler',                    
             'click a.media-modal-close' : 'editCancel'
         },		
-		initialize: function(){	   
-            var assignment = AN.GlobalVars.assignments.findWhere({
-                selected: true
-            });      
+		initialize: function(){	        
             $('body').append(this.render().el);
             return this;   		   
 		},		
 		displayPieChart: function(){
 			$('.media-router').children().removeClass('active');
 			$('#an-piechart').addClass('active');
-            var assignment = AN.GlobalVars.assignments.findWhere({
-                selected: true
-            });			
+            var assignment = this.model;	
 			$.get(ajaxurl, { 
 						action: 'get_pie_chart',
 						amid : assignment.get('id'),
@@ -34,9 +30,7 @@ AN.Views.AssignmentStatisticsView = (function($, my){
 		},	
         render: function() {
             var self = this;
-            var assignment = AN.GlobalVars.assignments.findWhere({
-                selected: true
-            });
+            var assignment = this.model;
             var template = _.template($('#stats-assignment-template').html(), {
                     assignment: assignment
             });
@@ -48,7 +42,11 @@ AN.Views.AssignmentStatisticsView = (function($, my){
         editCancel: function() {
             this.remove();            
             return false;
-        }
+        },
+ 		keyPressHandler: function(e) {
+            if (e.keyCode == 27) this.editCancel();
+            if (e.keyCode == 13) this.submitForm();
+            return this;
+        }        
     });
-    return my;
-})(jQuery, AN.Views.AssignmentStatisticsView);
+})(jQuery, AN || {});

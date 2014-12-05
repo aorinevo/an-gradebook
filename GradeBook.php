@@ -3,13 +3,13 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 2.8
+Version: 2.9
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
 */
 
-define( "AN_GRADEBOOK_VERSION", "2.8");
+define( "AN_GRADEBOOK_VERSION", "2.9");
 //Load scripts
 class AN_GradeBook_Scripts{
 	public function __construct(){
@@ -18,7 +18,8 @@ class AN_GradeBook_Scripts{
 			add_action('admin_enqueue_scripts', array($this,'enqueue_gradebook_scripts'));		
 	}
 	public function register_gradebook_scripts(){
-		wp_register_style( 'GradeBook_css', plugins_url('GradeBook.css',__File__), array(), null, false );
+		wp_register_style( 'GradeBook_css', plugins_url('GradeBook.css',__File__), array('list-tables'), null, false );
+		wp_register_style( 'bootstrap_css', plugins_url('js/packages/bootstrap/css/bootstrap.min.css',__File__), array(), null, false );		
 		wp_register_style( 'list-tables', plugins_url('list-tables.css',__File__), array(), null, false );		
 		wp_register_script('googlejsapi', 'https://www.google.com/jsapi', array(), null, false ); 
 //models
@@ -49,10 +50,12 @@ class AN_GradeBook_Scripts{
 		wp_register_script( 'GradeBook_js', plugins_url('GradeBook.js',__File__),array( 'jquery','models/Cell','models/CellList','models/Assignment','models/AssignmentList','models/Student','models/StudentList','models/CourseGradebook', 'backbone','underscore' ), null, true );
 		wp_register_script( 'init_app', plugins_url('init_app.js',__File__),array( 'jquery', 'backbone','underscore' ), null, true );		
 		wp_register_script( 'GradeBook_student_js', plugins_url('GradeBook_student.js',__File__),array( 'jquery', 'backbone','underscore' ), null, true );
+		wp_register_script( 'bootstrap_js', plugins_url('js/packages/bootstrap/js/bootstrap.min.js',__File__),array( 'jquery', 'backbone','underscore' ), null, true );
 	}
 	public function enqueue_gradebook_scripts($hook){
         if( $hook == "toplevel_page_an_gradebook_page" ){
 		wp_enqueue_style( 'GradeBook_css' );	
+		//wp_enqueue_style( 'bootstrap_css' );
 		wp_enqueue_style( 'media-views' );			
 		wp_enqueue_style( 'list-tables' );	
 //models	
@@ -81,6 +84,7 @@ class AN_GradeBook_Scripts{
     	wp_enqueue_script( 'views/GradebookView' );      	
 //other scripts    	
 		wp_enqueue_script( 'googlejsapi' ); 	
+		//wp_enqueue_script( 'bootstrap_js' ); 		
     	wp_enqueue_script( 'backbone' );
     	wp_enqueue_script( 'underscore' );	
 		wp_enqueue_script( 'jquery' );			
@@ -143,13 +147,13 @@ class AN_GradeBook_Scripts{
 	public function register_an_gradebook_menu_page(){	
 		if (gradebook_check_user_role('administrator')){
     		$gradebook_page = add_menu_page( 'GradeBook', 'GradeBooks', 'administrator', 'an_gradebook_page', 'an_gradebook_menu_page', 'dashicons-book-alt', '6.12' ); 
-    		add_action('load-'.$gradebook_page,array($this, 'an_gradebook_admin_help_tab'));			    		
+    		//add_action('load-'.$gradebook_page,array($this, 'an_gradebook_admin_help_tab'));			    		
 			//add_submenu_page( 'an_gradebook_page', 'GradeBook','All GradeBooks', 'administrator', 'an_gradebook_page');
 			//add_submenu_page( 'an_gradebook_page', 'Setting','Settings', 'administrator', 'an_gradebook_settings_page','an_gradebook_settings_page' );     	
     		//add_action('load-'.$settings_help, 'an_gradebook_settings_add_help_tab');			
 		} else {
     		$gradebook_page = add_menu_page( 'GradeBook', 'GradeBooks', 'subscriber', 'an_gradebook_page', 'an_gradebook_menu_page', 'dashicons-book-alt', '6.12' ); 
-    		add_action('load-'.$gradebook_page,array($this, 'an_gradebook_student_help_tab'));		
+    		//add_action('load-'.$gradebook_page,array($this, 'an_gradebook_student_help_tab'));		
 		}
 	} 	
 }
@@ -902,6 +906,8 @@ if (gradebook_check_user_role('administrator')){
 	include( dirname( __FILE__ ) . '/templates/edit-assignment-template.php' );
 	include( dirname( __FILE__ ) . '/templates/stats-assignment-template.php' );	
 	include( dirname( __FILE__ ) . '/templates/stats-student-template.php' );	
+	include( dirname( __FILE__ ) . '/templates/assignment-view-template.php' );		
+	include( dirname( __FILE__ ) . '/templates/student-view-template.php' );		
 	include( dirname( __FILE__ ) . '/templates/gradebook-interface-template.php' );
 	include( dirname( __FILE__ ) . '/templates/student-courses-interface-template.php' );
 	include( dirname( __FILE__ ) . '/templates/edit-course-template.php' );

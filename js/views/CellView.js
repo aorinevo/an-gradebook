@@ -1,5 +1,5 @@
-AN.Views.CellView = (function($, my){
-   my = AN.Views.Base.extend({
+(function($, AN){
+	AN.Views.CellView = AN.Views.Base.extend({
         tagName: 'td',
         events: {
             "click .view": "edit",
@@ -8,9 +8,10 @@ AN.Views.CellView = (function($, my){
         },
         initialize: function() {
             this.listenTo(this.model, 'change:assign_points_earned', this.render);
-            this.listenTo(AN.GlobalVars.assignments, 'change:selected', this.selectCell);
             this.listenTo(AN.GlobalVars.assignments, 'change:hover', this.hoverCell);            
-            this.listenTo(AN.GlobalVars.assignments, 'change:visibility', this.visibilityCell); 
+            this.listenTo(AN.GlobalVars.assignments, 'change:visibility', this.visibilityCell);
+            this.listenTo(AN.GlobalVars.assignments, 'remove', this.cleanUpAssignmentCell); 
+            this.listenTo(AN.GlobalVars.students, 'remove', this.cleanUpStudentCell);             
             this.listenTo(this.model, 'remove', this.close);                                    
         },
         render: function() {
@@ -20,7 +21,13 @@ AN.Views.CellView = (function($, my){
             this.input = this.$('.edit');
             return this;
         },
-        close: function(ev) {
+        cleanUpAssignmentCell: function(ev){
+        	ev.get('id') === this.model.get('amid') && AN.GlobalVars.cells.remove(this.model);
+        },
+        cleanUpStudentCell: function(ev){
+        	ev.get('amid') === this.model.get('amid') && AN.GlobalVars.cells.remove(this.model);
+        },        
+        close: function() {
         	this.remove();
         },
         updateOnEnter: function(e) {
@@ -47,14 +54,6 @@ AN.Views.CellView = (function($, my){
                 this.$el.toggleClass('hover',ev.get('hover'));                
  			} 
         },      
-        selectCell: function(ev) {
-            if (this.model.get('amid') === ev.get('id')) {
-                this.model.set({
-                    selected: ev.get('selected')
-                });
-                this.$el.toggleClass('selected',ev.get('selected'));
- 			}
-        },
         visibilityCell: function(ev) {
             if (this.model.get('amid') === ev.get('id')) {
                 this.model.set({
@@ -64,5 +63,4 @@ AN.Views.CellView = (function($, my){
  			}
         }       
     });
-return my;
-})(jQuery, AN.Views.CellView ||{});
+})(jQuery, AN || {});
