@@ -17,25 +17,25 @@
 		displayLineChart: function(){
 			$('.media-router').children().removeClass('active');
 			$('#an-piechart').addClass('active');
-            var student = AN.GlobalVars.students.findWhere({
-                selected: true
-            });			
+            var student = this.model;		
 			$.get(ajaxurl, { 
 						action: 'get_line_chart',
 						uid : this.model.get('id'),
 						gbid : this.model.get('gbid')
 					},
 					function(data){	
-						data.length ==1 ? $('.media-frame-content').html('<div style="padding: 10px;"> There is no content to display </div>') : drawLineChart(data);							
+						if( data.length === 1 ){
+							$('.media-frame-content').html('<div style="padding: 10px;"> There is no content to display </div>');
+						} else {
+							drawLineChart(data);							
+						}
 					}, 
 					'json');    	
 			return this;					
 		},	
         render: function() {
             var self = this;
-            var student = AN.GlobalVars.students.findWhere({
-                selected: true
-            });
+            var student = this.model;
             var template = _.template($('#stats-student-template').html(), {
                     student: student
             });

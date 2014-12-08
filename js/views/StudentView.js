@@ -10,16 +10,12 @@
         },
         initialize: function() {
 			this.listenTo(this.model, 'change:firstname change:lastname', this.render);            
-           	this.listenTo(this.model, 'change:selected', this.selectAllStudents);			
-           	//this.listenTo(this.model, 'change:selected', this.selectStudent);
-            this.listenTo(this.model, 'remove', this.close);
-            this.listenTo(AN.GlobalVars.courses, 'remove', this.cleanUpGradebookStudents);            
-            this.listenTo(AN.GlobalVars.courses, 'change:selected', this.close);
+           	//this.listenTo(this.model, 'change:selected', this.selectAllStudents);			
+            this.listenTo(AN.GlobalVars.students, 'add remove', this.close);
+            this.listenTo(AN.GlobalVars.assignments, 'add remove change:sorted change:assign_order', this.close);            
+            this.listenTo(AN.GlobalVars.courses, 'remove change:selected', this.close); 
             
-        },
-		cleanUpGradebookStudents: function(ev) {        
-            this.model.get('id') === ev.get('uid') && this.remove();
-        },     
+        },    
         render: function() {
             var template = _.template($('#student-view-template').html(), {
                     student: this.model
@@ -30,7 +26,7 @@
             	uid: parseInt(this.model.get('id')),		//anq: why is this not already an integer??
             	gbid: gbid
             	});
-           	x = _.sortBy(x,function(model){ return model.get('order');});
+           	x = _.sortBy(x,function(model){ return model.get('assign_order');});        	
             var self = this;
             _.each(x, function(cell) {
                 var view = new AN.Views.CellView({

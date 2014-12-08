@@ -18,9 +18,9 @@
 				        <label>Title:</label>
 				        <input type="text" name="assign_name" value="<%= assignment ? assignment.get('assign_name') : '' %>"/>
 				        <label>Date Assigned:</label>
-				        <input type="text" name="assign_date" id="assign-date-datepicker" />        
+				        <input type="text" name="assign_date" id="assign-date-datepicker"  />        				    
 				        <label>Date Due:</label>
-				        <input type="text" name="assign_due" id="assign-due-datepicker" />
+				        <input type="text" name="assign_due" id="assign-due-datepicker" value="<%= assignment ? assignment.get('assign_due') : '' %>"/>
 				        <label>Assignment Category:</label>
 				        <input type="text" name="assign_category" value="<%= assignment ? assignment.get('assign_category') : '' %>"/>		        
 				        <%= assignment ? 'Update assignment ' + assignment.get('id') + ' from course ' + gradebook.get('id')  : 'Add to course ' + gradebook.get('id') %>?        

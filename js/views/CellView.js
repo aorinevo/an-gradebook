@@ -6,13 +6,18 @@
             "keypress .edit": "updateOnEnter",
             "blur .edit": "hideInput"
         },
-        initialize: function() {
-            this.listenTo(this.model, 'change:assign_points_earned', this.render);
+        initialize: function() {          
             this.listenTo(AN.GlobalVars.assignments, 'change:hover', this.hoverCell);            
+            this.listenTo(AN.GlobalVars.assignments, 'change:assign_order', this.shiftCell);                
             this.listenTo(AN.GlobalVars.assignments, 'change:visibility', this.visibilityCell);
-            this.listenTo(AN.GlobalVars.assignments, 'remove', this.cleanUpAssignmentCell); 
-            this.listenTo(AN.GlobalVars.students, 'remove', this.cleanUpStudentCell);             
-            this.listenTo(this.model, 'remove', this.close);                                    
+            this.listenTo(AN.GlobalVars.assignments, 'remove', this.cleanUpAssignmentCells); 
+            this.listenTo(AN.GlobalVars.assignments, 'add remove change:sorted change:assign_order', this.close);
+            this.listenTo(AN.GlobalVars.students, 'remove', this.cleanUpStudentCells);                                      
+            this.listenTo(AN.GlobalVars.students, 'add remove', this.close);                                                  
+            this.listenTo(this.model, 'change:assign_points_earned', this.render);
+            this.listenTo(AN.GlobalVars.courses, 'remove change:selected', this.close);                                                            
+           // this.listenTo(this.model, 'change:assign_order', this.close);               
+            //this.listenTo(this.model, 'remove', this.close);               
         },
         render: function() {
         	var self = this;
@@ -21,14 +26,24 @@
             this.input = this.$('.edit');
             return this;
         },
-        cleanUpAssignmentCell: function(ev){
-        	ev.get('id') === this.model.get('amid') && AN.GlobalVars.cells.remove(this.model);
+        cleanUpAssignmentCells: function(ev){
+        	if( ev.get('id') === this.model.get('amid') ){
+	        	AN.GlobalVars.cells.remove(this.model);
+	        }
         },
-        cleanUpStudentCell: function(ev){
-        	ev.get('amid') === this.model.get('amid') && AN.GlobalVars.cells.remove(this.model);
+        cleanUpStudentCells: function(ev){
+        	if( ev.get('id') === this.model.get('uid') ){
+        		AN.GlobalVars.cells.remove(this.model.get('id'));
+        	}
         },        
         close: function() {
         	this.remove();
+        },    
+        shiftCell: function(ev){
+        	this.remove();         
+        	if(ev.get('id') === this.model.get('amid')){    	
+				this.model.set({assign_order: parseInt(ev.get('assign_order'))});   
+        	}
         },
         updateOnEnter: function(e) {
             if (e.keyCode == 13) this.hideInput();

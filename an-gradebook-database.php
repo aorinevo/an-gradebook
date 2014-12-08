@@ -1,6 +1,6 @@
 <?php
 class AN_GradeBook_Database{
-	const an_gradebook_db_version = 3.1;
+	const an_gradebook_db_version = 3.14;
 	public function __construct(){
 		register_activation_hook(__FILE__,array($this,'database_init'));	
 		register_activation_hook(__FILE__,array($this,'database_alter'));			
@@ -35,8 +35,35 @@ class AN_GradeBook_Database{
 		if(get_site_option( 'an_gradebook_db_version' )==3){
 			$sql = "ALTER TABLE an_assignment CHANGE assign_points_earned assign_points_earned decimal(7,2) NOT NULL";
 			$wpdb->query($sql);		
-			update_option( "an_gradebook_db_version", self::an_gradebook_db_version );				
+			update_option( "an_gradebook_db_version", 3.1 );				
 		}
+		if(get_site_option( 'an_gradebook_db_version' )==3.1){
+			$gradebooks = $wpdb ->get_results("SELECT * FROM an_gradebooks", ARRAY_A); 			
+			$assignments = $wpdb -> get_results("SELECT * FROM an_assignments", ARRAY_A); 
+			$cells = $wpdb -> get_results("SELECT * FROM an_assignment", ARRAY_A);
+			foreach ($gradebooks as $gradebook){
+				$gbid = $gradebook['id'];
+				$assignments_temp = array_filter($assignments,function($assignment) use($gbid){
+					return $assignment['gbid'] == $gbid;
+				});
+				usort($assignments_temp, build_sorter('assign_order'));
+				$i = 1;				
+				foreach($assignments_temp as &$assignment){
+					$amid = $assignment['id'];					
+					$wpdb->update('an_assignments', array( 'assign_order' => $i), array('id' => $amid));   
+					$cells_temp = array_filter($cells,function($cell) use($amid){
+						return $cell['amid'] == $amid;
+					});
+					usort($cells_temp, build_sorter('assign_order'));		
+					foreach($cells_temp as &$cell){
+						$cid = $cell['id'];
+						$wpdb->update('an_assignment', array( 'assign_order' => $i), array('id' => $cid));   						
+					}
+					$i++;
+				}				
+			}
+			update_option( "an_gradebook_db_version", self::an_gradebook_db_version );				
+		}		
 	}
 	public function database_init() {
 		global $wpdb;

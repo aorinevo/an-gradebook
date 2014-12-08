@@ -3,7 +3,7 @@
         defaults: {
             uid: null,
             gbid: null,
-            order: null,
+            assign_order: null,
             amid: null,
             assign_points_earned: 0,
             selected: false,

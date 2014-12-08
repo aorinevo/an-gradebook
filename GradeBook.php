@@ -3,13 +3,13 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 2.9
+Version: 3.0
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
 */
 
-define( "AN_GRADEBOOK_VERSION", "2.9");
+define( "AN_GRADEBOOK_VERSION", "3.0");
 //Load scripts
 class AN_GradeBook_Scripts{
 	public function __construct(){
@@ -158,8 +158,8 @@ class AN_GradeBook_Scripts{
 	} 	
 }
 
-include_once( dirname( __FILE__ ) . '/an-gradebook-database.php' );
 include_once( dirname( __FILE__ ) . '/functions.php' );
+include_once( dirname( __FILE__ ) . '/an-gradebook-database.php' );
 
 
 /*********************************
@@ -250,14 +250,16 @@ class AN_GradeBookAPI{
 	public function get_line_chart(){
 		global $wpdb;
 		
-		$line_chart_data1 = $wpdb->get_results('SELECT * FROM an_assignment WHERE uid = '. $_GET['uid'] .' AND gbid = '. $_GET['gbid'],ARRAY_A);	
+		$cells = 'an_assignment';
+		
+		$line_chart_data1 = $wpdb->get_results('SELECT * FROM '.$cells.' WHERE uid = '. $_GET['uid'] .' AND gbid = '. $_GET['gbid'],ARRAY_A);	
 		$line_chart_data2 = $wpdb->get_results('SELECT * FROM an_assignments WHERE gbid = '. $_GET['gbid'],ARRAY_A);
 	
 		foreach($line_chart_data1 as &$line_chart_value1){
 			$line_chart_value1['assign_order']= intval($line_chart_value1['assign_order']);		
 			$line_chart_value1['assign_points_earned'] = intval($line_chart_value1['assign_points_earned']);
 			foreach($line_chart_data2 as $line_chart_value2){
-				if($line_chart_value2['id'] === $line_chart_value1['amid']){
+				if($line_chart_value2['id'] == $line_chart_value1['amid']){
 					$all_homework_scores = $wpdb->get_col('SELECT assign_points_earned FROM an_assignment WHERE amid = '. $line_chart_value2['id']);
 					$class_average = array_sum($all_homework_scores)/count($all_homework_scores);
 										
@@ -556,8 +558,10 @@ class AN_GradeBookAPI{
 	  		case 'PUT' :
 	  			$params = json_decode(file_get_contents('php://input'),true);	
    				$wpdb->update('an_assignments', array( 'assign_name' => $params['assign_name'], 'assign_date' => $params['assign_date'],
-   					'assign_due' => $params['assign_due'], 'assign_category' => $params['assign_category']), array('id' => $params['id'] )
+   					'assign_due' => $params['assign_due'], 'assign_order'=>$params['assign_order'], 'assign_category' => $params['assign_category']), array('id' => $params['id'] )
    				);   
+   				$wpdb->update('an_assignment', array( 'assign_order' => $params['assign_order']), array('amid' => $params['id'] )
+   				);     				
    				$assignmentDetails = $wpdb->get_row('SELECT * FROM an_assignments WHERE id = '. $params['id'] , ARRAY_A);
    				$assignmentDetails['id'] = intval($assignmentDetails['id']);   				
    				$assignmentDetails['gbid'] = intval($assignmentDetails['gbid']);  
@@ -624,6 +628,13 @@ class AN_GradeBookAPI{
 	  	die();
 	}
 
+/*************************
+*
+*   cell api
+*
+**************************/	
+	
+
 	public function cell(){
 		global $wpdb;
    		$wpdb->show_errors();  		
@@ -639,7 +650,7 @@ class AN_GradeBookAPI{
 	  			echo json_encode(array('put'=>'putting'));
 	  			$params = json_decode(file_get_contents('php://input'),true);		  			
 	  			echo json_encode($params);
-   				$wpdb->update('an_assignment', array( 'assign_points_earned' => $params['assign_points_earned']),
+   				$wpdb->update('an_assignment', array( 'assign_order'=>$params['assign_order'], 'assign_points_earned' => $params['assign_points_earned']),
 					array( 'uid' => $params['uid'], 'amid' => $params['amid'] )
    				);   
    				$assign_points_earned = $wpdb->get_row('SELECT assign_points_earned FROM an_assignment WHERE uid = '. $params['uid'] . ' AND amid = '. $params['amid'] , ARRAY_A);
@@ -778,11 +789,6 @@ public function get_gradebook_entire(){
 		echo json_encode(array("status" => "Not Allowed."));
 		die();
 	}    	
-    $gradebook_students = $wpdb->get_results('SELECT * FROM an_gradebook WHERE gbid = '. $gbid, ARRAY_A);	
-    foreach($gradebook_students as &$student){
-    	$student['uid'] = intval($student['uid']);
-    	$student['gbid'] = intval($student['gbid']);    	
-    }
 	$assignments = $wpdb->get_results('SELECT * FROM an_assignments WHERE gbid = '. $gbid, ARRAY_A);
     foreach($assignments as &$assignment){
     	$assignment['id'] = intval($assignment['id']);
@@ -814,9 +820,8 @@ public function get_gradebook_entire(){
 	}  
    echo json_encode(
    array(
-   		"gradebooks_students"=>$gradebook_students,
    		"assignments"=>$assignments, 
-   		"student_assignments" => $student_assignments, 
+   		"cells" => $student_assignments, 
    		"students"=>$students
    ));
    die();

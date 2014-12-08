@@ -4,28 +4,28 @@
         initialize: function() {
             var self = this;
         	this.sort_key = 'lastname'; 
-			this.sort_column = AN.GlobalVars.students;              	         	           
-            var courseGradebook = new AN.Models.CourseGradebook();
-            this.xhr = courseGradebook.fetch({
+			this.sort_column = AN.GlobalVars.students;              	         	                       
+            this.xhr = AN.GlobalVars.courseGradebook.fetch({
             	success: function(data){
             		AN.GlobalVars.students.reset();   
 					AN.GlobalVars.cells.reset();               		            		
 					AN.GlobalVars.assignments.reset();              		            							
-                _.each(courseGradebook.get('students'), function(student) {
+                _.each(AN.GlobalVars.courseGradebook.get('students'), function(student) {
                     AN.GlobalVars.students.add(student);
                 });
-                _.each(courseGradebook.get('assignments'), function(assignment) {
+                _.each(AN.GlobalVars.courseGradebook.get('assignments'), function(assignment) {
                     AN.GlobalVars.assignments.add(assignment);
                 }); 
-                _.each(courseGradebook.get('student_assignments'), function(cell) {     	
+                _.each(AN.GlobalVars.courseGradebook.get('cells'), function(cell) {     	
                     AN.GlobalVars.cells.add(cell);
                 });                                       
                 self.render();
                 self.listenTo(AN.GlobalVars.courses, 'add', self.render);
-                self.listenTo(AN.GlobalVars.assignments, 'add', self.render);
-                self.listenTo(AN.GlobalVars.cells, 'add', self.render);                
-                self.listenTo(AN.GlobalVars.assignments, 'change:assign_category', self.render);                
-            	self.listenTo(AN.GlobalVars.assignments, 'change:sorted', self.sortAssignment);              		
+                self.listenTo(AN.GlobalVars.students, 'add', self.render);   
+            	self.listenTo(AN.GlobalVars.students, 'add remove', self.sortByStudent);                                  
+				self.listenTo(AN.GlobalVars.cells, 'add remove change:assign_order', self.render);                      
+                self.listenTo(AN.GlobalVars.assignments, 'add remove change:assign_order change:assign_category', self.render);                                   
+            	self.listenTo(AN.GlobalVars.assignments, 'change:sorted', self.sortByAssignment);          	            		
             	}
             });
             this.listenTo(this.model, 'change:selected', this.close);
@@ -33,11 +33,12 @@
         },
         events: {
             'click button#add-student': 'addStudent',
-            'click button#add-assignment': 'addAssignment', //Need to add function for adding assignments          
+            'click button#add-assignment': 'addAssignment',
             'click button#filter-assignments': 'filterAssignments',
             'click #cb-select-all-1': 'selectAllStudents'
         },
-        selectAllStudents: function(ev){
+        selectAllStudents: function(ev){ //This function is not implemented.  Possibility in future versions that more closely
+        								 //Resemble wordpress admin page/post/etc.... list-tables
         	var _selected = $('#cb-select-all-1').is(':checked');
         	if(_selected){
         		_.each(AN.GlobalVars.students.models, function(student){
@@ -60,15 +61,15 @@
                     assign_categories: _assign_categories
                 });        
             this.$el.html(template);
-            $('#filter-assignments-select').val(_y);                    	
+            $('#filter-assignments-select').val(_y);                 	
         	switch(this.sort_key){
-        		case 'cell':
+        		case 'cell':     
         			_.each(this.sort_column, function(cell) {
                 		var view = new AN.Views.StudentView({
                     		model: AN.GlobalVars.students.get(cell.get('uid'))
                 		}); 
-						$('#students').append(view.render().el);                    
-            		});             
+						$('#students').append(view.render().el);                     
+            		});                           		
             		var y = AN.GlobalVars.assignments.where({
                 		gbid: parseInt(this.model.get('id'))
             		});
@@ -80,7 +81,7 @@
                 		$('#students-header tr').append(view.render().el);
             		});
             		break;
-            	case 'lastname':       		
+            	case 'lastname':      		
             		_.each(this.sort_column.models, function(student) {
                 		var view = new AN.Views.StudentView({
                     		model: AN.GlobalVars.students.get(student.get('id'))
@@ -132,24 +133,19 @@
                 	assign.set({visibility: true});
             	});
             }        
-            return false;
         },     
         addAssignment: function(ev) {    
             var view = new AN.Views.EditAssignmentView({});           
-            return this;
         },    
         addStudent: function(ev) {       
-        	if(ev.currentTarget.id === "add-student"){
-            	var x = AN.GlobalVars.students.findWhere({selected: true});
-            	x && x.set({selected: false});
-				var y = AN.GlobalVars.assignments.findWhere({selected: true});
-				y && y.set({selected: false});
-			}
-            $('#gradebook-interface-buttons-container').children().attr('disabled',true);
-            var view = new AN.Views.EditStudentView();      
-            return false;
-        },                
-        sortAssignment: function(ev) {
+            var view = new AN.Views.EditStudentView({});      
+        },  
+        sortByStudent: function(ev) {     		
+			this.sort_key = 'lastname'; 
+			this.sort_column = AN.GlobalVars.students;                                               
+           	this.render();                          
+        },                      
+        sortByAssignment: function(ev) {
             var x = AN.GlobalVars.cells.where({amid: parseInt(ev.get('id'))});         			
 			this.sort_column = _.sortBy(x,function(cell){
 				if (ev.get('sorted')==='asc'){
@@ -160,7 +156,6 @@
 			});             		
 			this.sort_key = 'cell';                                                
            	this.render();                          
-            return this;
         }
     });
 })(jQuery, AN || {});

@@ -76,8 +76,7 @@
                 	_.each(response['assignment'], function(assignment) {
                   	  	AN.GlobalVars.cells.add(assignment);
               		});
-                	AN.GlobalVars.students.add(response['student']);
-                	AN.GlobalVars.courses.add(response['anGradebook']);                            	 
+                	AN.GlobalVars.students.add(response['student']);                       	 
             		}
             	});            	
             }

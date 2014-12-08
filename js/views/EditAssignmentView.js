@@ -9,9 +9,7 @@
             'submit #edit-assignment-form': 'editSave'
         },
         initialize: function(){
-            var assignment = AN.GlobalVars.assignments.findWhere({
-                selected: true
-            });        
+            var assignment = this.model;      
             $('body').append(this.render().el);
             $('#assign-date-datepicker, #assign-due-datepicker').datepicker();
             $('#assign-date-datepicker, #assign-due-datepicker').datepicker('option','dateFormat','yy-mm-dd');
@@ -50,16 +48,7 @@
 				inputName[0].setSelectionRange(strLength, strLength);
 			});                      
             return this;
-        },
-        toggleEditDelete: function(){
-            var y = AN.GlobalVars.assignments.findWhere({selected: true});
-            if(y){
-              $('#add-assignment, #edit-assignment, #delete-assignment, #add-student').attr('disabled',false);
-            }else{          
-              $('#edit-assignment, #delete-assignment').attr('disabled',true); 
-            }    
-            $('#add-assignment, #add-student').attr('disabled',false);            
-        },      
+        },   
 		keyPressHandler: function(e) {
             if (e.keyCode == 27) this.editCancel();
             if (e.keyCode == 13) this.submitForm();
@@ -67,7 +56,6 @@
         },             
         editCancel: function() {
             this.remove();
-			this.toggleEditDelete();
             return false;
         },
         submitForm: function(){        	
@@ -91,8 +79,7 @@
             		}
             	});            	
             }
-            this.remove();
-			this.toggleEditDelete();       
+            this.remove();  
             return false;
         }
     });

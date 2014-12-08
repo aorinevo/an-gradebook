@@ -7,6 +7,8 @@
             'click .dashicons-menu': 'toggleAssignmentMenu',
             'click li.assign-submenu-delete' : 'deleteAssignment',
             'click li.assign-submenu-edit' : 'editAssignment',         
+            'click li.assign-submenu-left' : 'shiftAssignmentLeft',              
+            'click li.assign-submenu-right' : 'shiftAssignmentRight',               
             'click li.assign-submenu-stats' : 'statsAssignment',            
             'mouseenter div.column-frame' : 'mouseEnter',
             'mouseleave div.column-frame' : 'mouseLeave'
@@ -14,27 +16,38 @@
         initialize: function() {
 			this.listenTo(this.model, 'change:assign_name', this.render);         
             this.listenTo(this.model, 'change:sorted', this.sortColumnCSS);
-            this.listenTo(this.model, 'change:visibility', this.visibilityColumnCSS);            
-            this.listenTo(this.model, 'remove', this.close);
+            this.listenTo(this.model, 'change:visibility', this.visibilityColumnCSS);   
+            this.listenTo(AN.GlobalVars.students, 'add remove', this.close);      
+            this.listenTo(AN.GlobalVars.assignments, 'add remove change:sorted change:assign_order', this.close);                           
+            this.listenTo(AN.GlobalVars.courses, 'remove change:selected', this.close);             
         },
         mouseEnter: function(){
         	this.$el.addClass('hover');
         	this.model.set({hover: true});
         },
-        close: function(){
-			this.remove();			
-        },
         mouseLeave: function(){
         	this.$el.removeClass('hover');	
         	this.model.set({hover: false});	
-        },
+        },        
+        shiftAssignmentLeft: function(){
+        	var x = AN.GlobalVars.assignments.findWhere({assign_order: this.model.get('assign_order')-1});
+        	x.save({assign_order: this.model.get('assign_order')});
+			this.model.save({assign_order: this.model.get('assign_order')-1});
+        },	
+        shiftAssignmentRight: function(){
+        	var x = AN.GlobalVars.assignments.findWhere({assign_order: this.model.get('assign_order')+1});
+        	x.save({assign_order: this.model.get('assign_order')});
+			this.model.save({assign_order: this.model.get('assign_order')+1});
+        },        
         toggleAssignmentMenu: function(){
         	var _assign_menu = $('#column-assign-id-'+this.model.get('id'));
         	if( _assign_menu.css('display') === 'none'){
+        		var view = this;
 				_assign_menu.toggle(1, function(){
         			var self = this;				
 					$(document).one('click',function(){
 						$(self).hide();
+						view.model.set({hover:false}); 
 					});		
 				});
 			}
@@ -43,10 +56,12 @@
             this.visibilityColumnCSS();             
         	var order = this.model.get('sorted') === 'asc' ? 'down' : 'up';
 			var template = _.template($('#assignment-view-template').html(), {
-                    assignment: this.model
+                    assignment: this.model,
+                    min: _.min(AN.GlobalVars.assignments.models, function(assignment){ return assignment.get('assign_order');}),
+                    max: _.max(AN.GlobalVars.assignments.models, function(assignment){ return assignment.get('assign_order');})                
                 });
         	this.$el.html(template);         	
-            return this;
+        	return this;
         },
         sortColumn: function(ev){
         	var y = AN.GlobalVars.assignments.findWhere({selected: true});
@@ -71,7 +86,7 @@
         		this.$el.toggleClass( "desc", !desc ).toggleClass( "asc", desc );   
             } else {
                 this.$el.removeClass('asc desc');
-                this.$el. addClass('asc');			
+                this.$el.addClass('asc');			
             }
         },              
         visibilityColumnCSS: function(ev) {
@@ -82,19 +97,25 @@
             }
         },
         statsAssignment: function(){
-            var view = new AN.Views.AssignmentStatisticsView({model: this.model}); 
-            return this;			
+            var view = new AN.Views.AssignmentStatisticsView({model: this.model}); 		
         }, 
         editAssignment: function(ev) {    
             var view = new AN.Views.EditAssignmentView({model: this.model});           
-            return this;
         },               
         deleteAssignment: function() {
 			this.model.destroy({success: 
 				function (model){
-	            	model.set({ selected: false });                      		
+	            	var _x = model.get('assign_order'); 
+	            	var _y = _.max(AN.GlobalVars.assignments.models, function(assignment){ return assignment.get('assign_order');});                     		
+	            	for( i = _x; i < _y.get('assign_order'); i++){
+	            		var _z = AN.GlobalVars.assignments.findWhere({assign_order: i+1});
+	            		_z.save({assign_order: i});
+	            	}	            	
         		}}
             );        
-        }                
+        },
+        close: function(){     
+			this.remove();			
+        }                     
     });
 })(jQuery, AN || {});

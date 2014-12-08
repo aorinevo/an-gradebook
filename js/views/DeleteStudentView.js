@@ -27,16 +27,7 @@
             }
             this.$el.append('<div class="media-modal-backdrop"></div>');                                              
             return this;
-        },
-        toggleEditDelete: function(){      
-            var x = AN.GlobalVars.students.findWhere({selected: true});
-            if(x){
-              $('#add-student, #edit-student, #delete-student, #add-assignment').attr('disabled',false);
-            }else{           
-              $('#edit-student, #delete-student').attr('disabled',true);
-            }     
-            $('#add-student, #add-assignment').attr('disabled',false);
-        },   
+        },  
  		keyPressHandler: function(e) {
             if (e.keyCode == 27) this.deleteCancel();
             if (e.keyCode == 13) this.submitForm();
@@ -44,27 +35,21 @@
         },                  
         deleteCancel: function() {
             this.remove();           
-			this.toggleEditDelete();
             return false;
         },
         submitForm: function(){        	
           $('#delete-student-form').submit();
         },        
         deleteSave: function(ev) {
+        	ev.preventDefault();
             var studentInformation = $(ev.currentTarget).serializeObject();
 			var x = studentInformation.id;
             var todel = this.model;
             todel.set({delete_options: studentInformation.delete_options});
             var self = this;
 			todel.destroy({success: function (model,response){
-	        	model.set({
-                    selected: false
-                });                    
-                self.toggleEditDelete();                 		        		
+				self.remove();                               		        		
         	}});           
-            this.remove();
-            this.toggleEditDelete();
-            return false;
         }
     });
 })(jQuery, AN || {});

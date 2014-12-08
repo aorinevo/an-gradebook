@@ -4,7 +4,7 @@ Donate link:
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
 Tested up to: 4.0.1
-Stable tag: 2.9
+Stable tag: 3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,6 +60,15 @@ Students are able to:
 * plugin icon: https://www.iconfinder.com/icons/175285/edit_property_icon#size=256
 
 == Changelog ==
+
+Version 3.0:
+
+* Fixed assignment header bug where sorting a column caused the header cell to be the only cell to change color on hover on the first mouse enter.
+* Feature: Added assignment ordering.  Newly added assignments are appended to the gradebook.  To move an assignment to the left or right, click on the assignment cell menu icon and choose from the shift options.  
+* Fixed assignment header display bug (Firefox).  Assignment headers would fail to display in Firefox.
+* Cleaned up views.  Views were rarely removed, which ate up memory.  Now all unnecessary views are removed.
+* Upgraded the database to handle ordering. 
+* Other performance and code enhancements.
 
 Version 2.9:
 
