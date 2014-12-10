@@ -44,8 +44,8 @@
 			_.defer(function(){
 				this.inputName = self.$('input[name="assign_name"]');
 				var strLength= inputName.val().length;
-				inputName.focus();				
-				inputName[0].setSelectionRange(strLength, strLength);
+				//inputName.focus();				
+				//inputName[0].setSelectionRange(strLength, strLength);
 			});                      
             return this;
         },   

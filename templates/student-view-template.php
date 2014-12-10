@@ -6,15 +6,21 @@
 				<div class="locked-indicator"></div>
 		</th>
 	-->
-		<td class="student"><%= student.get("firstname") %> 
-			<div class="row-actions">
-				<span class=""><a class="edit-student" href="">Edit</a>  |  </span>
-				<span class="student-statistics"><a class="student-statistics" href="">Statistics</a>  |  </span>				
-				<span class="delete"><a class="delete-student" href="">Delete</a></span>
+		<th class="student">	
+			<div class="column-frame">	
+			<div class="dashicons dashicons-menu"></div>	
+				<%= student.get("firstname") %> 				
 			</div>
-		</td>
+			<div id="row-student-id-<%= student.get('id')%>">
+				<ul>		
+					<li class='student-submenu-edit'>Edit</li>
+					<li class='student-submenu-stats'>Statistics</li>
+					<li class='student-submenu-delete'>Delete</li>
+				</ul>
+			</div>				
+		</th>
 		<td><%= student.get("lastname") %></td>
-		<td><%= student.get("id") %></td>
+		<td><%= student.get("user_login") %></td>
     </script>      
     
     

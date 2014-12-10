@@ -14,7 +14,7 @@
             this.listenTo(AN.GlobalVars.assignments, 'add remove change:sorted change:assign_order', this.close);
             this.listenTo(AN.GlobalVars.students, 'remove', this.cleanUpStudentCells);                                      
             this.listenTo(AN.GlobalVars.students, 'add remove', this.close);                                                  
-            this.listenTo(this.model, 'change:assign_points_earned', this.render);
+            //this.listenTo(this.model, 'change:assign_points_earned', this.render);
             this.listenTo(AN.GlobalVars.courses, 'remove change:selected', this.close);                                                            
            // this.listenTo(this.model, 'change:assign_order', this.close);               
             //this.listenTo(this.model, 'remove', this.close);               
@@ -46,13 +46,17 @@
         	}
         },
         updateOnEnter: function(e) {
-            if (e.keyCode == 13) this.hideInput();
+            if (e.keyCode == 13){
+            	this.hideInput();
+            }
         },
         hideInput: function() { //this gets called twice.
-            var value = this.input.val();
-            var self = this;
-            this.model.save({assign_points_earned: value});
-            this.$el.removeClass("editing");
+            var self = this;          
+            var value = parseFloat(this.input.val());            
+            this.model.save({assign_points_earned: value},{wait: true, success: function(model,response){
+				self.$el.removeClass("editing");  
+            	self.render();
+            }});
         },
         edit: function() {
             var w = this.$el.width();

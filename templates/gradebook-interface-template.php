@@ -38,7 +38,7 @@
       		<input id="cb-select-all-1" type="checkbox">
       	</th>
       -->
-        <th><div><span>First Name</span> <span class="sorting-indicator"></span> </div></th><th>Last Name</th><th>ID</th>
+        <th><div><span>First Name</span> <span class="sorting-indicator"></span> </div></th><th>Last Name</th><th>Login</th>
       </tr>
     </thead>
     <tbody id="students"></tbody>

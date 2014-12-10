@@ -6,7 +6,11 @@
             'click input[id^=cb-select-]': 'selectStudent',
             'click a.edit-student': 'editStudent',
             'click a.delete-student': 'deleteStudent',
-            'click a.student-statistics': 'studentStatistics',            
+            'click a.student-statistics': 'studentStatistics', 
+            'click .dashicons-menu': 'toggleStudentMenu',
+            'click li.student-submenu-delete' : 'deleteStudent',
+            'click li.student-submenu-edit' : 'editStudent',         
+            'click li.student-submenu-stats' : 'studentStatistics',                         
         },
         initialize: function() {
 			this.listenTo(this.model, 'change:firstname change:lastname', this.render);            
@@ -36,6 +40,19 @@
             });
             return this;
         },
+        toggleStudentMenu: function(){
+        	var _student_menu = $('#row-student-id-'+this.model.get('id'));
+        	if( _student_menu.css('display') === 'none'){
+        		var view = this;
+				_student_menu.toggle(1, function(){
+        			var self = this;				
+					$(document).one('click',function(){
+						$(self).hide();
+						//view.model.set({hover:false}); 
+					});		
+				});
+			}
+        },        
         selectAllStudents: function(){
         	var _selected = $('#cb-select-all-1').is(':checked');        
         	if(_selected){
