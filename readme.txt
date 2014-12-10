@@ -64,7 +64,7 @@ Students are able to:
 Version 3.1:
 
 * Code maintenance: Split up GradeBook.php into classes.
-* Code maintenance: Removed necessary lines of code such as redundant wp_enqueue_script calls.
+* Code maintenance: Removed unnecessary lines of code such as redundant wp_enqueue_script calls.
 * Bug Fix: user_login was incorrectly set to the users second initial of their first name, lastname, and user_id concatenated together, in lowercase.
 * Due to the bug fix, we removed the ID column of the gradebook and replaced it with a Login column.  This is the login name the user must use to log in.  The password is still set to password.
 * Added a student menu button that handles edit, delete, and statistics views.
