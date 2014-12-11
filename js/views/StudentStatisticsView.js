@@ -17,7 +17,8 @@
 		displayLineChart: function(){
 			$('.media-router').children().removeClass('active');
 			$('#an-piechart').addClass('active');
-            var student = this.model;		
+            var student = this.model;	
+            console.log(student);	
 			$.get(ajaxurl, { 
 						action: 'get_line_chart',
 						uid : this.model.get('id'),
