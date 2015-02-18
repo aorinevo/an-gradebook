@@ -3,8 +3,8 @@ Contributors: anevo, jamarparris
 Donate link: 
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.3
-Tested up to: 4.0.1
-Stable tag: 3.2
+Tested up to: 4.1
+Stable tag: 3.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,13 +22,13 @@ Administrators are able to
 
 *Username*
 
-Students added through the plugin, who are not already in the database, will have the user_login set to the first initial of their first name concatenated with their last name and user_id number; all characters must be entered in lowercase. 
+Students added through the plugin, who are not already in the database, will have the user_login set to the first initial of their first name concatenated with their last name and a string of digits; all characters must be entered in lowercase. 
 
 *Password*
 
 The password will be set to *password*.
 
-*Note: If students are added using their user_id, then their username and password remains unchanged, provided that the respective information exists in the database.*
+*Note: If students are added using their user_login, then their username and password remains unchanged, provided that the respective information exists in the database.*
 
 Students are able to:
 
@@ -60,6 +60,10 @@ Students are able to:
 * plugin icon: https://www.iconfinder.com/icons/175285/edit_property_icon#size=256
 
 == Changelog ==
+
+Version 3.3:
+
+* Instructors now can add existing users in their WordPress database to the GradeBook by entering the user_login instead of the confusing and difficult to find user_id.  If the user_login exists in the database, the user is added to the GradeBook.  Otherwise, nothing happens.
 
 Version 3.2:
 

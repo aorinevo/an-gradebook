@@ -1,14 +1,16 @@
     <script id="student-view-template" type="text/template">
-		<th class="student">	
-			<div class="column-frame">	
-			<div class="dashicons dashicons-menu"></div>	
-				<%= student.get("firstname") %> 				
-			</div>
+    	<th>
+    		<div class="dashicons dashicons-menu"></div>
 			<div id="row-student-id-<%= student.get('id')%>">
 				<ul>		
 					<li class='student-submenu-stats'>Statistics</li>
 				</ul>
-			</div>				
+			</div>	    		
+    	</th>
+		<th class="student">	
+			<div class="column-frame">		
+				<%= student.get("firstname") %> 				
+			</div>			
 		</th>
 		<td><%= student.get("lastname") %></td>
 		<td><%= student.get("user_login") %></td>

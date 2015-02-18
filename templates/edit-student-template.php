@@ -19,10 +19,10 @@
 				        <input type="text" name="firstname" value="<%= student ? student.get('firstname') : '' %>"/>
 				        <label>Last Name:</label>
 				        <input type="text" name="lastname" value="<%= student ? student.get('lastname') : '' %>"/>
-				        <label>ID<%= student ? ':' : ' (if student exists in the data base, use the students id to add. Otherwise a new record will be created for this student):'%></label>
-				        <%= student ? student.get('id') : '<input type="text" name="id-exists"/>' %>
+				        <label>User Login:<%= student ? '' : ' (if student exists in the data base, use the students user_login to add. Otherwise a new record will be created for this student):'%></label>
+				        <%= student ? student.get('user_login') : '<input type="text" name="id-exists"/>' %>
 				        <p/>
-				        <%= student ? 'Update user ' + student.get('id') + ' from course ' + gradebook.get('id')  : 'Add to course ' + gradebook.get('id') %>?
+				        <%= student ? 'Update user ' + student.get('user_login') + ' from course ' + gradebook.get('id')  : 'Add to course ' + gradebook.get('id') %>?
 				        <input type="hidden" name="gbid" value="<%= gradebook.get('id') %>"/>
     				</form>
     			</div>			

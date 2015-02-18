@@ -147,39 +147,39 @@ class gradebook_student_API{
 						die();
 					}
 				}else {
-					$studentDetails = get_user_by('id',$params['id-exists']);
+					$studentDetails = get_user_by('login',$params['id-exists']);
 					if($studentDetails){
-						$result = $wpdb->insert('an_gradebook', array('uid' => $params['id-exists'],'gbid' => $params['gbid']), 
+						$result = $wpdb->insert('an_gradebook', array('uid' => $studentDetails->ID,'gbid' => $params['gbid']), 
 						array('%d','%d') 
-					);
-    				$assignmentDetails = $wpdb->get_results('SELECT * FROM an_assignments WHERE gbid = '. $params['gbid'], ARRAY_A);
-			    	foreach( $assignmentDetails as $assignment){
-		       		$wpdb->insert('an_assignment', array('gbid'=> $params['gbid'], 'amid'=> $assignment['id'], 
-		          		'uid' => $studentDetails->ID, 'assign_order' => $assignment['assign_order']));
-    				};    			
-					$anGradebook = $wpdb->get_results('SELECT * FROM an_gradebook WHERE id = '. $wpdb->insert_id, ARRAY_A);	
-					foreach($anGradebook as &$value){
-						$value['gbid'] = intval($value['gbid']);
-					}
-					$assignments = $wpdb->get_results('SELECT * FROM an_assignment WHERE uid = '. $studentDetails->ID .' AND gbid = '. $params['gbid'], ARRAY_A);										
-					usort($assignments, build_sorter('assign_order'));
-					foreach($assignments as &$assignmentDetail){
-						$assignmentDetail['amid'] = intval($assignmentDetail['amid']);		
-						$assignmentDetail['uid'] = intval($assignmentDetail['uid']);				
-						$assignmentDetail['assign_order'] = intval($assignmentDetail['assign_order']);			
-						$assignmentDetail['assign_points_earned'] = intval($assignmentDetail['assign_points_earned']);		
-						$assignmentDetail['gbid'] = intval($assignmentDetail['gbid']);	
-						$assignmentDetail['id'] = intval($assignmentDetail['id']);
-					} 				
-					echo json_encode(array(
-	    	  			'student'=> array('firstname' => $studentDetails -> first_name,
-						'lastname' => $studentDetails -> last_name,
-		      			'gbid' => intval($params['gbid']),
-	    	  			'id' => $studentDetails -> ID),
-	  					'assignment' => $assignments,
-		      			'anGradebook' => $anGradebook
-					));
-					die();			
+						);
+    					$assignmentDetails = $wpdb->get_results('SELECT * FROM an_assignments WHERE gbid = '. $params['gbid'], ARRAY_A);
+			    		foreach( $assignmentDetails as $assignment){
+		       			$wpdb->insert('an_assignment', array('gbid'=> $params['gbid'], 'amid'=> $assignment['id'], 
+		          			'uid' => $studentDetails->ID, 'assign_order' => $assignment['assign_order']));
+    					};    			
+						$anGradebook = $wpdb->get_results('SELECT * FROM an_gradebook WHERE id = '. $wpdb->insert_id, ARRAY_A);	
+						foreach($anGradebook as &$value){
+							$value['gbid'] = intval($value['gbid']);
+						}
+						$assignments = $wpdb->get_results('SELECT * FROM an_assignment WHERE uid = '. $studentDetails->ID .' AND gbid = '. $params['gbid'], ARRAY_A);										
+						usort($assignments, build_sorter('assign_order'));
+						foreach($assignments as &$assignmentDetail){
+							$assignmentDetail['amid'] = intval($assignmentDetail['amid']);		
+							$assignmentDetail['uid'] = intval($assignmentDetail['uid']);				
+							$assignmentDetail['assign_order'] = intval($assignmentDetail['assign_order']);			
+							$assignmentDetail['assign_points_earned'] = intval($assignmentDetail['assign_points_earned']);		
+							$assignmentDetail['gbid'] = intval($assignmentDetail['gbid']);	
+							$assignmentDetail['id'] = intval($assignmentDetail['id']);
+						} 				
+						echo json_encode(array(
+		    	  			'student'=> array('firstname' => $studentDetails -> first_name,
+							'lastname' => $studentDetails -> last_name,
+		    	  			'gbid' => intval($params['gbid']),
+	    	  				'id' => $studentDetails -> ID),
+	  						'assignment' => $assignments,
+		      				'anGradebook' => $anGradebook
+						));
+						die();			
 					}
 				} 	  		
 				break;
