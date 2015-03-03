@@ -1,19 +1,19 @@
-    <script id="student-view-template" type="text/template">
-    	<th>
-    		<div class="dashicons dashicons-menu"></div>
-			<div id="row-student-id-<%= student.get('id')%>">
-				<ul>		
-					<li class='student-submenu-stats'>Statistics</li>
-				</ul>
-			</div>	    		
-    	</th>
-		<th class="student">	
-			<div class="column-frame">		
+<script id="student-view-template" type="text/template">
+	<th class="student-tools">
+		<div class="btn-group">
+			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+				<span class="caret"></span>
+			</button>
+			<ul class="dropdown-menu" role="menu">
+				<li class='student-submenu-stats'><a href='#'>Statistics</a></li>
+			</ul>
+		</div>
+	</th> 
+	<td class="student">	
 				<%= student.get("firstname") %> 				
-			</div>			
-		</th>
-		<td><%= student.get("lastname") %></td>
-		<td><%= student.get("user_login") %></td>
-    </script>      
+	</td>
+	<td><%= student.get("lastname") %></td>
+	<td><%= student.get("user_login") %></td>   	
+</script>      
     
     

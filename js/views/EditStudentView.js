@@ -1,20 +1,21 @@
 (function($,my){
 	AN.Views.EditStudentView = AN.Views.Base.extend({
-        id: 'edit-student-form-container-container',
+ 		id: 'base-modal',
+    	className: 'modal fade',
         events: {
-            'click button#edit-student-cancel': 'editCancel',
-            'click a.media-modal-close' : 'editCancel', 
-			'keyup'  : 'keyPressHandler',                            
+            'hidden.bs.modal' : 'editCancel',
+			'keyup'  : 'keyPressHandler',  
+			'keydown #user_login' : 'getUsersLogin',                          
             'click #edit-student-save': 'submitForm',            
             'submit #edit-student-form': 'editSave'
         },
-        initialize: function(){   
+        initialize: function(){          
             $('body').append(this.render().el);     	
             return this;
         },        
         render: function() {
-            var self = this;
-            var student = this.model;
+		    var self = this;        
+            var student = self.model;
             var gradebook = AN.GlobalVars.courses.findWhere({
         		selected: true
             });
@@ -31,14 +32,14 @@
                 });
                 self.$el.html(template);
             }     
-            this.$el.append('<div class="media-modal-backdrop"></div>');
+            this.$el.modal('show');            
 			_.defer(function(){
-				this.inputName = self.$('input[name="firstname"]');
-				var strLength= inputName.val().length;
+				self.inputName = self.$('input[name="firstname"]');
+				var strLength= self.inputName.val().length;
 				//inputName.focus();				
 				//inputName[0].setSelectionRange(strLength, strLength);
-			});                                                 
-            return this;
+			}); 					
+            return self;
         },
         toggleEditDelete: function(){      
             var x = AN.GlobalVars.students.findWhere({selected: true});
@@ -53,8 +54,14 @@
             if (e.keyCode == 27) this.editCancel();
             if (e.keyCode == 13) this.submitForm();
             return this;
-        },                  
+        },  
+        getUsersLogin: function(){
+			this.availableTags = [
+      			"testing"
+    		];  
+        },                
         editCancel: function() {
+			this.$el.data('modal', null);            
             this.remove();           
 			this.toggleEditDelete();
             return false;
@@ -80,8 +87,7 @@
             		}
             	});            	
             }
-            this.remove();
-            this.toggleEditDelete();
+			this.$el.modal('hide');
             return false;
         }
     });

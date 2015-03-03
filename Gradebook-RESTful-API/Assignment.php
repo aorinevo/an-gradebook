@@ -51,8 +51,8 @@ class gradebook_assignment_API{
 			echo json_encode(array("status" => "Not Allowed."));
 			die();
 		}   	
-		$server_request_method = $_SERVER['REQUEST_METHOD'];	
-		switch ( $server_request_method ){			
+		$method = (isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'])) ? $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] : $_SERVER['REQUEST_METHOD'];
+		switch ($method){
 			case 'DELETE' :  
 				parse_str($_SERVER['QUERY_STRING'],$params);				
  				$wpdb->delete('an_assignment', array('amid'=> $params['id']));

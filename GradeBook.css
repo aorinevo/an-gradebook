@@ -1,3 +1,15 @@
+.modal {
+   z-index: 999999 !important;
+}
+body {
+  background-color: #f1f1f1 !important;
+}
+
+.student-tools, .assignment-tools { 
+	overflow: visible !important; 
+}
+
+
 #chart-container{
 	text-align: center;
 }

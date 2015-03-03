@@ -110,7 +110,7 @@
             !this.model.get('selected') && this.remove();
         },     
         filterAssignments: function() {       
-        	var _x = $('#filter-assignments-select').val();	           
+        	var _x = $('#filter-assignments-select').val();	
             var _toHide = AN.GlobalVars.assignments.filter(
 	            function(assign){
                		return assign.get('assign_category') != _x;

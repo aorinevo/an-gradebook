@@ -1,7 +1,7 @@
 (function($,AN){
 	AN.Views.AssignmentView = AN.Views.Base.extend({
         tagName: 'th',
-        className: 'assignment manage-column sortable asc',
+        className: 'assignment-tools assignment',
         events: {
             'click li.assign-submenu-sort': 'sortColumn',
             'click .dashicons-menu': 'toggleAssignmentMenu',
@@ -29,12 +29,14 @@
         	this.$el.removeClass('hover');	
         	this.model.set({hover: false});	
         },        
-        shiftAssignmentLeft: function(){
+        shiftAssignmentLeft: function(ev){
+        	ev.preventDefault();          
         	var x = AN.GlobalVars.assignments.findWhere({assign_order: this.model.get('assign_order')-1});
         	x.save({assign_order: this.model.get('assign_order')});
 			this.model.save({assign_order: this.model.get('assign_order')-1});
         },	
-        shiftAssignmentRight: function(){
+        shiftAssignmentRight: function(ev){
+        	ev.preventDefault();          
         	var x = AN.GlobalVars.assignments.findWhere({assign_order: this.model.get('assign_order')+1});
         	x.save({assign_order: this.model.get('assign_order')});
 			this.model.save({assign_order: this.model.get('assign_order')+1});
@@ -64,6 +66,7 @@
         	return this;
         },
         sortColumn: function(ev){
+        	ev.preventDefault();  
         	var y = AN.GlobalVars.assignments.findWhere({selected: true});
         	y && y.set({selected: false});
             if (this.model.get('sorted')) {
@@ -80,7 +83,8 @@
                 this.model.set({ sorted: 'asc' });
             }        	
         },
-        sortColumnCSS: function() {
+        sortColumnCSS: function(ev) {
+        	ev.preventDefault();  
             if (this.model.get('sorted')) {
         		var desc = this.$el.hasClass('desc');
         		this.$el.toggleClass( "desc", !desc ).toggleClass( "asc", desc );   
@@ -96,13 +100,16 @@
                 this.$el.addClass('hidden');
             }
         },
-        statsAssignment: function(){
+        statsAssignment: function(ev){
+        	ev.preventDefault();  
             var view = new AN.Views.AssignmentStatisticsView({model: this.model}); 		
         }, 
-        editAssignment: function(ev) {    
+        editAssignment: function(ev) {
+        	ev.preventDefault();              
             var view = new AN.Views.EditAssignmentView({model: this.model});           
         },               
-        deleteAssignment: function() {
+        deleteAssignment: function(ev) {
+			ev.preventDefault();          
 			this.model.destroy({success: 
 				function (model){
 	            	var _x = model.get('assign_order'); 

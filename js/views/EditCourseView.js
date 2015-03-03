@@ -1,9 +1,9 @@
 (function($,my){
 	AN.Views.EditCourseView = AN.Views.Base.extend({
-        id: 'edit-course-form-container-container',
+ 		id: 'base-modal',
+    	className: 'modal fade',
         events: {
-            'click button#edit-course-cancel': 'editCancel',
-            'click a.media-modal-close' : 'editCancel',
+            'hidden.bs.modal' : 'editCancel',
             'keyup'  : 'keyPressHandler',        
             'click #edit-course-save': 'submitForm',
             'submit #edit-course-form': 'editSave'
@@ -31,7 +31,7 @@
                 });
                 self.$el.html(template);                
             }                        
-            this.$el.append('<div class="media-modal-backdrop"></div>');
+            this.$el.modal('show');
 			_.defer(function(){
 				this.inputName = self.$('input[name="name"]');
 				var strLength= inputName.val().length;
@@ -55,8 +55,9 @@
             return this;
         },                 
         editCancel: function() {
-            this.remove();            
-			this.toggleEditDelete();
+			this.$el.data('modal', null);        
+            this.remove();      
+			this.toggleEditDelete();                                  
             return false;
         },
         submitForm: function(){
@@ -76,8 +77,7 @@
             		}
             	});            	
             }
-			this.toggleEditDelete();       
-            this.remove();
+			this.$el.modal('hide');               
             return false;
         }
     });

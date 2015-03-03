@@ -49,8 +49,7 @@
             	if(x){
             	x.set({selected: false});
             	}
-            }
-        	$('#myModal').show();        
+            }       
             $('#courses-interface-buttons-container').children().attr('disabled', true);
             var view = new AN.Views.EditCourseView();
             return false;

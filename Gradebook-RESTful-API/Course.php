@@ -52,8 +52,8 @@ class gradebook_course_API{
 			echo json_encode(array("status" => "Not Allowed."));
 			die();
 		}   	
-		$server_request_method = $_SERVER['REQUEST_METHOD'];	
-		switch ( $server_request_method ){
+		$method = (isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'])) ? $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] : $_SERVER['REQUEST_METHOD'];
+		switch ($method){
 			case 'DELETE' : 
 				$id = $_REQUEST['id'];
 				$gbid = $id;		

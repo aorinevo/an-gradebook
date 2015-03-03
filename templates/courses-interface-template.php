@@ -1,11 +1,11 @@
     <script id="courses-interface-template" type="text/template">
     <div id="courses-interface-buttons-container">
-    <button id="add-course" class="wp-core-ui button">Add Course</button>        
-    <button id="edit-course" class="wp-core-ui button">Edit Course</button>    
-    <button id="delete-course" class="wp-core-ui button">Delete Course</button>         
+    <button id="add-course" class="btn btn-default">Add Course</button>        
+    <button id="edit-course" class="btn btn-default">Edit Course</button>    
+    <button id="delete-course" class="btn btn-default">Delete Course</button>         
     </div> 
     <hr/>       
-    <table id="an-courses-container" class="wp-list-table widefat fixed pages">  
+    <table id="an-courses-container" class="table table-bordered table-stripped">  
        <thead>
         <tr>
             <th>ID</th><th>Course</th><th>School</th><th>Semester</th><th>Year</th>

@@ -1,9 +1,9 @@
 (function($,AN){
 	AN.Views.EditAssignmentView = AN.Views.Base.extend({
-        id: 'edit-assignment-form-container-container',
+ 		id: 'base-modal',
+    	className: 'modal fade',
         events: {
-            'click button#edit-assignment-cancel': 'editCancel',
-            'click a.media-modal-close' : 'editCancel', 
+            'hidden.bs.modal' : 'editCancel',
 			'keyup'  : 'keyPressHandler',    			                                   
             'click #edit-assignment-save': 'submitForm',
             'submit #edit-assignment-form': 'editSave'
@@ -15,7 +15,7 @@
             $('#assign-date-datepicker, #assign-due-datepicker').datepicker('option','dateFormat','yy-mm-dd');
             if(assignment){                  
             $('#assign-date-datepicker').datepicker('setDate', assignment.get('assign_date'));                                                            
-            $('#assign-due-datepicker').datepicker('setDate', assignment.get('assign_due'));       
+            $('#assign-due-datepicker').datepicker('setDate', assignment.get('assign_due'));       		    		 
             }     	
             return this;
         },
@@ -40,13 +40,13 @@
                 });
                 self.$el.html(template);
             }     
-            this.$el.append('<div class="media-modal-backdrop"></div>');   
+			this.$el.modal('show');
 			_.defer(function(){
 				this.inputName = self.$('input[name="assign_name"]');
 				var strLength= inputName.val().length;
 				//inputName.focus();				
 				//inputName[0].setSelectionRange(strLength, strLength);
-			});                      
+			});    			    		              
             return this;
         },   
 		keyPressHandler: function(e) {
@@ -55,6 +55,7 @@
             return this;
         },             
         editCancel: function() {
+			this.$el.data('modal', null);           
             this.remove();
             return false;
         },
@@ -79,7 +80,7 @@
             		}
             	});            	
             }
-            this.remove();  
+			this.$el.modal('hide');
             return false;
         }
     });

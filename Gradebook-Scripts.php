@@ -6,9 +6,9 @@ class AN_GradeBook_Scripts{
 			add_action('admin_enqueue_scripts', array($this,'enqueue_gradebook_scripts'));		
 	}
 	public function register_gradebook_scripts(){
-		wp_register_style( 'GradeBook_css', plugins_url('GradeBook.css',__File__), array('media-views', 'list-tables'), null, false );
+		wp_register_style( 'GradeBook_css', plugins_url('GradeBook.css',__File__), array('media-views'), null, false );
 		wp_register_style( 'bootstrap_css', plugins_url('js/packages/bootstrap/css/bootstrap.min.css',__File__), array(), null, false );		
-		wp_register_style( 'list-tables', plugins_url('list-tables.css',__File__), array(), null, false );		
+		//wp_register_style( 'list-tables', plugins_url('list-tables.css',__File__), array(), null, false );		
 		wp_register_script('googlejsapi', 'https://www.google.com/jsapi', array(), null, false ); 
 	//models
 		wp_register_script( 'models/Cell', plugins_url('js/models/Cell.js',__File__),array( 'js/init_app','jquery','backbone','underscore' ), null, true );		
@@ -35,7 +35,7 @@ class AN_GradeBook_Scripts{
 		wp_register_script( 'views/CourseView', plugins_url('js/views/CourseView.js',__File__),array( 'js/init_app','jquery','backbone','underscore' ), null, true );												
 		wp_register_script( 'views/GradebookView', plugins_url('js/views/GradebookView.js',__File__),array( 'js/init_app','jquery','backbone','underscore' ), null, true );														
 		wp_register_script( 'views/StudentGradebookView', plugins_url('js/views/StudentGradebookView.js',__File__),array( 'js/init_app','jquery','backbone','underscore' ), null, true );																
-		wp_register_script( 'views/EditStudentView', plugins_url('js/views/EditStudentView.js',__File__),array( 'js/init_app','jquery','backbone','underscore' ), null, true );														
+		wp_register_script( 'views/EditStudentView', plugins_url('js/views/EditStudentView.js',__File__),array( 'js/init_app','jquery','backbone','underscore','jquery-ui-autocomplete' ), null, true );														
 		wp_register_script( 'views/DeleteStudentView', plugins_url('js/views/DeleteStudentView.js',__File__),array( 'js/init_app','jquery','backbone','underscore' ), null, true );																
 		wp_register_script( 'views/EditAssignmentView', plugins_url('js/views/EditAssignmentView.js',__File__),array( 'js/init_app','jquery','backbone','underscore', 'jquery-ui-datepicker' ), null, true );																		
 		wp_register_script( 'views/EditCourseView', plugins_url('js/views/EditCourseView.js',__File__),array( 'js/init_app','jquery','backbone','underscore' ), null, true );																		
@@ -71,13 +71,13 @@ class AN_GradeBook_Scripts{
     		'views/StudentGradebookView' 		    	    		
 			), null, true );			 
 		wp_register_script( 'js/init_app', plugins_url('js/init_app.js',__File__),array( 'jquery', 'backbone','underscore', 'googlejsapi' ), null, true );		
-		//wp_register_script( 'bootstrap_js', plugins_url('js/packages/bootstrap/js/bootstrap.min.js',__File__),array( 'jquery', 'backbone','underscore' ), null, true );
+		wp_register_script( 'bootstrap_js', plugins_url('js/packages/bootstrap/js/bootstrap.min.js',__File__),array( 'jquery', 'backbone','underscore' ), null, true );
 	}
 	public function enqueue_gradebook_scripts($hook){
         if( $hook == "toplevel_page_an_gradebook_page" ){
 			wp_enqueue_style( 'GradeBook_css' );	
-			//wp_enqueue_style( 'bootstrap_css' );		  		   	
-			//wp_enqueue_script( 'bootstrap_js' ); 					
+			wp_enqueue_style( 'bootstrap_css' );		  		   	
+			wp_enqueue_script( 'bootstrap_js' ); 					
 		} else {
 	  		return;
 		}	

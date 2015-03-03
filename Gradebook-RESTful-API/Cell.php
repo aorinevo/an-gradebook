@@ -54,7 +54,8 @@ class gradebook_cell_API{
 			echo json_encode(array("status" => "Not Allowed."));
 			die();
 		}   		
-		switch ($_SERVER['REQUEST_METHOD']){
+		$method = (isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'])) ? $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] : $_SERVER['REQUEST_METHOD'];
+		switch ($method){
 			case 'DELETE' :  
 	  			echo json_encode(array('delete'=>'deleting'));
 	  			break;
