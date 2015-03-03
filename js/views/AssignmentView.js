@@ -83,8 +83,7 @@
                 this.model.set({ sorted: 'asc' });
             }        	
         },
-        sortColumnCSS: function(ev) {
-        	ev.preventDefault();  
+        sortColumnCSS: function() {
             if (this.model.get('sorted')) {
         		var desc = this.$el.hasClass('desc');
         		this.$el.toggleClass( "desc", !desc ).toggleClass( "asc", desc );   
