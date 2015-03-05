@@ -29,7 +29,7 @@
             return this;
         },
         addCourse: function(course) {
-            var view = new AN.Views.CourseView({
+            var view = new AN.Views.StudentCourseView({
                 model: course
             });
             $('#courses').append(view.render().el);

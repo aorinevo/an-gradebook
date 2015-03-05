@@ -3,13 +3,13 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 3.5
+Version: 3.5.1
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
 */
 
-define( "AN_GRADEBOOK_VERSION", "3.5");
+define( "AN_GRADEBOOK_VERSION", "3.5.1");
 
 include_once( dirname( __FILE__ ) . '/functions.php' );
 include_once( dirname( __FILE__ ) . '/Gradebook-Database.php' );

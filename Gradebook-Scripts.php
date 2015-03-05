@@ -31,6 +31,7 @@ class AN_GradeBook_Scripts{
 		wp_register_script( 'views/AssignmentView', plugins_url('js/views/AssignmentView.js',__File__),array( 'js/init_app','jquery','backbone','underscore' ), null, true );								
 		wp_register_script( 'views/StudentAssignmentView', plugins_url('js/views/StudentAssignmentView.js',__File__),array( 'js/init_app','jquery','backbone','underscore' ), null, true );										
 		wp_register_script( 'views/StudentView', plugins_url('js/views/StudentView.js',__File__),array( 'js/init_app','jquery','backbone','underscore' ), null, true );										
+		wp_register_script( 'views/StudentCourseView', plugins_url('js/views/StudentCourseView.js',__File__),array( 'js/init_app','jquery','backbone','underscore' ), null, true );														
 		wp_register_script( 'views/StudentStudentView', plugins_url('js/views/StudentStudentView.js',__File__),array( 'js/init_app','jquery','backbone','underscore' ), null, true );												
 		wp_register_script( 'views/CourseView', plugins_url('js/views/CourseView.js',__File__),array( 'js/init_app','jquery','backbone','underscore' ), null, true );												
 		wp_register_script( 'views/GradebookView', plugins_url('js/views/GradebookView.js',__File__),array( 'js/init_app','jquery','backbone','underscore' ), null, true );														
@@ -63,6 +64,7 @@ class AN_GradeBook_Scripts{
 			'jquery', 'backbone', 'underscore', 'js/init_app', 'models/Cell', 'models/CellList', 'models/Assignment', 'models/AssignmentList',
 			'models/Student','models/StudentList', 'models/StudentCourse', 'models/StudentCourseList', 'models/StudentCourseGradebook',
 			'views/StudentCellView', 
+	    	'views/StudentCourseView' , 			
 			'views/StudentAssignmentView',
     		'views/StudentStudentView' ,
 	    	'views/CourseView' ,     		 			
@@ -171,7 +173,8 @@ class AN_GradeBook_Scripts{
 			ob_start();
 			include( dirname( __FILE__ ) . '/templates/stats-assignment-template.php' );	
 			include( dirname( __FILE__ ) . '/templates/stats-student-template.php' );
-			include( dirname( __FILE__ ) . '/templates/student-student-view-template.php' );				
+			include( dirname( __FILE__ ) . '/templates/student-student-view-template.php' );
+			include( dirname( __FILE__ ) . '/templates/student-course-view-template.php' );							
 			include( dirname( __FILE__ ) . '/templates/student-assignment-view-template.php' );				
 			include( dirname( __FILE__ ) . '/templates/student-courses-interface-template.php' );
 			include( dirname( __FILE__ ) . '/templates/student-gradebook-interface-template.php' );

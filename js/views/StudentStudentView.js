@@ -9,7 +9,6 @@
             this.listenTo(AN.GlobalVars.courses, 'remove change:selected', this.close); 
         },    
         render: function() {
-        	console.log(this.model);
             var template = _.template($('#student-view-template').html(), {
                     student: this.model
                 }); 
