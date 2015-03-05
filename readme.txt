@@ -4,7 +4,7 @@ Donate link:
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.5
 Tested up to: 4.1.1
-Stable tag: 3.4
+Stable tag: 3.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,6 +60,14 @@ Students are able to:
 * plugin icon: https://www.iconfinder.com/icons/175285/edit_property_icon#size=256
 
 == Changelog ==
+
+Version 3.5:
+
+* The delete student modal was still rendered using old styling.  This was updated to the new styling.
+* Added dropdown tools menu for courses, similar to the one for students.  This allowed us to remove the edit and delete buttons from the top of the GradeBook page.
+* Fixed styling conflict both on the student view and instructor view with wordpress #adminmenuback.  
+* Added background-color: white to tables.
+* New Feature: Export GradeBook to CSV.
 
 Version 3.4:
 

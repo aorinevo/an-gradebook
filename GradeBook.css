@@ -1,6 +1,16 @@
 .modal {
    z-index: 999999 !important;
 }
+
+.table{
+  background-color: white !important;
+}
+
+#adminmenuback {
+	z-index: 1 !important;
+}
+
+
 body {
   background-color: #f1f1f1 !important;
 }

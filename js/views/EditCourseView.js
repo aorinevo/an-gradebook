@@ -8,21 +8,16 @@
             'click #edit-course-save': 'submitForm',
             'submit #edit-course-form': 'editSave'
         },
-        initialize: function(){  
-            var course = AN.GlobalVars.courses.findWhere({
-                selected: true
-            });      
+        initialize: function(model){  
             $('body').append(this.render().el);
             return this;                
         },
         render: function() {
             var self = this;
-            var course = AN.GlobalVars.courses.findWhere({
-                selected: true
-            });
-            if (course) {
+            var _course = this.model;            
+            if (_course) {
                 var template = _.template($('#edit-course-template').html(), {
-                    course: course
+                    course: _course
                 });
                 self.$el.html(template);                              
             } else {
@@ -39,45 +34,44 @@
 				//inputName[0].setSelectionRange(strLength, strLength);
 			});            
             return this;
-        },       
-        toggleEditDelete: function(){
-            var x = AN.GlobalVars.courses.findWhere({selected: true});
-            if(x){
-              $('#edit-course, #delete-course').attr('disabled', false);
-            }else{
-              $('#edit-course, #delete-course').attr('disabled', true); 
-            }         
-            $('#add-course').attr('disabled', false);            
-        },         
+        },              
         keyPressHandler: function(e) {
-            if (e.keyCode == 27) this.editCancel();
-            if (e.keyCode == 13) this.submitForm();
+        	var self = this;
+			switch(e.keyCode){
+				case 27: 
+					self.$el.modal('hide');  
+					break;
+				case 13: 		
+					self.submitForm();
+					break;
+			}					
             return this;
         },                 
         editCancel: function() {
 			this.$el.data('modal', null);        
-            this.remove();      
-			this.toggleEditDelete();                                  
+            this.remove();                                      
             return false;
         },
         submitForm: function(){
         	$('#edit-course-form').submit();
         },
         editSave: function(ev) {
+        	var self = this;
             var courseInformation = $(ev.currentTarget).serializeObject(); //action: "add_course" or action: "update_course" is hidden in the edit-course-template 
 			var x = $(ev.currentTarget).serializeObject().id;           
             var toadd = AN.GlobalVars.courses.findWhere({id : x});
             if(toadd){
             	toadd.save(courseInformation,{wait: true});
+					 self.$el.modal('hide');              	
             } else {
              	delete(courseInformation['id']);
             	var toadds = new AN.Models.Course(courseInformation);
             	toadds.save(courseInformation,{success: function(model){
             		 AN.GlobalVars.courses.add(model);  
+					 self.$el.modal('hide');                		 
             		}
             	});            	
-            }
-			this.$el.modal('hide');               
+            }           
             return false;
         }
     });

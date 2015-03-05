@@ -42,6 +42,7 @@ class AN_GradeBookAPI{
 		add_action('wp_ajax_get_gradebook_entire', array($this, 'get_gradebook_entire'));			
 		add_action('wp_ajax_get_pie_chart', array($this, 'get_pie_chart'));	
 		add_action('wp_ajax_get_line_chart', array($this, 'get_line_chart'));						
+		add_action('wp_ajax_get_csv', array($this, 'get_csv'));					
 		//student_gradebook
 		add_action('wp_ajax_get_line_chart_studentview', array($this, 'get_line_chart_studentview'));		
 		add_action('wp_ajax_get_student_courses', array($this, 'get_student_courses'));		
@@ -50,6 +51,80 @@ class AN_GradeBookAPI{
 		add_action('wp_ajax_get_student_gradebook', array($this, 'get_student_gradebook'));		
 		add_action('wp_ajax_get_student_gradebook_entire', array($this, 'get_student_gradebook_entire'));		
 		add_action('wp_ajax_get_student', array($this, 'get_student'));							
+	}
+	
+	public function get_csv(){
+		global $wpdb;
+		if (!gradebook_check_user_role('administrator')){	
+			echo json_encode(array("status" => "Not Allowed."));
+			die();
+		}    
+		$gbid = $_GET['id'];	
+		$assignments = $wpdb->get_results('SELECT * FROM an_assignments WHERE gbid = '. $gbid, ARRAY_A);		
+	    foreach($assignments as &$assignment){
+    		$assignment['id'] = intval($assignment['id']);
+    		$assignment['gbid'] = intval($assignment['gbid']);    	
+	    	$assignment['assign_order'] = intval($assignment['assign_order']);       	
+    	}	
+    	usort($assignments, build_sorter('assign_order'));     	
+		$column_headers_assignment_names = array();
+		foreach($assignments as $assignment){
+    		array_push($column_headers_assignment_names, $assignment['assign_name']);
+    	}
+	
+	    $column_headers = array_merge(
+	    	array('firstname','lastname','user_login','id','gbid'),
+	    	$column_headers_assignment_names
+	    );		    	
+		$student_assignments = $wpdb->get_results('SELECT * FROM an_assignment WHERE gbid = '. $gbid, ARRAY_A);
+    	foreach($student_assignments as &$student_assignment){
+	    	$student_assignment['gbid'] = intval($student_assignment['gbid']);
+    	}		
+		$students = $wpdb->get_results('SELECT uid FROM an_gradebook WHERE gbid = '. $gbid, ARRAY_N);
+   		foreach($students as &$value){
+	        $studentData = get_userdata($value[0]);
+    	    $value = array(
+	          	'firstname' => $studentData->first_name, 
+    	      	'lastname' => $studentData->last_name, 
+    	      	'user_login' => $studentData->user_login,
+        	  	'id'=>intval($studentData->ID),
+          		'gbid' => intval($gbid)
+	          	);
+	    }	
+	    //array('firstname','lastname','user_login','id','gbid','assignment names')
+	    //array(,,,,,'assignment dates')
+	    //array('john','doe', 'jdoe23',32,4, 'assignment scores') 
+    	usort($student_assignments, build_sorter('assign_order')); 
+		foreach($student_assignments as &$student_assignment){
+			$student_assignment['amid'] = intval($student_assignment['amid']);		
+			$student_assignment['uid'] = intval($student_assignment['uid']);				
+			$student_assignment['assign_order'] = intval($student_assignment['assign_order']);			
+			$student_assignment['assign_points_earned'] = floatval($student_assignment['assign_points_earned']);		
+			$student_assignment['gbid'] = intval($student_assignment['gbid']);	
+			$student_assignment['id'] = intval($student_assignment['id']);
+		} 
+		
+		$student_records = array(); 
+		foreach($students as &$row){
+			$records_for_student = array_filter($student_assignments,function($k) use ($row) {
+					return $k['uid']==$row['id'];
+				});
+			$scores_for_student = array_map(function($k){ return $k['assign_points_earned'];}, $records_for_student);		
+			$student_record = array_merge($row, $scores_for_student);
+			array_push($student_records,$student_record);
+		}	
+		header('Content-Type: text/csv; charset=utf-8');
+		header('Content-Disposition: attachment; filename=data.csv');
+
+		// create a file pointer connected to the output stream
+		$output = fopen('php://output', 'w');
+
+		fputcsv($output, $column_headers);	
+		foreach($student_records as &$row){
+			fputcsv($output, $row);			
+		}	
+		fclose($output);	
+		die();		
 	}
 	
 	public function get_pie_chart(){

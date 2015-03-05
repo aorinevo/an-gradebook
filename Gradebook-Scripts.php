@@ -154,6 +154,7 @@ class AN_GradeBook_Scripts{
 			include( dirname( __FILE__ ) . '/templates/stats-assignment-template.php' );	
 			include( dirname( __FILE__ ) . '/templates/stats-student-template.php' );	
 			include( dirname( __FILE__ ) . '/templates/assignment-view-template.php' );		
+			include( dirname( __FILE__ ) . '/templates/course-view-template.php' );			
 			include( dirname( __FILE__ ) . '/templates/student-view-template.php' );		
 			include( dirname( __FILE__ ) . '/templates/gradebook-interface-template.php' );
 			include( dirname( __FILE__ ) . '/templates/student-courses-interface-template.php' );
