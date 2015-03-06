@@ -42,6 +42,7 @@ class AN_GradeBook_Scripts{
 		wp_register_script( 'views/EditCourseView', plugins_url('js/views/EditCourseView.js',__File__),array( 'js/init_app','jquery','backbone','underscore' ), null, true );																		
 		wp_register_script( 'views/AssignmentStatisticsView', plugins_url('js/views/AssignmentStatisticsView.js',__File__),array( 'js/init_app','jquery','backbone','underscore', 'googlejsapi' ), null, true );																		
 		wp_register_script( 'views/StudentStatisticsView', plugins_url('js/views/StudentStatisticsView.js',__File__),array( 'js/init_app','jquery','backbone','underscore', 'googlejsapi' ), null, true );																		
+		wp_register_script( 'views/StudentDetailsAssignmentView', plugins_url('js/views/StudentDetailsAssignmentView.js',__File__),array( 'js/init_app','jquery','backbone','underscore', 'jquery-ui-datepicker' ), null, true );																				
 	//other scripts		
 		wp_register_script( 'js/GradeBook_js', plugins_url('js/GradeBook.js',__File__),
 			array( 
@@ -67,7 +68,8 @@ class AN_GradeBook_Scripts{
 	    	'views/StudentCourseView' , 			
 			'views/StudentAssignmentView',
     		'views/StudentStudentView' ,
-	    	'views/CourseView' ,     		 			
+	    	'views/CourseView' ,  
+	    	'views/StudentDetailsAssignmentView',   		 			
     		'views/AssignmentStatisticsView',		
     	    'views/StudentStatisticsView',
     		'views/StudentGradebookView' 		    	    		
@@ -175,7 +177,8 @@ class AN_GradeBook_Scripts{
 			include( dirname( __FILE__ ) . '/templates/stats-student-template.php' );
 			include( dirname( __FILE__ ) . '/templates/student-student-view-template.php' );
 			include( dirname( __FILE__ ) . '/templates/student-course-view-template.php' );							
-			include( dirname( __FILE__ ) . '/templates/student-assignment-view-template.php' );				
+			include( dirname( __FILE__ ) . '/templates/student-assignment-view-template.php' );
+			include( dirname( __FILE__ ) . '/templates/student-details-assignment-template.php' );									
 			include( dirname( __FILE__ ) . '/templates/student-courses-interface-template.php' );
 			include( dirname( __FILE__ ) . '/templates/student-gradebook-interface-template.php' );
 			$mytemplates = ob_get_clean();	

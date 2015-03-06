@@ -5,6 +5,7 @@
   		</button>
   		<ul class="dropdown-menu" role="menu">
 			<li class='assign-submenu-stats'><a href='#'>Statistics</a></li>				
+			<li class='assign-submenu-details'><a href='#'>Details</a></li>			
   		</ul>
   	</div>		
 </script>      

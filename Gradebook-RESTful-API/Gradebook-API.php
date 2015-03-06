@@ -59,7 +59,7 @@ class AN_GradeBookAPI{
 			echo json_encode(array("status" => "Not Allowed."));
 			die();
 		}    
-		$gbid = $_GET['id'];	
+		$gbid = $_GET['id'];			
 		$assignments = $wpdb->get_results('SELECT * FROM an_assignments WHERE gbid = '. $gbid, ARRAY_A);		
 	    foreach($assignments as &$assignment){
     		$assignment['id'] = intval($assignment['id']);
@@ -67,11 +67,11 @@ class AN_GradeBookAPI{
 	    	$assignment['assign_order'] = intval($assignment['assign_order']);       	
     	}	
     	usort($assignments, build_sorter('assign_order'));     	
-		$column_headers_assignment_names = array();
-		foreach($assignments as $assignment){
-    		array_push($column_headers_assignment_names, $assignment['assign_name']);
-    	}
-	
+		$column_headers_assignment_names = array_column($assignments, 'assign_name');
+		
+		//foreach($assignments as &$assignment){
+    	//	array_push($column_headers_assignment_names, $assignment['assign_name']);
+    	//}
 	    $column_headers = array_merge(
 	    	array('firstname','lastname','user_login','id','gbid'),
 	    	$column_headers_assignment_names

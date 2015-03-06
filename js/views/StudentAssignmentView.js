@@ -5,6 +5,7 @@
         events: {
             'click .dashicons-menu': 'toggleAssignmentMenu',           
             'click li.assign-submenu-stats' : 'statsAssignment',            
+            'click li.assign-submenu-details' : 'detailsAssignment',              
             'mouseenter div.column-frame' : 'mouseEnter',
             'mouseleave div.column-frame' : 'mouseLeave'
         },
@@ -51,7 +52,12 @@
                 this.$el.addClass('hidden');
             }
         },
-        statsAssignment: function(){
+        detailsAssignment: function(ev){
+        	ev.preventDefault();
+            var view = new AN.Views.StudentDetailsAssignmentView({model: this.model});
+        },
+        statsAssignment: function(ev){
+        	ev.preventDefault();        
             var view = new AN.Views.AssignmentStatisticsView({model: this.model}); 		
         }, 
         close: function(){     
