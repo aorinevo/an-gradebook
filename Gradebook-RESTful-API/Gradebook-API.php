@@ -60,6 +60,7 @@ class AN_GradeBookAPI{
 			die();
 		}    
 		$gbid = $_GET['id'];			
+		$gradebook = $wpdb->get_results('SELECT * FROM an_gradebooks WHERE id = '. $gbid, ARRAY_A);		
 		$assignments = $wpdb->get_results('SELECT * FROM an_assignments WHERE gbid = '. $gbid, ARRAY_A);		
 	    foreach($assignments as &$assignment){
     		$assignment['id'] = intval($assignment['id']);
@@ -67,11 +68,12 @@ class AN_GradeBookAPI{
 	    	$assignment['assign_order'] = intval($assignment['assign_order']);       	
     	}	
     	usort($assignments, build_sorter('assign_order'));     	
-		$column_headers_assignment_names = array_column($assignments, 'assign_name');
-		
-		//foreach($assignments as &$assignment){
-    	//	array_push($column_headers_assignment_names, $assignment['assign_name']);
-    	//}
+    	
+		$column_headers_assignment_names = array();
+
+		foreach($assignments as &$assignment){
+    		array_push($column_headers_assignment_names, $assignment['assign_name']);
+    	}
 	    $column_headers = array_merge(
 	    	array('firstname','lastname','user_login','id','gbid'),
 	    	$column_headers_assignment_names
@@ -91,9 +93,6 @@ class AN_GradeBookAPI{
           		'gbid' => intval($gbid)
 	          	);
 	    }	
-	    //array('firstname','lastname','user_login','id','gbid','assignment names')
-	    //array(,,,,,'assignment dates')
-	    //array('john','doe', 'jdoe23',32,4, 'assignment scores') 
     	usort($student_assignments, build_sorter('assign_order')); 
 		foreach($student_assignments as &$student_assignment){
 			$student_assignment['amid'] = intval($student_assignment['amid']);		
@@ -114,7 +113,8 @@ class AN_GradeBookAPI{
 			array_push($student_records,$student_record);
 		}	
 		header('Content-Type: text/csv; charset=utf-8');
-		header('Content-Disposition: attachment; filename=data.csv');
+		$filename = str_replace(" ", "_", $gradebook[0]['name'].'_'.$gbid);
+		header('Content-Disposition: attachment; filename='.$filename.'.csv');
 
 		// create a file pointer connected to the output stream
 		$output = fopen('php://output', 'w');

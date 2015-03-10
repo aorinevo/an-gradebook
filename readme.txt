@@ -4,11 +4,11 @@ Donate link:
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.5
 Tested up to: 4.1.1
-Stable tag: 3.5.2
+Stable tag: 3.5.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-A simple gradebook built on backbone, underscore, jQuery, JS, mySQL, and php.
+AN_GradeBook allows educators to create, maintain, and share grades quickly and efficiently. 
 
 == Description == 
 
@@ -61,6 +61,13 @@ Students are able to:
 * plugin icon: https://www.iconfinder.com/icons/175285/edit_property_icon#size=256
 
 == Changelog ==
+
+Version 3.5.3:
+
+* Update and clean forms.
+* Bug fix: Adding a student to an already filtered gradebook caused hidden assignment cells for that student to appear.
+* Download cvs filename is derived from the course name and id.  For example, a Calculus I course with ID 19 will have the exported csv stored in a file named Calculus_I_19.csv
+
 
 Version 3.5.2:
 
@@ -283,14 +290,3 @@ Version 1.3.1:
 Version 1.3: 
 
 * Bug fix: Not enough of the jquery libraries were being loaded preventing users from adding courses, adding students, etc...
-
-== Upgrade notice ==
-
-This version is not backwards compatible. You will not have access to gradebooks created in previous versions.
-
-
-
-
-== Disclaimer ==
-
-GradeBook is still in development.  Version 2.4.7 is still a beta release.

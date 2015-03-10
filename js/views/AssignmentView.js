@@ -9,6 +9,7 @@
             'click li.assign-submenu-edit' : 'editAssignment',         
             'click li.assign-submenu-left' : 'shiftAssignmentLeft',              
             'click li.assign-submenu-right' : 'shiftAssignmentRight',               
+            //'click li.assign-submenu-publish' : 'togglePublish',             
             'click li.assign-submenu-stats' : 'statsAssignment',            
             'mouseenter div.column-frame' : 'mouseEnter',
             'mouseleave div.column-frame' : 'mouseLeave'
@@ -28,7 +29,20 @@
         mouseLeave: function(){
         	this.$el.removeClass('hover');	
         	this.model.set({hover: false});	
-        },        
+        },     
+        /*
+        togglePublish: function(ev){
+        	ev.preventDefault();
+        	if(this.model.get('publish')){
+        		this.model.set({publish : false});
+        		this.$('li.assign-submenu-publish a').html('Publish');
+        	} else {
+        		this.model.set({publish : true});        	
+        		this.$('li.assign-submenu-publish a').html('Private');
+        	}
+        	return this;
+        },   
+        */
         shiftAssignmentLeft: function(ev){
         	ev.preventDefault();          
         	var x = AN.GlobalVars.assignments.findWhere({assign_order: this.model.get('assign_order')-1});

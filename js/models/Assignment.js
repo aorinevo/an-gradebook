@@ -8,6 +8,7 @@
             gbid: null,
             sorted: '',
             visibility: true,
+            publish: true,
             selected: false
         },
         url: function(){

@@ -6,16 +6,32 @@
 				<h4 class="modal-title" id="myModalLabel"><%= course ? 'Edit ' : 'Create ' %>Course</h4>
 			</div>
 			<div class="modal-body">
-				<form id="edit-course-form">      
-					<input type="hidden" name="id" value="<%= course ? course.get('id') : '' %>"/>        
-					<label>Course Name:</label>
-					<input type="text" name="name" value="<%= course ? course.get('name') : '' %>"/>
-					<label>School:</label>
-					<input type="text" name="school" value="<%= course ? course.get('school') : '' %>"/>
-					<label>Semester:</label>
-					<input type="text" name="semester" value="<%= course ? course.get('semester') : '' %>"/>
-					<label>Year:</label>
-					<input type="text" name="year" value="<%= course ? course.get('year') : '' %>"/>
+				<form id="edit-course-form" class="form-horizontal"> 
+					<div class="form-group">     
+						<input type="hidden" name="id" value="<%= course ? course.get('id') : '' %>"/>        
+						<label for="course_name" class="col-sm-3 control-label">Course Name:</label>
+						<div class="col-sm-7">
+							<input type="text" id="course_name" class="form-control" name="name" value="<%= course ? course.get('name') : '' %>"/>
+						</div>
+					</div>
+					<div class="form-group">     					
+						<label for="course_school" class="col-sm-3 control-label">School:</label>
+						<div class="col-sm-7">						
+							<input type="text" id="course_school" class="form-control" name="school" value="<%= course ? course.get('school') : '' %>"/>
+						</div>	
+					</div>	
+					<div class="form-group">     						
+						<label for="course_semester" class="col-sm-3 control-label">Semester:</label>
+						<div class="col-sm-7">						
+							<input type="text" id="course_semester" class="form-control" name="semester" value="<%= course ? course.get('semester') : '' %>"/>
+						</div>
+					</div>						
+					<div class="form-group">     						
+						<label for="course_year" class="col-sm-3 control-label">Year:</label>
+						<div class="col-sm-7">						
+							<input type="text" id="course_year" class="form-control" name="year" value="<%= course ? course.get('year') : '' %>"/>
+						</div>
+					</div>					
 				</form>
 			</div>
 			<div class="modal-footer">

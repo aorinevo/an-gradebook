@@ -14,14 +14,12 @@
             this.listenTo(AN.GlobalVars.assignments, 'add remove change:sorted change:assign_order', this.close);
             this.listenTo(AN.GlobalVars.students, 'remove', this.cleanUpStudentCells);                                      
             this.listenTo(AN.GlobalVars.students, 'add remove', this.close);                                                  
-            //this.listenTo(this.model, 'change:assign_points_earned', this.render);
             this.listenTo(AN.GlobalVars.courses, 'remove change:selected', this.close);                                                            
-           // this.listenTo(this.model, 'change:assign_order', this.close);               
-            //this.listenTo(this.model, 'remove', this.close);               
         },
         render: function() {
         	var self = this;
-            this.$el.toggleClass('hidden', !self.model.get('visibility'));           
+        	var _assignment = AN.GlobalVars.assignments.findWhere({id : this.model.get('amid')});
+            this.$el.toggleClass('hidden', !_assignment.get('visibility'));           
             this.$el.html('<div class="view">' + this.model.get('assign_points_earned') + '</div> <input class="edit" type="text" value="' + parseFloat(this.model.get('assign_points_earned')) + '"></input>');
             this.input = this.$('.edit');
             return this;
