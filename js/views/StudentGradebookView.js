@@ -10,45 +10,22 @@
             		AN.GlobalVars.students.reset();   
 					AN.GlobalVars.cells.reset();               		            		
 					AN.GlobalVars.assignments.reset();              		            							
-                _.each(AN.GlobalVars.courseGradebook.get('students'), function(student) {
-                    AN.GlobalVars.students.add(student);
-                });
+                    AN.GlobalVars.students.add(AN.GlobalVars.courseGradebook.get('students'));
                 _.each(AN.GlobalVars.courseGradebook.get('assignments'), function(assignment) {
                     AN.GlobalVars.assignments.add(assignment);
                 }); 
                 _.each(AN.GlobalVars.courseGradebook.get('cells'), function(cell) {     	
+                	//console.log(cell);
                     AN.GlobalVars.cells.add(cell);
                 });                                       
-                self.render();
-                self.listenTo(AN.GlobalVars.courses, 'add', self.render);
-                self.listenTo(AN.GlobalVars.students, 'add', self.render);   
-            	self.listenTo(AN.GlobalVars.students, 'add remove', self.sortByStudent);                                  
-				self.listenTo(AN.GlobalVars.cells, 'add remove change:assign_order', self.render);                      
-                self.listenTo(AN.GlobalVars.assignments, 'add remove change:assign_order change:assign_category', self.render);                                   
-            	self.listenTo(AN.GlobalVars.assignments, 'change:sorted', self.sortByAssignment);          	            		
+                self.render();                                                       	            		
             	}
             });
             this.listenTo(this.model, 'change:selected', this.close);
             return this;
         },
         events: {
-            'click button#add-student': 'addStudent',
-            'click button#add-assignment': 'addAssignment',
-            'click button#filter-assignments': 'filterAssignments',
-            'click #cb-select-all-1': 'selectAllStudents'
-        },
-        selectAllStudents: function(ev){ //This function is not implemented.  Possibility in future versions that more closely
-        								 //Resemble wordpress admin page/post/etc.... list-tables
-        	var _selected = $('#cb-select-all-1').is(':checked');
-        	if(_selected){
-        		_.each(AN.GlobalVars.students.models, function(student){
-        			student.set({selected: true});
-        		});
-        	} else {
-        		_.each(AN.GlobalVars.students.models, function(student){
-        			student.set({selected: false});
-        		});        	
-        	}
+            'click button#filter-assignments': 'filterAssignments'
         },
         render: function() {
         	var course = AN.GlobalVars.courses.findWhere({
@@ -57,7 +34,7 @@
         	var _x = _.map(AN.GlobalVars.assignments.models, function(model){return model.get('assign_category');});
          	var _assign_categories = _.without(_.uniq(_x),"");                                           
 			var _y = $('#filter-assignments-select').val();	                
-            var template = _.template($('#gradebook-interface-template').html(), {
+            var template = _.template($('#student-gradebook-interface-template').html(), {
                     assign_categories: _assign_categories
                 });        
             this.$el.html(template);
@@ -65,7 +42,7 @@
         	switch(this.sort_key){
         		case 'cell':     
         			_.each(this.sort_column, function(cell) {
-                		var view = new AN.Views.StudentView({
+                		var view = new AN.Views.StudentStudentView({
                     		model: AN.GlobalVars.students.get(cell.get('uid'))
                 		}); 
 						$('#students').append(view.render().el);                     
@@ -75,15 +52,16 @@
             		});
             		y = _.sortBy(y,function(assign){ return assign.get('assign_order');});
             		_.each(y, function(assignment) {
-                		var view = new AN.Views.AssignmentView({
+                		var view = new AN.Views.StudentAssignmentView({
                     		model: assignment
                 	});
                 		$('#students-header tr').append(view.render().el);
             		});
             		break;
-            	case 'lastname':      		
+            	case 'lastname':     
+				//console.log(AN.GlobalVars.students);
             		_.each(this.sort_column.models, function(student) {
-                		var view = new AN.Views.StudentView({
+                		var view = new AN.Views.StudentStudentView({
                     		model: AN.GlobalVars.students.get(student.get('id'))
                 		});
 						$('#students').append(view.render().el);                    
@@ -96,7 +74,7 @@
             		});
             		y = _.sortBy(y,function(assign){ return assign.get('assign_order');});  	
             		_.each(y, function(assignment) {
-                		var view = new AN.Views.AssignmentView({
+                		var view = new AN.Views.StudentAssignmentView({
                     		model: assignment
                 		});
                 	$('#students-header tr').append(view.render().el);
@@ -110,7 +88,7 @@
             !this.model.get('selected') && this.remove();
         },     
         filterAssignments: function() {       
-        	var _x = $('#filter-assignments-select').val();	
+        	var _x = $('#filter-assignments-select').val();	           
             var _toHide = AN.GlobalVars.assignments.filter(
 	            function(assign){
                		return assign.get('assign_category') != _x;
@@ -133,13 +111,7 @@
                 	assign.set({visibility: true});
             	});
             }        
-        },     
-        addAssignment: function(ev) {    
-            var view = new AN.Views.EditAssignmentView({});           
-        },    
-        addStudent: function(ev) {       
-            var view = new AN.Views.EditStudentView({});      
-        },  
+        },      
         sortByStudent: function(ev) {     		
 			this.sort_key = 'lastname'; 
 			this.sort_column = AN.GlobalVars.students;                                               

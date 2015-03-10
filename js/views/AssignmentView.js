@@ -1,7 +1,7 @@
 (function($,AN){
 	AN.Views.AssignmentView = AN.Views.Base.extend({
         tagName: 'th',
-        className: 'assignment manage-column sortable asc',
+        className: 'assignment-tools assignment',
         events: {
             'click li.assign-submenu-sort': 'sortColumn',
             'click .dashicons-menu': 'toggleAssignmentMenu',
@@ -9,6 +9,7 @@
             'click li.assign-submenu-edit' : 'editAssignment',         
             'click li.assign-submenu-left' : 'shiftAssignmentLeft',              
             'click li.assign-submenu-right' : 'shiftAssignmentRight',               
+            //'click li.assign-submenu-publish' : 'togglePublish',             
             'click li.assign-submenu-stats' : 'statsAssignment',            
             'mouseenter div.column-frame' : 'mouseEnter',
             'mouseleave div.column-frame' : 'mouseLeave'
@@ -28,13 +29,28 @@
         mouseLeave: function(){
         	this.$el.removeClass('hover');	
         	this.model.set({hover: false});	
-        },        
-        shiftAssignmentLeft: function(){
+        },     
+        /*
+        togglePublish: function(ev){
+        	ev.preventDefault();
+        	if(this.model.get('publish')){
+        		this.model.set({publish : false});
+        		this.$('li.assign-submenu-publish a').html('Publish');
+        	} else {
+        		this.model.set({publish : true});        	
+        		this.$('li.assign-submenu-publish a').html('Private');
+        	}
+        	return this;
+        },   
+        */
+        shiftAssignmentLeft: function(ev){
+        	ev.preventDefault();          
         	var x = AN.GlobalVars.assignments.findWhere({assign_order: this.model.get('assign_order')-1});
         	x.save({assign_order: this.model.get('assign_order')});
 			this.model.save({assign_order: this.model.get('assign_order')-1});
         },	
-        shiftAssignmentRight: function(){
+        shiftAssignmentRight: function(ev){
+        	ev.preventDefault();          
         	var x = AN.GlobalVars.assignments.findWhere({assign_order: this.model.get('assign_order')+1});
         	x.save({assign_order: this.model.get('assign_order')});
 			this.model.save({assign_order: this.model.get('assign_order')+1});
@@ -64,6 +80,7 @@
         	return this;
         },
         sortColumn: function(ev){
+        	ev.preventDefault();  
         	var y = AN.GlobalVars.assignments.findWhere({selected: true});
         	y && y.set({selected: false});
             if (this.model.get('sorted')) {
@@ -96,13 +113,16 @@
                 this.$el.addClass('hidden');
             }
         },
-        statsAssignment: function(){
+        statsAssignment: function(ev){
+        	ev.preventDefault();  
             var view = new AN.Views.AssignmentStatisticsView({model: this.model}); 		
         }, 
-        editAssignment: function(ev) {    
+        editAssignment: function(ev) {
+        	ev.preventDefault();              
             var view = new AN.Views.EditAssignmentView({model: this.model});           
         },               
-        deleteAssignment: function() {
+        deleteAssignment: function(ev) {
+			ev.preventDefault();          
 			this.model.destroy({success: 
 				function (model){
 	            	var _x = model.get('assign_order'); 

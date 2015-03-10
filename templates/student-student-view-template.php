@@ -5,19 +5,15 @@
 				<span class="caret"></span>
 			</button>
 			<ul class="dropdown-menu" role="menu">
-				<li class='student-submenu-edit'><a href='#'>Edit</a></li>
 				<li class='student-submenu-stats'><a href='#'>Statistics</a></li>
-				<li class='student-submenu-delete'><a href='#'><span class="text-danger">Delete</span></a></li>
 			</ul>
 		</div>
-	</th>
+	</th> 
 	<td class="student">	
-		<div class="column-frame">	
-			<%= student.get("firstname") %> 				
-		</div>				
+				<%= student.get("firstname") %> 				
 	</td>
 	<td><%= student.get("lastname") %></td>
-	<td><%= student.get("user_login") %></td>
+	<td><%= student.get("user_login") %></td>   	
 </script>      
     
     

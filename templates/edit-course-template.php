@@ -1,39 +1,43 @@
 <script id="edit-course-template" type="text/template">
-    <div id="edit-course-form-container" class="media-modal wp-core-ui"> 
-    <a class="media-modal-close" title="Close"><span class="media-modal-icon"></span></a>
-    	<div class="media-modal-content">
-    	    <div class="media-frame wp-core-ui">
-    	    	<div class="media-frame-title">
-    				<h1><%= course ? 'Edit ' : 'Create ' %> Course</h1>
-    			</div>    
-				<div class="media-frame-menu">
-					<div class="media-menu">
-						<a href="#" class="media-menu-item"><%= course ? 'Edit ' : 'Create ' %>Course</a>
-						<div class="separator"></div>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="myModalLabel"><%= course ? 'Edit ' : 'Create ' %>Course</h4>
+			</div>
+			<div class="modal-body">
+				<form id="edit-course-form" class="form-horizontal"> 
+					<div class="form-group">     
+						<input type="hidden" name="id" value="<%= course ? course.get('id') : '' %>"/>        
+						<label for="course_name" class="col-sm-3 control-label">Course Name:</label>
+						<div class="col-sm-7">
+							<input type="text" id="course_name" class="form-control" name="name" value="<%= course ? course.get('name') : '' %>"/>
+						</div>
 					</div>
-				</div>       			
-    	    	<div class="media-frame-content">
-    				<form id="edit-course-form">      
-        				<input type="hidden" name="id" value="<%= course ? course.get('id') : '' %>"/>        
-        				<label>Course Name:</label>
-        				<input type="text" name="name" value="<%= course ? course.get('name') : '' %>"/>
-        				<label>School:</label>
-        				<input type="text" name="school" value="<%= course ? course.get('school') : '' %>"/>
-        				<label>Semester:</label>
-        				<input type="text" name="semester" value="<%= course ? course.get('semester') : '' %>"/>
-        				<label>Year:</label>
-        				<input type="text" name="year" value="<%= course ? course.get('year') : '' %>"/>
-    				</form>
-    			</div>    			
-        		<div class="media-frame-toolbar">
-    				<div class="media-toolbar">         
-     					<div class="media-toolbar-secondary"></div>
-     					<div class="media-toolbar-primary">
-     						<button id="edit-course-save" class="button media-button button-primary button-large">Save</button>
-     					</div>
-       				</div>
-       			</div> 
-       		</div>
-    	</div>  
-    </div> 
-    </script> 
+					<div class="form-group">     					
+						<label for="course_school" class="col-sm-3 control-label">School:</label>
+						<div class="col-sm-7">						
+							<input type="text" id="course_school" class="form-control" name="school" value="<%= course ? course.get('school') : '' %>"/>
+						</div>	
+					</div>	
+					<div class="form-group">     						
+						<label for="course_semester" class="col-sm-3 control-label">Semester:</label>
+						<div class="col-sm-7">						
+							<input type="text" id="course_semester" class="form-control" name="semester" value="<%= course ? course.get('semester') : '' %>"/>
+						</div>
+					</div>						
+					<div class="form-group">     						
+						<label for="course_year" class="col-sm-3 control-label">Year:</label>
+						<div class="col-sm-7">						
+							<input type="text" id="course_year" class="form-control" name="year" value="<%= course ? course.get('year') : '' %>"/>
+						</div>
+					</div>					
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				<button type="button" id="edit-course-save" data-dismiss="modal" class="btn btn-primary">Save</button>
+			</div>
+		</div>
+	</div>
+</script> 
