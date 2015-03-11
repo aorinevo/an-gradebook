@@ -18,18 +18,6 @@
             return this;
         },
         selectCourse: function(ev) {
-            var x = AN.GlobalVars.students.findWhere({
-                selected: true
-            });
-            x && x.set({
-                selected: false
-            });
-            var y = AN.GlobalVars.assignments.findWhere({
-                selected: true
-            });
-            y && y.set({
-                selected: false
-            });
             if (this.model.get('selected')) {
                 this.model.set({
                     selected: false

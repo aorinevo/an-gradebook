@@ -42,6 +42,7 @@ class AN_GradeBook_Scripts{
 		wp_register_script( 'views/EditCourseView', plugins_url('js/views/EditCourseView.js',__File__),array( 'js/init_app','jquery','backbone','underscore' ), null, true );																		
 		wp_register_script( 'views/AssignmentStatisticsView', plugins_url('js/views/AssignmentStatisticsView.js',__File__),array( 'js/init_app','jquery','backbone','underscore', 'googlejsapi' ), null, true );																		
 		wp_register_script( 'views/StudentStatisticsView', plugins_url('js/views/StudentStatisticsView.js',__File__),array( 'js/init_app','jquery','backbone','underscore', 'googlejsapi' ), null, true );																		
+		wp_register_script( 'views/StatisticsView', plugins_url('js/views/StatisticsView.js',__File__),array( 'js/init_app','jquery','backbone','underscore', 'googlejsapi' ), null, true );																				
 		wp_register_script( 'views/StudentDetailsAssignmentView', plugins_url('js/views/StudentDetailsAssignmentView.js',__File__),array( 'js/init_app','jquery','backbone','underscore', 'jquery-ui-datepicker' ), null, true );																				
 	//other scripts		
 		wp_register_script( 'js/GradeBook_js', plugins_url('js/GradeBook.js',__File__),
@@ -57,7 +58,7 @@ class AN_GradeBook_Scripts{
 	    	 'views/EditAssignmentView',     	    	    	
     		 'views/EditCourseView',     	    	    	    	   	    	    	    	    	
     		 'views/AssignmentStatisticsView' ,  
-	    	 'views/StudentStatisticsView' ,  
+	    	 'views/StatisticsView' ,  
     		 'views/GradebookView' 			
 			 ), null, true );
 		wp_register_script( 'js/GradeBook_student_js', plugins_url('js/GradeBook_student.js',__File__),

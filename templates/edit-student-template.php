@@ -6,24 +6,43 @@
 				<h4 class="modal-title" id="myModalLabel"><%= student ? 'Edit ' : 'Create ' %>Student</h4>
 			</div>
 			<div class="modal-body">
-    				<form id="edit-student-form">      
+    			<form id="edit-student-form" class="form-horizontal">     
+					<div class="form-group">     			 
 				        <input type="hidden" name="id" value="<%= student ? student.get('id') : '' %>"/>         
-				        <label>First Name:</label>
-				        <input type="text" name="firstname" value="<%= student ? student.get('firstname') : '' %>"/>
-				        <label>Last Name:</label>
-				        <input type="text" name="lastname" value="<%= student ? student.get('lastname') : '' %>"/>
-				        <label>User Login:<%= student ? '' : ' (if student exists in the data base, use the students user_login to add. Otherwise a new record will be created for this student):'%></label>
-				        <%= student ? student.get('user_login') : '<div class="ui-front"><input type="text" name="id-exists" id="user_login"/></div>' %>
-				        <p/>
-				        <%= student ? 'Update user ' + student.get('user_login') + ' from course ' + gradebook.get('id')  : 'Add to course ' + gradebook.get('id') %>?
-				        <input type="hidden" name="gbid" value="<%= gradebook.get('id') %>"/>
-				        <p/>			        
-    				</form>
+				        <label for="firstname" class="col-sm-4 control-label">First Name:</label>
+						<div class="col-sm-6">					        
+				        	<input type="text" class="form-control" id="firstname" name="firstname" value="<%= student ? student.get('firstname') : '' %>"/>
+				        </div>	
+				    </div>
+					<div class="form-group"> 				        
+				        <label for="lastname" class="col-sm-4 control-label">Last Name:</label>
+						<div class="col-sm-6">					        
+				        	<input type="text" class="form-control" id="lastname" name="lastname" value="<%= student ? student.get('lastname') : '' %>"/>
+				        </div>	
+				    </div>
+				    <% if (!student) { %>
+					<div class="form-group"> 				    
+				        <label for="user_login" class="col-sm-4 control-label">User Login:</label>
+				        <div class="ui-front col-sm-6"><input class="form-control" type="text" name="id-exists" id="user_login"/></div> 
+				        <input type="hidden" name="gbid" value="<%= gradebook.get('id') %>"/>				        
+				    </div>
+				    <% } %>
+				        <div>
+				        <% if (student) { %>
+				        	Update user <%= student.get('user_login') %> from course <%= gradebook.get('id') %>?
+				        <% } else { %>
+				        	if student exists in the wordpress database, use the students user_login to add. Otherwise a new record will be created for this student.
+				        	Add to course <%= gradebook.get('id') %>? 
+				        <% } %>
+				        </div>			        
+    			</form>
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 				<button type="button" id="edit-student-save" data-dismiss="modal" class="btn btn-primary">Save</button>
 			</div>
-		</div>
+		</div>		
 	</div>
 </script>   
+
+<!--if student exists in the wordpress database, use the students user_login to add. Otherwise a new record will be created for this student-->

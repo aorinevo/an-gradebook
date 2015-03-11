@@ -15,7 +15,7 @@
 		displayLineChart: function(){
             var student = this.model;		
 			$.get(ajaxurl, { 
-						action: 'get_line_chart',
+						action: 'get_line_chart_studentview',
 						uid : this.model.get('id'),
 						gbid : this.model.get('gbid')
 					},
