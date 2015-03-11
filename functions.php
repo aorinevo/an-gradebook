@@ -1,4 +1,7 @@
 <?php
+
+//include_once( ABSPATH . 'wp-includes/pluggable.php' );
+
 function build_sorter($key) {
 	return function ($a, $b) use ($key) {
 		return strnatcmp($a[$key], $b[$key]);
@@ -17,16 +20,5 @@ function gradebook_check_user_role( $role, $user_id = null ) {
 	}
  	return in_array( $role, (array) $user->roles );
 }
-	
-function an_delete_user_student ($user_id){
-	global $wpdb;
-	if (!gradebook_check_user_role('administrator')){	
-		echo json_encode(array("status" => "Not Allowed."));
-		die();
-	}  
-	$x = $user_id;
-	$results1 = $wpdb->delete('an_gradebook',array('uid'=>$x));
-	$results2 = $wpdb->delete('an_assignment',array('uid'=>$x));		
-}
-add_action( 'delete_user', 'an_delete_user_student');
+
 ?>

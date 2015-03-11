@@ -1,3 +1,25 @@
+.modal {
+   z-index: 999999 !important;
+}
+
+.table{
+  background-color: white !important;
+}
+
+#adminmenuback {
+	z-index: 1 !important;
+}
+
+
+body {
+  background-color: #f1f1f1 !important;
+}
+
+.student-tools, .assignment-tools { 
+	overflow: visible !important; 
+}
+
+
 #chart-container{
 	text-align: center;
 }
@@ -16,6 +38,7 @@ td.course{
 	margin-left:auto;
 	margin-right:auto;
 }
+
 
 #an-gradebooks #courses-interface-buttons-container{
   text-align: center;
@@ -45,6 +68,8 @@ form, input {
 
 #students-header tr th{
 	cursor: default;
+	min-width: 75px !important;
+	max-width: 135px !important;	
 }
 
 #courses tr.selected > td:first-child{
@@ -126,18 +151,23 @@ form, input {
 	padding: 10px;
 }
 
-th div[id^="column-assign-id"]{
+th div[id^="column-assign-id"], div[id^="row-student-id"]{
 	position:absolute;
+	z-index: 99;
 	display: none;
 	background-color: white;
 }
 
-th div[id^="column-assign-id"] li{
+th div[id^="column-assign-id"] li, div[id^="row-student-id"] li{
 	cursor: pointer;
 }
 
-th div[id^="column-assign-id"] li:hover{
+th div[id^="column-assign-id"] li:hover, div[id^="row-student-id"] li:hover{
 	background-color: #f7fcfe;
+}
+
+div .tablenav.top .actions.gradebook-actions{
+	display:block;
 }
 
 /*! jQuery UI - v1.10.4 - 2014-02-13

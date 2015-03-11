@@ -1,6 +1,6 @@
 <?php
 class AN_GradeBook_Database{
-	const an_gradebook_db_version = 3.14;
+	const an_gradebook_db_version = 3.141;
 	public function __construct(){
 		register_activation_hook(__FILE__,array($this,'database_init'));	
 		register_activation_hook(__FILE__,array($this,'database_alter'));			
@@ -63,7 +63,12 @@ class AN_GradeBook_Database{
 				}				
 			}
 			update_option( "an_gradebook_db_version", self::an_gradebook_db_version );				
-		}		
+		}
+		if(get_site_option( 'an_gradebook_db_version' )==3.14){ 
+			$sql = 'ALTER TABLE an_assignments ADD assign_visibility VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT "Students"';					
+			$wpdb->query($sql);				
+		    update_option( "an_gradebook_db_version", self::an_gradebook_db_version);
+		}				
 	}
 	public function database_init() {
 		global $wpdb;
@@ -92,13 +97,14 @@ class AN_GradeBook_Database{
 		//$db_name2 should be changed to $table_name but we'll stick with this for now
 		$db_name2 = 'an_assignments';
 		//The column headings that should be in the an_assignments table are stored in $table_columns
-		$table_columns = array('id','gbid','assign_order','assign_name','assign_category','assign_date','assign_due');
+		$table_columns = array('id','gbid','assign_order','assign_name','assign_category', 'assign_visibility','assign_date','assign_due');
 		$table_columns_specs = array(
 			'id' => 'int(11) NOT NULL AUTO_INCREMENT',
 			'gbid' => 'int(11) NOT NULL',
 			'assign_order' => 'int(11) NOT NULL',
 			'assign_name' => 'mediumtext NOT NULL',
 			'assign_category' => 'mediumtext NOT NULL',			
+			'assign_visibility' => 'VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT "Students"', 							
 			'assign_date' => 'DATE NOT NULL DEFAULT "0000-00-00"',
 			'assign_due' => 'DATE NOT NULL DEFAULT "0000-00-00"');
 		if($wpdb->get_var('SHOW TABLES LIKE "'.$db_name2.'"') != $db_name2){
@@ -108,6 +114,7 @@ class AN_GradeBook_Database{
 			assign_order int(11) NOT NULL,		
 			assign_name mediumtext NOT NULL,
 			assign_category mediumtext NOT NULL,			
+			assign_visibility VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT "Students",
 			assign_date DATE NOT NULL DEFAULT "0000-00-00",
 			assign_due DATE NOT NULL DEFAULT "0000-00-00",			
 			PRIMARY KEY  (id) )';

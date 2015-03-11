@@ -3,7 +3,8 @@
         defaults: {
             firstname: 'john',
             lastname: 'doe',
-            selected: false
+            selected: false,
+            user_login: null
         },
         url: function(){
         	if(this.get('id')){

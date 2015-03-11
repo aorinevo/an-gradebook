@@ -8,6 +8,8 @@
             gbid: null,
             sorted: '',
             visibility: true,
+           // assign_visibility: 'Student',            
+            publish: true,
             selected: false
         },
         url: function(){

@@ -1,11 +1,9 @@
 (function($,my){
 	AN.Views.StudentStatisticsView = AN.Views.Base.extend({
-		id: 'stats-student-container-container',
+ 		id: 'base-modal',
+    	className: 'modal fade',
         events: {
-            'click button#stats-student-close': 'editCancel',
-            'click a#an-piechart': 'displayPieChart',
-            'click a#an-linechart': 'displayLineChart',            
-            'click a.media-modal-close' : 'editCancel'
+            'hidden.bs.modal' : 'editCancel',  
         },		
 		initialize: function(){	   
             var student = AN.GlobalVars.students.findWhere({
@@ -15,11 +13,9 @@
             return this;   		   
 		},		
 		displayLineChart: function(){
-			$('.media-router').children().removeClass('active');
-			$('#an-piechart').addClass('active');
             var student = this.model;		
 			$.get(ajaxurl, { 
-						action: 'get_line_chart',
+						action: 'get_line_chart_studentview',
 						uid : this.model.get('id'),
 						gbid : this.model.get('gbid')
 					},
@@ -41,10 +37,11 @@
             });
             self.$el.html(template);             
             this.displayLineChart();                                            
-            this.$el.append('<div class="media-modal-backdrop"></div>');           
+			this.$el.modal('show');        
             return this;
         },
         editCancel: function() {
+			this.$el.data('modal', null);           
             this.remove();            
             return false;
         }

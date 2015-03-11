@@ -2,13 +2,13 @@
 Contributors: anevo, jamarparris
 Donate link: 
 Tags: GradeBook, Course Management, Education, Grades
-Requires at least: 3.3
-Tested up to: 4.0.1
-Stable tag: 3.0
+Requires at least: 3.5
+Tested up to: 4.1.1
+Stable tag: 3.5.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-A simple gradebook built on backbone, underscore, jQuery, JS, mySQL, and php.
+AN_GradeBook allows educators to create, maintain, and share grades quickly and efficiently. 
 
 == Description == 
 
@@ -22,13 +22,13 @@ Administrators are able to
 
 *Username*
 
-Students added through the plugin, who are not already in the database, will have the user_login set to the first initial of their first name concatenated with their last name and user_id number; all characters must be entered in lowercase. 
+Students added through the plugin, who are not already in the database, will have the user_login set to the first initial of their first name concatenated with their last name and a string of digits; all characters must be entered in lowercase. 
 
 *Password*
 
 The password will be set to *password*.
 
-*Note: If students are added using their user_id, then their username and password remains unchanged, provided that the respective information exists in the database.*
+*Note: If students are added using their user_login, then their username and password remains unchanged, provided that the respective information exists in the database.*
 
 Students are able to:
 
@@ -48,18 +48,68 @@ Students are able to:
 
 == Screenshots ==
 
-1. GradeBook with two courses.
+1. GradeBook with a few courses.
 2. GradeBook with a course selected and corresponding students displayed.
 3. Line chart for a particular student.
 4. Pie chart for a particular assignment.
-5. Create assignment modal.
+5. Add course modal.
 6. Student view of GradeBook.
+7. Student view of assignment details.
 
 == Credits ==
 
 * plugin icon: https://www.iconfinder.com/icons/175285/edit_property_icon#size=256
 
 == Changelog ==
+
+Version 3.5.4:
+
+* New Feature: Choose which assignments are visible to your students by selecting the Students option in the edit assignment modal.
+
+Version 3.5.3:
+
+* Update and clean forms.
+* Bug fix: Adding a student to an already filtered gradebook caused hidden assignment cells for that student to appear.
+* Download cvs filename is derived from the course name and id.  For example, a Calculus I course with ID 19 will have the exported csv stored in a file named Calculus_I_19.csv
+
+
+Version 3.5.2:
+
+* Added details view on student side of the gradebook.  In particular, students can now view due dates.
+
+Version 3.5.1:
+
+* Fixed bug on student view where the gradebook would not display.
+
+Version 3.5:
+
+* The delete student modal was still rendered using old styling.  This was updated to the new styling.
+* Added dropdown tools menu for courses, similar to the one for students.  This allowed us to remove the edit and delete buttons from the top of the GradeBook page.
+* Fixed styling conflict both on the student view and instructor view with wordpress #adminmenuback.  
+* Added background-color: white to tables.
+* New Feature: Export GradeBook to CSV.
+
+Version 3.4:
+
+* Added support for server requests of type x-http-method-override.
+* Restyled using Bootstrap.
+
+Version 3.3:
+
+* Instructors now can add existing users in their WordPress database to the GradeBook by entering the user_login instead of the confusing and difficult to find user_id.  If the user_login exists in the database, the user is added to the GradeBook.  Otherwise, nothing happens.
+
+Version 3.2:
+
+* This update is mostly for the student view of grade-book.  
+* Code maintenance: Split up Gradebook_student.js into models and views.
+
+Version 3.1:
+
+* Code maintenance: Split up GradeBook.php into classes.
+* Code maintenance: Removed unnecessary lines of code such as redundant wp_enqueue_script calls.
+* Bug Fix: user_login was incorrectly set to the users second initial of their first name, lastname, and user_id concatenated together, in lowercase.
+* Due to the bug fix, we removed the ID column of the gradebook and replaced it with a Login column.  This is the login name the user must use to log in.  The password is still set to password.
+* Added a student menu button that handles edit, delete, and statistics views.
 
 Version 3.0:
 
@@ -244,14 +294,3 @@ Version 1.3.1:
 Version 1.3: 
 
 * Bug fix: Not enough of the jquery libraries were being loaded preventing users from adding courses, adding students, etc...
-
-== Upgrade notice ==
-
-This version is not backwards compatible. You will not have access to gradebooks created in previous versions.
-
-
-
-
-== Disclaimer ==
-
-GradeBook is still in development.  Version 2.4.7 is still a beta release.
