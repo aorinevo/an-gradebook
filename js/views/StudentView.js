@@ -78,7 +78,7 @@
         },
         studentStatistics: function(ev){
         	ev.preventDefault();    
-            var view = new AN.Views.StudentStatisticsView({ model: this.model});          
+            var view = new AN.Views.StatisticsView({ model: this.model});          
         },
         editStudent: function(ev){
         	ev.preventDefault();    

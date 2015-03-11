@@ -118,7 +118,7 @@
             var view = new AN.Views.AssignmentStatisticsView({model: this.model}); 		
         }, 
         editAssignment: function(ev) {
-        	ev.preventDefault();              
+        	ev.preventDefault();                	      
             var view = new AN.Views.EditAssignmentView({model: this.model});           
         },               
         deleteAssignment: function(ev) {

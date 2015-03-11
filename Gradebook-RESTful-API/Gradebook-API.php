@@ -186,8 +186,13 @@ class AN_GradeBookAPI{
 		global $wpdb;
 		$uid = get_current_user_id();
 		$gbid = $_GET['gbid'];
-		$line_chart_data1 = $wpdb->get_results('SELECT * FROM an_assignment WHERE uid = '. $uid .' AND gbid = '. $gbid,ARRAY_A);	
-		$line_chart_data2 = $wpdb->get_results('SELECT * FROM an_assignments WHERE gbid = '. $gbid,ARRAY_A);
+		$line_chart_data2 = $wpdb->get_results('SELECT * FROM an_assignments WHERE assign_visibility = "Students" AND gbid = '. $gbid,ARRAY_A);  	
+    	$assignmentIDsformated ='';
+    	foreach($line_chart_data2 as &$assignment){
+    	    $assignmentIDsformated = $assignmentIDsformated. $assignment['id'] . ',';
+    	}
+    	$assignmentIDsformated = substr($assignmentIDsformated, 0, -1);		
+		$line_chart_data1 = $wpdb->get_results('SELECT * FROM an_assignment WHERE amid IN ('.$assignmentIDsformated.') AND uid = '. $uid,ARRAY_A);			
 	
 		foreach($line_chart_data1 as &$line_chart_value1){
 			$line_chart_value1['assign_order']= intval($line_chart_value1['assign_order']);		
@@ -281,13 +286,18 @@ class AN_GradeBookAPI{
 		global $wpdb;
 		$gbid = $_GET['gbid']; 	
 	   	$current_user = wp_get_current_user();		
-		$assignments = $wpdb->get_results('SELECT * FROM an_assignments WHERE gbid = '. $gbid, ARRAY_A);
+		$assignments = $wpdb->get_results('SELECT * FROM an_assignments WHERE assign_visibility = "Students" AND gbid = '. $gbid, ARRAY_A);
 	    foreach($assignments as &$assignment){
     		$assignment['id'] = intval($assignment['id']);
     		$assignment['gbid'] = intval($assignment['gbid']);    	
 	    	$assignment['assign_order'] = intval($assignment['assign_order']);       	
     	}	   	
-		$student_assignments = $wpdb->get_results('SELECT * FROM an_assignment WHERE gbid = '. $gbid .' AND uid = '. $current_user->ID , ARRAY_A);    	
+    	$assignmentIDsformated ='';
+    	foreach($assignments as &$assignment){
+    	    $assignmentIDsformated = $assignmentIDsformated. $assignment['id'] . ',';
+    	}
+    	$assignmentIDsformated = substr($assignmentIDsformated, 0, -1);
+		$student_assignments = $wpdb->get_results('SELECT * FROM an_assignment WHERE amid IN ('.$assignmentIDsformated.') AND uid = '. $current_user->ID , ARRAY_A);    			
     	foreach($student_assignments as &$student_assignment){
 	    	$student_assignment['gbid'] = intval($student_assignment['gbid']);
     	}		

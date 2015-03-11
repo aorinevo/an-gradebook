@@ -63,7 +63,7 @@ class gradebook_assignment_API{
 	  		case 'PUT' :
 	  			$params = json_decode(file_get_contents('php://input'),true);	
    				$wpdb->update('an_assignments', array( 'assign_name' => $params['assign_name'], 'assign_date' => $params['assign_date'],
-   					'assign_due' => $params['assign_due'], 'assign_order'=>$params['assign_order'], 'assign_category' => $params['assign_category']), array('id' => $params['id'] )
+   					'assign_due' => $params['assign_due'], 'assign_order'=>$params['assign_order'], 'assign_category' => $params['assign_category'], 'assign_visibility' => $params['assign_visibility_options']), array('id' => $params['id'] )
    				);   
    				$wpdb->update('an_assignment', array( 'assign_order' => $params['assign_order']), array('amid' => $params['id'] )
    				);     				
@@ -95,9 +95,10 @@ class gradebook_assignment_API{
 					'assign_date' => $params['assign_date'],					
 					'assign_due' => $params['assign_due'],					
 					'assign_category' => $params['assign_category'],						
+					'assign_visibility' => $params['assign_visibility_options'],						
 					'gbid' => $params['gbid'],
 					'assign_order'=> $assignOrder
-				), array( '%s','%s','%s','%s','%d','%d') 
+				), array( '%s','%s','%s','%s','%s','%d','%d') 
 				);
 				$assignID = $wpdb->insert_id;
 			    $studentIDs = $wpdb->get_results('SELECT uid FROM an_gradebook WHERE gbid = '. $params['gbid'], ARRAY_N);

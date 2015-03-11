@@ -10,7 +10,7 @@
          			<input type="hidden" name="action" value="delete_student"/>
 				    <input type="hidden" name="id" value="<%= student ? student.get('id') : '' %>"/> 
 				    <div class="form-group">
-				    	<label for="delete_options" class="col-sm-3 form-label">Delete from:</label>
+				    	<label for="delete_options" class="col-sm-3 control-label">Delete from:</label>
 				    	<div class="col-sm-7">
 							<select class="form-control" id="delete_options" name="delete_options">
 								<option value="gradebook">this gradebook only.</option>

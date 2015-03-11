@@ -27,12 +27,21 @@
 					    </div>    
 					</div>
 					<div class="form-group">					
-				        <label for="assign_category" class="col-sm-4 control-label">Assignment Category:</label>
+				        <label for="assign_category" class="col-sm-4 control-label">Category:</label>
 						<div class="col-sm-6">				        
 				        	<input type="text" id="assign_category" class="form-control" name="assign_category" value="<%= assignment ? assignment.get('assign_category') : '' %>"/>		        
 				        </div>	
-				        <input type="hidden" name="gbid" value="<%= gradebook.get('id')%>"/>
-					</div>					
+					</div>	
+				    <div class="form-group">
+				    	<label for="assign_visibility_options" class="col-sm-4 control-label">Visibility:</label>
+				    	<div class="col-sm-6">
+							<select class="form-control" id="assign_visibility_options" name="assign_visibility_options">
+								<option value="Students">Students</option>
+								<option value="Instructor">Instructor</option>
+							</select>					
+ 						</div>	 						
+ 					</div>	
+					<input type="hidden" name="gbid" value="<%= gradebook.get('id') %>"/>	 											
     			</form>    		
 				<div>
 					<%= assignment ? 'Update assignment ' + assignment.get('id') + ' from course ' + gradebook.get('id')  : 'Add to course ' + gradebook.get('id') %>?            			

@@ -20,7 +20,6 @@
             return this;
         },
         render: function() {
-            var self = this;
             var assignment = this.model;
             if(this.model){
                 var gradebook = AN.GlobalVars.courses.findWhere({id : this.model.get('gbid')+""});            
@@ -32,20 +31,20 @@
                     assignment: assignment,
                     gradebook: gradebook
                 });
-                self.$el.html(template);             
+                this.$el.html(template);             
             } else {
                 var template = _.template($('#edit-assignment-template').html(), {
                     assignment: null,
                     gradebook: gradebook
                 });
-                self.$el.html(template);
+                this.$el.html(template);
             }     
 			this.$el.modal('show');
+			var self = this;
 			_.defer(function(){
 				this.inputName = self.$('input[name="assign_name"]');
 				var strLength= inputName.val().length;
-				//inputName.focus();				
-				//inputName[0].setSelectionRange(strLength, strLength);
+				$("#assign_visibility_options option[value='" + self.model.get('assign_visibility') + "']").attr("selected", "selected");
 			});    			    		              
             return this;
         },   
@@ -59,7 +58,7 @@
             this.remove();
             return false;
         },
-        submitForm: function(){        	
+        submitForm: function(){   
           $('#edit-assignment-form').submit();
         },
         editSave: function(ev) {
@@ -68,7 +67,7 @@
 			var x = $(ev.currentTarget).serializeObject().id;           
             var toadd = AN.GlobalVars.assignments.findWhere({id : parseInt(x)});
             if(toadd){
-            	toadd.save(assignmentInformation,{wait: true});
+            	toadd.save(assignmentInformation,{wait: true});          	
             } else {
              	delete(assignmentInformation['id']);
             	var toadds = new AN.Models.Assignment(assignmentInformation);

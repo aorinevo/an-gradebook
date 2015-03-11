@@ -21,7 +21,6 @@
            	x = _.sortBy(x,function(model){ return model.get('assign_order');});        	
             var self = this;
             _.each(x, function(cell) {
-            	console.log(cell);
                 var view = new AN.Views.StudentCellView({
                     model: cell
                 });
