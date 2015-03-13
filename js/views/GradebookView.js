@@ -81,7 +81,7 @@
                 		$('#students-header tr').append(view.render().el);
             		});
             		break;
-            	case 'lastname':      		
+            	case 'lastname':             	    		
             		_.each(this.sort_column.models, function(student) {
                 		var view = new AN.Views.StudentView({
                     		model: AN.GlobalVars.students.get(student.get('id'))

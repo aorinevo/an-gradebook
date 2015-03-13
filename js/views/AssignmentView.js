@@ -30,19 +30,6 @@
         	this.$el.removeClass('hover');	
         	this.model.set({hover: false});	
         },     
-        /*
-        togglePublish: function(ev){
-        	ev.preventDefault();
-        	if(this.model.get('publish')){
-        		this.model.set({publish : false});
-        		this.$('li.assign-submenu-publish a').html('Publish');
-        	} else {
-        		this.model.set({publish : true});        	
-        		this.$('li.assign-submenu-publish a').html('Private');
-        	}
-        	return this;
-        },   
-        */
         shiftAssignmentLeft: function(ev){
         	ev.preventDefault();          
         	var x = AN.GlobalVars.assignments.findWhere({assign_order: this.model.get('assign_order')-1});
@@ -81,10 +68,8 @@
         },
         sortColumn: function(ev){
         	ev.preventDefault();  
-        	var y = AN.GlobalVars.assignments.findWhere({selected: true});
-        	y && y.set({selected: false});
             if (this.model.get('sorted')) {
-            	if (this.model.get('sorted')=== 'desc') {
+            	if (this.model.get('sorted') === 'desc') {
                 	this.model.set({sorted: 'asc'});
             	} else {
                 	this.model.set({sorted: 'desc'});            

@@ -21,7 +21,7 @@
     
     <hr/>
     <div>
-    <table id="an-gradebook-container" class="table table-bordered table-stripped">  
+    <table id="an-gradebook-container" class="table table-bordered table-striped">  
     <thead id="students-header">
       <tr>
         <th></th><th><div><span>First Name</span></div></th><th>Last Name</th><th>Login</th>
