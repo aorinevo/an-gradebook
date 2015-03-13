@@ -1,9 +1,9 @@
 (function($,AN){
 	AN.Views.DeleteStudentView = AN.Views.Base.extend({
-        id: 'delete-student-form-container-container',
+ 		id: 'base-modal',
+    	className: 'modal fade',
         events: {
-            'click button#delete-student-cancel': 'deleteCancel',
-            'click a.media-modal-close' : 'deleteCancel', 
+            'hidden.bs.modal' : 'deleteCancel',         
 			'keyup'  : 'keyPressHandler',                            
             'click #delete-student-delete': 'submitForm',            
             'submit #delete-student-form': 'deleteSave'
@@ -25,7 +25,7 @@
                 });
                 self.$el.html(template);
             }
-            this.$el.append('<div class="media-modal-backdrop"></div>');                                              
+            this.$el.modal('show');
             return this;
         },  
  		keyPressHandler: function(e) {
@@ -34,6 +34,7 @@
             return this;
         },                  
         deleteCancel: function() {
+			this.$el.data('modal', null);          
             this.remove();           
             return false;
         },
@@ -42,14 +43,15 @@
         },        
         deleteSave: function(ev) {
         	ev.preventDefault();
+        	var self = this;
             var studentInformation = $(ev.currentTarget).serializeObject();
 			var x = studentInformation.id;
             var todel = this.model;
             todel.set({delete_options: studentInformation.delete_options});
             var self = this;
-			todel.destroy({success: function (model,response){
-				self.remove();                               		        		
-        	}});           
+			todel.destroy({success: function (model,response){			                          		        				
+				self.$el.modal('hide'); 
+        	}});             		        	
         }
     });
 })(jQuery, AN || {});

@@ -1,20 +1,16 @@
 (function($, AN){
 	AN.Views.AssignmentStatisticsView = AN.Views.Base.extend({
-		id: 'stats-assignment-container-container',
-        events: {
-            'click button#stats-assignment-close': 'editCancel',
-            'click a#an-piechart': 'displayPieChart',
-            'click a#an-linechart': 'displayLineChart',     
-			'keyup'  : 'keyPressHandler',                    
-            'click a.media-modal-close' : 'editCancel'
+ 		id: 'base-modal',
+    	className: 'modal fade',
+        events: { 
+            'hidden.bs.modal' : 'editCancel',               
+			'keyup'  : 'keyPressHandler'
         },		
 		initialize: function(){	        
             $('body').append(this.render().el);
             return this;   		   
 		},		
 		displayPieChart: function(){
-			$('.media-router').children().removeClass('active');
-			$('#an-piechart').addClass('active');
             var assignment = this.model;	
 			$.get(ajaxurl, { 
 						action: 'get_pie_chart',
@@ -36,10 +32,11 @@
             });
             self.$el.html(template);             
             this.displayPieChart();                                            
-            this.$el.append('<div class="media-modal-backdrop"></div>');           
+			this.$el.modal('show');       
             return this;
         },
         editCancel: function() {
+			this.$el.data('modal', null);         
             this.remove();            
             return false;
         },

@@ -7,15 +7,12 @@
             year: '2014',
             selected: false
         },
-        url: function(){        	
+        url: function(){
         	if(this.get('id')){
         		return ajaxurl + '?action=course&id='+this.get('id');
-        	} else{
+        	} else {
         		return ajaxurl + '?action=course';
         	}
-        },
-        export2csv: function(){
-        	window.location.assign(ajaxurl + '?action=get_csv&id='+this.get('id'));
         }
 	});
 })(AN || {});

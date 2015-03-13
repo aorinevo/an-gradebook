@@ -1,5 +1,5 @@
 (function($,my){
-	AN.Views.StudentStatisticsView = AN.Views.Base.extend({
+	AN.Views.StatisticsView = AN.Views.Base.extend({
  		id: 'base-modal',
     	className: 'modal fade',
         events: {
@@ -15,7 +15,7 @@
 		displayLineChart: function(){
             var student = this.model;		
 			$.get(ajaxurl, { 
-						action: 'get_line_chart_studentview',
+						action: 'get_line_chart',
 						uid : this.model.get('id'),
 						gbid : this.model.get('gbid')
 					},

@@ -1,3 +1,25 @@
+.modal {
+   z-index: 999999;
+}
+
+.table{
+  background-color: white;
+}
+
+#adminmenuback {
+	z-index: 1;
+}
+
+
+body {
+  background-color: #f1f1f1;
+}
+
+.student-tools, .assignment-tools { 
+	overflow: visible; 
+}
+
+
 #chart-container{
 	text-align: center;
 }
@@ -17,6 +39,7 @@ td.course{
 	margin-right:auto;
 }
 
+
 #an-gradebooks #courses-interface-buttons-container{
   text-align: center;
 }
@@ -33,10 +56,6 @@ td.course{
 }
 
 
-form, input {
-  display: block;
-}
-
 #students .selected td, 
 #students .selected th,
 #students .selected, #courses .selected td{
@@ -45,6 +64,8 @@ form, input {
 
 #students-header tr th{
 	cursor: default;
+	min-width: 75px !important;
+	max-width: 135px !important;	
 }
 
 #courses tr.selected > td:first-child{
@@ -75,11 +96,6 @@ form, input {
   background-color: #f7fcfe !important;
 }
 
-
-#students tr:nth-of-type(odd), #courses tr:nth-of-type(odd) {
-	background-color: #f9f9f9;
-}
-
 #students td.editing .view {
     display: none;
 }
@@ -100,17 +116,9 @@ form, input {
 	padding-left: 0px;
 	padding-bottom: 0px;
 	padding-top: 0px;
-  width: 60%;
+  	width: 60%;
 }
 
-#students-header .column-sort {
-	display: inline-block;
-	cursor: pointer;	
-	padding-right:0px;
-	padding-left: 0px;
-	padding-bottom: 0px;
-	padding-top: 0px;	
-}
 
 #students td .edit {
 	display: none;
@@ -122,23 +130,6 @@ form, input {
     display: block;
 }
 
-#edit-assignment-form, #edit-student-form, #edit-course-form, #filter-assignments-form{
-	padding: 10px;
-}
-
-th div[id^="column-assign-id"]{
-	position:absolute;
-	display: none;
-	background-color: white;
-}
-
-th div[id^="column-assign-id"] li{
-	cursor: pointer;
-}
-
-th div[id^="column-assign-id"] li:hover{
-	background-color: #f7fcfe;
-}
 
 /*! jQuery UI - v1.10.4 - 2014-02-13
 * http://jqueryui.com
