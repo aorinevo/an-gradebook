@@ -6,9 +6,8 @@ class AN_GradeBook_Scripts{
 			add_action('admin_enqueue_scripts', array($this,'enqueue_gradebook_scripts'));		
 	}
 	public function register_gradebook_scripts(){
-		wp_register_style( 'GradeBook_css', plugins_url('GradeBook.css',__File__), array('media-views'), null, false );
-		wp_register_style( 'bootstrap_css', plugins_url('js/packages/bootstrap/css/bootstrap.min.css',__File__), array(), null, false );		
-		//wp_register_style( 'list-tables', plugins_url('list-tables.css',__File__), array(), null, false );		
+		wp_register_style( 'GradeBook_css', plugins_url('GradeBook.css',__File__), array('bootstrap_css'), null, false );
+		wp_register_style( 'bootstrap_css', plugins_url('js/packages/bootstrap/css/bootstrap.min.css',__File__), array(), null, false );				
 		wp_register_script('googlejsapi', 'https://www.google.com/jsapi', array(), null, false ); 
 	//models
 		wp_register_script( 'models/Cell', plugins_url('js/models/Cell.js',__File__),array( 'js/init_app','jquery','backbone','underscore' ), null, true );		

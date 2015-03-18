@@ -1,10 +1,9 @@
 === AN_GradeBook ===
 Contributors: anevo, jamarparris
-Donate link: 
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.5
 Tested up to: 4.1.1
-Stable tag: 3.5.4
+Stable tag: 3.5.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,6 +60,11 @@ Students are able to:
 * plugin icon: https://www.iconfinder.com/icons/175285/edit_property_icon#size=256
 
 == Changelog ==
+
+Version 3.5.5:
+
+* Bug fix: Sort on first assignment column broken.
+* General file management.
 
 Version 3.5.4:
 
