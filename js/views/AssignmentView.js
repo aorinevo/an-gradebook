@@ -8,7 +8,12 @@
             'click li.assign-submenu-delete' : 'deleteAssignment',
             'click li.assign-submenu-edit' : 'editAssignment',         
             'click li.assign-submenu-left' : 'shiftAssignmentLeft',              
+<<<<<<< HEAD
             'click li.assign-submenu-right' : 'shiftAssignmentRight',                         
+=======
+            'click li.assign-submenu-right' : 'shiftAssignmentRight',               
+            //'click li.assign-submenu-publish' : 'togglePublish',             
+>>>>>>> 9e135805a3f695c7bd95e7d1a2a630c2d034cf04
             'click li.assign-submenu-stats' : 'statsAssignment',            
             'mouseenter div.column-frame' : 'mouseEnter',
             'mouseleave div.column-frame' : 'mouseLeave'

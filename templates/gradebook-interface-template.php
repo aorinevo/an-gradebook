@@ -1,10 +1,6 @@
 <script id="gradebook-interface-template" type="text/template">
     <hr/>   
 	<div>  
-    	<ol class="breadcrumb">
-			<li><a href="#">Courses</a></li>
-			<li class="active">Gradebook</li>
-		</ol>
     	<ul id="gradebook-interface-buttons-container">
     		<li><button type="button" id="add-student" class="btn btn-default">Add Student</button></li>
 	    	<li><button type="button" id="add-assignment" class="btn btn-default">Add Assignment</button></li>
