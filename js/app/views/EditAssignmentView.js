@@ -10,12 +10,9 @@ function($,Backbone,_,Assignment){
             'submit #edit-assignment-form': 'editSave'
         },
         initialize: function(options){  
-        	console.log(options);
-			this.options = options.options;
-			console.log(this.options);			
+			this.options = options.options;		
            	_(this).extend(this.options.gradebook_state);            	               
            	this.course = this.courses.findWhere({'selected': true});
-           	console.log(this.model);
            	this.assignment = this.model || null;           	
             $('body').append(this.render().el);
             $('#assign-date-datepicker, #assign-due-datepicker').datepicker();

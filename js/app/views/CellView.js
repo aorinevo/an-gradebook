@@ -8,9 +8,7 @@ function($,Backbone,_){
             "blur .edit": "hideInput"
         },
         initialize: function(options) { 
-        	console.log(options);
 			this.options = options.options;
-			console.log(this.options);
            	_(this).extend(this.options.gradebook_state);   
             this.course = this.courses.findWhere({'selected': true});                  
             this.listenTo(this.assignments, 'change:hover', this.hoverCell);            
@@ -24,8 +22,6 @@ function($,Backbone,_){
         },
         render: function() {
         	var self = this;
-        	console.log(this.model);
-        	console.log(this.assignments);
         	var _assignment = this.assignments.findWhere({id : this.model.get('amid')});
             if(_assignment){
             	this.$el.toggleClass('hidden', !_assignment.get('visibility'));           

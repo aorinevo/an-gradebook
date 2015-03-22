@@ -9,9 +9,7 @@ function($,Backbone,_, EditCourseView){
             'click li.course-submenu-edit' : 'editCourse'           
         },
         initialize: function(options) {
-        	console.log(options);
 			this.options = options.options;
-			console.log(this.options);
            	_(this).extend(this.options.gradebook_state);         
             this.course = this.model;           	
 			this.listenTo(this.course, 'change:name change:school change:semester change:year', this.render);

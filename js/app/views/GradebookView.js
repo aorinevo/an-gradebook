@@ -7,26 +7,18 @@ function($,Backbone,_,CourseGradebook, StudentList, AssignmentList, CellList, St
         initialize: function(options) {
             var self = this;   
             this.options = options.options;
-            console.log(this.options);
            	_(this).extend(this.options.gradebook_state);
-           	console.log(this);
            
             this.course = this.courses.findWhere({'selected': true});                        
         	this.sort_key = 'lastname'; 
 			this.sort_column = this.students; 
-			console.log('hellllllo');
 			this.courseGradebook = new CourseGradebook(this.course.attributes);	
-			console.log('hlo');				             	         	                       
-			console.log(this.courseGradebook);
             this.xhr = this.courseGradebook.fetch({
             	success: function(data){  
-            		console.log('hello23');     		
             		self.students.reset();   
 					self.cells.reset();               		            		
-					self.assignments.reset();
-					console.log(data);              		            							
+					self.assignments.reset();          		            							
                 _.each(self.courseGradebook.get('students'), function(student) {
-                	console.log('hello254');
                     self.students.add(student);
                 });
                 _.each(self.courseGradebook.get('assignments'), function(assignment) {
@@ -35,8 +27,7 @@ function($,Backbone,_,CourseGradebook, StudentList, AssignmentList, CellList, St
                 _.each(self.courseGradebook.get('cells'), function(cell) {     	
                     self.cells.add(cell);
                 });  
-                
-                console.log(self.cells);                                  
+                                                
                 self.render();
                 self.listenTo(self.courses, 'add', self.render);
                 self.listenTo(self.students, 'add', self.render);   
@@ -70,11 +61,8 @@ function($,Backbone,_,CourseGradebook, StudentList, AssignmentList, CellList, St
         },
         render: function() {
         	var self = this;
-        	console.log(this.options);
         	var course = this.course;
         	var _x = _.map(this.assignments.models, function(model){return model.get('assign_category');});
-        	console.log(_x);
-        	debugger;
          	var _assign_categories = _.without(_.uniq(_x),"") || null;                                           
 			var _y = $('#filter-assignments-select').val();	                
             var template = _.template($('#gradebook-interface-template').html());
@@ -94,8 +82,6 @@ function($,Backbone,_,CourseGradebook, StudentList, AssignmentList, CellList, St
             		});
             		y = _.sortBy(y,function(assign){ return assign.get('assign_order');});
             		_.each(y, function(assignment) {
-            			console.log(assignment);
-            			console.log('LLLLL');
                 		var view = new AssignmentView({
                     		model: assignment, options: self.options
                 	});
@@ -103,23 +89,16 @@ function($,Backbone,_,CourseGradebook, StudentList, AssignmentList, CellList, St
             		});
             		break;
             	case 'lastname':            
-            		console.log('lastname'); 
-    				console.log(this.sort_column.models);
             		_.each(this.sort_column.models, function(student) { 
-            			console.log(student);
                 		var view = new StudentView({model: student, options: self.options});
 						$('#students').append(view.render().el);              		                 
             		});             		            		  
             		var y = self.assignments.where({
                 		gbid: parseInt(this.course.get('id'))
             		});
-            		console.log(y);
             		y = _.sortBy(y,function(assign){ return assign.get('assign_order');});  
-            		console.log('hello3');	
             		_.each(y, function(assignment) {
-            			console.log('hello4');
                 		var view = new AssignmentView({model: assignment, options: self.options});
-                		console.log('hello2');
                 		$('#students-header tr').append(view.render().el);
             		}); 
             		break;             	
@@ -159,9 +138,6 @@ function($,Backbone,_,CourseGradebook, StudentList, AssignmentList, CellList, St
             var view = new EditAssignmentView({options: this.options});           
         },    
         addStudent: function(ev) {  
-        	console.log(ev);
-        	console.log('BT24');
-        	alert('hello');     
             var view = new EditStudentView({options: this.options});      
         },  
         sortByStudent: function(ev) {     		

@@ -10,9 +10,7 @@ function($,Backbone,_){
             'submit #delete-student-form': 'deleteSave'
         },
         initialize: function(options){   
-        	console.log(options);
 			this.options = options.options;
-			console.log(this.options);
            	_(this).extend(this.options.gradebook_state);             
             $('body').append(this.render().el);     	
             return this;

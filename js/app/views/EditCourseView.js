@@ -10,9 +10,7 @@ function($,Backbone,_,Course){
             'submit #edit-course-form': 'editSave'
         },
         initialize: function(options){  
-        	console.log(options);
 			this.options = options.options;
-			console.log(this.options);
            	_(this).extend(this.options.gradebook_state);     
             this.course = this.model || null;                  	        
             $('body').append(this.render().el);

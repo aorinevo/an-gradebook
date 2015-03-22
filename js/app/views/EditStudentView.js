@@ -11,21 +11,16 @@ function($,Backbone,_,Student){
             'submit #edit-student-form': 'editSave'
         },
         initialize: function(options){  
-        	console.log(options);
 			this.options = options.options;
-			console.log(this.options);
            	_(this).extend(this.options.gradebook_state);
-           	console.log(this);
             this.course = this.courses.findWhere({'selected': true});     
             this.student = this.model || null;       	      
             $('body').append(this.render().el);     	
             return this;
         },        
         render: function() {
-		    var self = this; 
-		    console.log(this.model);       
+		    var self = this;     
             var gradebook = this.course;
-            console.log(this.student);
             var template = _.template($('#edit-student-template').html());
             var compiled = template({student: this.student, gradebook: gradebook});                
             self.$el.html(compiled);  
@@ -67,12 +62,8 @@ function($,Backbone,_,Student){
         },        
         editSave: function(ev) {
         	var self = this;
-        	console.log(ev);
             var studentInformation = $(ev.currentTarget).serializeObject();
-            console.log(studentInformation);
-            console.log(this.student);
             if(this.student){
-            	console.log('RAWR');
             	studentInformation.id = parseInt(studentInformation.id);
             	this.student.save(studentInformation,{wait: true});
 				this.$el.modal('hide');              	

@@ -11,8 +11,6 @@
 				<select name="filter_option" id="filter-assignments-select" class="form-control">
         			<option value="-1">Show all</option>						
         			<% 
-						console.log(assign_categories);
-						debugger;
         				if( assign_categories){
 	 						for (var i in assign_categories){
  								print('<option value='+assign_categories[i]+'>'+assign_categories[i]+'</option>');

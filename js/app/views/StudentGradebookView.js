@@ -15,7 +15,6 @@
                     AN.GlobalVars.assignments.add(assignment);
                 }); 
                 _.each(AN.GlobalVars.courseGradebook.get('cells'), function(cell) {     	
-                	//console.log(cell);
                     AN.GlobalVars.cells.add(cell);
                 });                                       
                 self.render();                                                       	            		
@@ -59,7 +58,6 @@
             		});
             		break;
             	case 'lastname':     
-				//console.log(AN.GlobalVars.students);
             		_.each(this.sort_column.models, function(student) {
                 		var view = new AN.Views.StudentStudentView({
                     		model: AN.GlobalVars.students.get(student.get('id'))

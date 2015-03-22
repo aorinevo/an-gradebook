@@ -14,10 +14,8 @@ var App = Backbone.View.extend({
 			this.assignments = new AssignmentList([]); 
 			this.options = options || {};               			 	
 			this.options.gradebook_state = { courses: this.courses, students: this.students, assignments: this.assignments, cells: this.cells };			
-            this.courses.fetch();      
-            console.log(this.options);                  
+            this.courses.fetch();                       
             this.listenTo(this.courses, 'change:selected', this.showGradebook);
-            console.log(this.courses);
             this.listenTo(this.courses, 'add', this.addCourse);
             return this;
         },
@@ -26,8 +24,7 @@ var App = Backbone.View.extend({
             this.$el.html(template);
             return this;        
         },
-        showGradebook: function(course) { 
-        	console.log(course);       
+        showGradebook: function(course) {      
 			if (course.get('selected')===true){
                 var gradebook = new GradebookView({options: this.options});          
             } 
@@ -40,7 +37,6 @@ var App = Backbone.View.extend({
             	x.set({selected: false});
             	}
             }       
-            console.log(this.courses);
             var view = new EditCourseView({options: this.options});
             return false;
         },

@@ -16,14 +16,9 @@ function($,Backbone,_,StatisticsView,EditStudentView,DeleteStudentView, CellView
         initialize: function(options) {
         	var self = this;
 			this.options = options.options;
-			console.log(this.options);
            	_(this).extend(this.options.gradebook_state);
-           	console.log(this);
             this.course = this.courses.findWhere({'selected': true});    
-        	console.log('hello5');
-        	console.log(this.model);
 			this.listenTo(this.model, 'change:firstname change:lastname', this.render);      
-			console.log('hello6');      
            	this.listenTo(this.model, 'change:selected', this.selectAllStudents);			
             this.listenTo(self.students, 'add remove', this.close);
             this.listenTo(self.assignments, 'add remove change:sorted change:assign_order', this.close);            
@@ -31,13 +26,9 @@ function($,Backbone,_,StatisticsView,EditStudentView,DeleteStudentView, CellView
             
         },    
         render: function() {
-        	console.log('hello4');
             var template = _.template($('#student-view-template').html()); 
-            console.log(this.model);
             var compiled = template({student: this.model});
             this.$el.html(compiled);     
-            console.log(this.$el.html());
-            console.log(this.model);
             var gbid = parseInt(this.courses.findWhere({selected: true}).get('id')); //anq: why is this not already an integer??
             var x = this.cells.where({
             	uid: parseInt(this.model.get('id')),		//anq: why is this not already an integer??
@@ -89,7 +80,7 @@ function($,Backbone,_,StatisticsView,EditStudentView,DeleteStudentView, CellView
         },
         studentStatistics: function(ev){
         	ev.preventDefault();    
-            var view = new StatisticsView({ model: this.model});          
+            var view = new StatisticsView({model: this.model, options: this.options});          
         },
         editStudent: function(ev){        	
         	ev.preventDefault();    

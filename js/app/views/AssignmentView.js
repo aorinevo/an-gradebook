@@ -1,4 +1,4 @@
-define(['jquery','backbone','underscore','views/AssignmentStatisticsView','views/EditAssignmentView'],
+define(['jquery','backbone','underscore','views/AssignmentStatisticsView','views/EditAssignmentView','jquery-ui'],
 function($,Backbone,_,AssignmentStatisticsView, EditAssignmentView){
 	var AssignmentView = Backbone.View.extend({
         tagName: 'th',
@@ -16,15 +16,10 @@ function($,Backbone,_,AssignmentStatisticsView, EditAssignmentView){
             'mouseleave div.column-frame' : 'mouseLeave'
         },
         initialize: function(options) {
-        	console.log(options);
 			this.options = options.options;
-			console.log(this.options);
            	_(this).extend(this.options.gradebook_state);   
             this.course = this.courses.findWhere({'selected': true}); 
-            console.log(this.course);
-            console.log(this.course.get('id'));
             this.assignment = this.model;
-            console.log(this.assignment);
            	this.render();            	   
 			this.listenTo(this.assignment, 'change:assign_name', this.render);         
             this.listenTo(this.assignment, 'change:sorted', this.sortColumnCSS);
@@ -112,7 +107,7 @@ function($,Backbone,_,AssignmentStatisticsView, EditAssignmentView){
         },
         statsAssignment: function(ev){
         	ev.preventDefault();  
-            var view = new AssignmentStatisticsView({options: this.options});           
+            var view = new AssignmentStatisticsView({model: this.assignment, options: this.options});           
         }, 
         editAssignment: function(ev) {
         	ev.preventDefault();                	      

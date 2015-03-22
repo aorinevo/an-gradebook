@@ -38,7 +38,7 @@ function enqueue_an_gradebook_scripts($hook){
 	wp_register_style( 'jquery_ui_css', $app_base.'/jquery-ui/jquery-ui.css', array(), null, false );	
 	wp_register_style( 'GradeBook_css', plugins_url('GradeBook.css',__File__), array('bootstrap_css','jquery_ui_css'), null, false );				
 	wp_register_style( 'bootstrap_css', $app_base.'/bootstrap/css/bootstrap.css', array(), null, false);	
-	wp_register_script( 'requirejs', $app_base.'/../require.js', array(), null, false);					
+	wp_register_script( 'requirejs', $app_base.'/../require.js', array(), null, true);					
 	if( $hook == "toplevel_page_an_gradebook" ){					
 		wp_enqueue_style('GradeBook_css');					
 		wp_enqueue_script('requirejs');			

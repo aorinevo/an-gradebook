@@ -1,4 +1,4 @@
-define(['jquery','backbone','underscore'],
+define(['jquery','backbone','underscore','goog!visualization,1,packages:[corechart]'],
 function($,Backbone,_){
 	var StatisticsView = Backbone.View.extend({
  		id: 'base-modal',
@@ -6,15 +6,32 @@ function($,Backbone,_){
         events: {
             'hidden.bs.modal' : 'editCancel',  
         },		
-		initialize: function(){	   
-            var student = AN.GlobalVars.students.findWhere({
-                selected: true
-            });      
+		initialize: function(options){	
+			google.load('visualization', '1.0', {'packages':['corechart']});  
+			this.options = options.options;
+           	_(this).extend(this.options.gradebook_state);   		
+            this.student = this.students.findWhere({selected: true});      
             $('body').append(this.render().el);
             return this;   		   
 		},		
-		displayLineChart: function(){
-            var student = this.model;		
+		drawLineChart: function(data) {
+			var data = google.visualization.arrayToDataTable(data);
+
+        	var options = {
+				'title': 'Student Grades vs. Class Average',
+          		'width': '700',
+		  		'height': '300',          
+          		'vAxis': {
+          	 		maxValue : 100,
+	          	 	minValue : 0
+    	      	}
+        	};
+
+        	var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+       		chart.draw(data, options);
+		}, 				
+		displayLineChart: function(){	
+			var self = this;	
 			$.get(ajaxurl, { 
 						action: 'get_line_chart',
 						uid : this.model.get('id'),
@@ -24,7 +41,7 @@ function($,Backbone,_){
 						if( data.length === 1 ){
 							$('.media-frame-content').html('<div style="padding: 10px;"> There is no content to display </div>');
 						} else {
-							drawLineChart(data);							
+							self.drawLineChart(data);							
 						}
 					}, 
 					'json');    	
@@ -32,9 +49,8 @@ function($,Backbone,_){
 		},	
         render: function() {
             var self = this;
-            var student = this.model;
             var template = _.template($('#stats-student-template').html(), {
-                    student: student
+                    student: self.student
             });
             self.$el.html(template);             
             this.displayLineChart();                                            

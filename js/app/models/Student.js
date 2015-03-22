@@ -7,7 +7,6 @@ define(['backbone'],function(Backbone){
             user_login: null
         },
         url: function(){
-        	console.log('ajaxing');
         	if(this.get('id')){
         		return ajaxurl + '?action=student&id='+this.get('id')+'&gbid='+this.get('gbid')+'&delete_options='+this.get('delete_options');
         	} else {
