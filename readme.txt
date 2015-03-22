@@ -3,7 +3,7 @@ Contributors: anevo, jamarparris
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.5
 Tested up to: 4.1.1
-Stable tag: 3.5.5
+Stable tag: 3.5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,6 +60,12 @@ Students are able to:
 * plugin icon: https://www.iconfinder.com/icons/175285/edit_property_icon#size=256
 
 == Changelog ==
+
+Version 3.5.6:
+
+* Database upgrade: Users no longer in the database are removed from gradebooks. Deleting users through the Users tab, removes students from gradebooks.
+* Use RequireJS to manage file loading for almost the entire app.  A couple of js files have to be loaded through php.  In particular, the css files for bootstrap and jquery-ui, the require.js file, and the dependent file app.js.
+
 
 Version 3.5.5:
 

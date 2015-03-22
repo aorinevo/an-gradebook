@@ -1,6 +1,6 @@
 <?php
 class AN_GradeBook_Database{
-	const an_gradebook_db_version = 3.141;
+	const an_gradebook_db_version = 3.1415;
 	public function __construct(){
 		register_activation_hook(__FILE__,array($this,'database_init'));	
 		register_activation_hook(__FILE__,array($this,'database_alter'));			
@@ -68,7 +68,19 @@ class AN_GradeBook_Database{
 			$sql = 'ALTER TABLE an_assignments ADD assign_visibility VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT "Students"';					
 			$wpdb->query($sql);				
 		    update_option( "an_gradebook_db_version", self::an_gradebook_db_version);
-		}				
+		}	
+		if(get_site_option( 'an_gradebook_db_version' )==3.141){ 
+			$sql1 = "SELECT uid FROM an_gradebook";					
+			$sql2 = "SELECT ID FROM wp_users";			
+			$result1 = $wpdb->get_col($sql1);				
+			$result2 = $wpdb->get_col($sql2);	
+			$uids_to_delete_from_gradebook = array_diff($result1, $result2);
+			$sql1 = "DELETE FROM an_gradebook WHERE uid IN (".implode(',', $uids_to_delete_from_gradebook).")";
+			$sql2 = "DELETE FROM an_assignment WHERE uid IN (".implode(',', $uids_to_delete_from_gradebook).")";			
+			$wpdb->query($sql1);
+			$wpdb->query($sql2);			
+		    update_option( "an_gradebook_db_version", self::an_gradebook_db_version);
+		}					
 	}
 	public function database_init() {
 		global $wpdb;

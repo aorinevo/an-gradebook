@@ -11,9 +11,13 @@
 				<select name="filter_option" id="filter-assignments-select" class="form-control">
         			<option value="-1">Show all</option>						
         			<% 
-	 					for (var i in assign_categories){
- 							print('<option value='+assign_categories[i]+'>'+assign_categories[i]+'</option>');
+        			/*
+        				if( !assign_categories){
+	 						for (var i in assign_categories){
+ 								print('<option value='+assign_categories[i]+'>'+assign_categories[i]+'</option>');
+ 							}
  						}
+ 						*/
         			%>    			      
 	        	</select>
 				<button type="button" id="filter-assignments" class="btn btn-default">Filter</button> 

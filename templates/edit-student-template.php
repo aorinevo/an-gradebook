@@ -28,7 +28,7 @@
 				    </div>
 				    <% } %>
 				        <div>
-				        <% if (student) { %>
+				        <% if (student) { console.log(gradebook);%>
 				        	Update user <%= student.get('user_login') %> from course <%= gradebook.get('id') %>?
 				        <% } else { %>
 				        	if student exists in the wordpress database, use the students user_login to add. Otherwise a new record will be created for this student.
