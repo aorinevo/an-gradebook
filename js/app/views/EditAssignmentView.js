@@ -15,7 +15,8 @@ function($,Backbone,_,Assignment){
 			console.log(this.options);			
            	_(this).extend(this.options.gradebook_state);            	               
            	this.course = this.courses.findWhere({'selected': true});
-           	this.assignment = this.assignments.findWhere({gbid : parseInt(this.course.get('id'))});           	
+           	console.log(this.model);
+           	this.assignment = this.model || null;           	
             $('body').append(this.render().el);
             $('#assign-date-datepicker, #assign-due-datepicker').datepicker();
             $('#assign-date-datepicker, #assign-due-datepicker').datepicker('option','dateFormat','yy-mm-dd');
@@ -31,21 +32,17 @@ function($,Backbone,_,Assignment){
             } else {
             	var gradebook = this.courses.findWhere({selected: true});            
             }
-            if (this.assignment) {
-                var template = _.template($('#edit-assignment-template').html());
-                var compiled = template({assignment: this.assignment, gradebook: gradebook});
-                this.$el.html(compiled);             
-            } else {
-                var template = _.template($('#edit-assignment-template').html());
-                var compiled = template({assignment: null, gradebook: gradebook});
-                this.$el.html(compiled); 
-            }     
+            var template = _.template($('#edit-assignment-template').html());
+            var compiled = template({assignment: this.assignment, gradebook: gradebook});
+            this.$el.html(compiled);                 
 			this.$el.modal('show');
 			var self = this;
 			_.defer(function(){
 				this.inputName = self.$('input[name="assign_name"]');
 				var strLength= inputName.val().length;
-				$("#assign_visibility_options option[value='" + self.assignment.get('assign_visibility') + "']").attr("selected", "selected");
+				if(self.assignment){
+					$("#assign_visibility_options option[value='" + self.assignment.get('assign_visibility') + "']").attr("selected", "selected");
+				}
 			});    			    		              
             return this;
         },   

@@ -16,25 +16,19 @@ function($,Backbone,_,Student){
 			console.log(this.options);
            	_(this).extend(this.options.gradebook_state);
            	console.log(this);
-            this.course = this.courses.findWhere({'selected': true});            	      
+            this.course = this.courses.findWhere({'selected': true});     
+            this.student = this.model || null;       	      
             $('body').append(this.render().el);     	
             return this;
         },        
         render: function() {
 		    var self = this; 
 		    console.log(this.model);       
-            var student = self.model;
             var gradebook = this.course;
-            if (student) {
-            	console.log(student);
-                var template = _.template($('#edit-student-template').html());
-                var compiled = template({student: student, gradebook: gradebook});                
-                self.$el.html(compiled);
-            } else {
-                var template = _.template($('#edit-student-template').html());
-                var compiled = template({student: null,gradebook: gradebook});
-                self.$el.html(compiled);
-            }     
+            console.log(this.student);
+            var template = _.template($('#edit-student-template').html());
+            var compiled = template({student: this.student, gradebook: gradebook});                
+            self.$el.html(compiled);  
             this.$el.modal('show');            
 			_.defer(function(){
 				self.inputName = self.$('input[name="firstname"]');
@@ -73,10 +67,14 @@ function($,Backbone,_,Student){
         },        
         editSave: function(ev) {
         	var self = this;
+        	console.log(ev);
             var studentInformation = $(ev.currentTarget).serializeObject();
-            if(this.model){
+            console.log(studentInformation);
+            console.log(this.student);
+            if(this.student){
+            	console.log('RAWR');
             	studentInformation.id = parseInt(studentInformation.id);
-            	this.model.save(studentInformation,{wait: true});
+            	this.student.save(studentInformation,{wait: true});
 				this.$el.modal('hide');              	
             } else {
              	delete(studentInformation['id']);

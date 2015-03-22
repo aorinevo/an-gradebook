@@ -70,8 +70,11 @@ function($,Backbone,_,CourseGradebook, StudentList, AssignmentList, CellList, St
         },
         render: function() {
         	var self = this;
+        	console.log(this.options);
         	var course = this.course;
         	var _x = _.map(this.assignments.models, function(model){return model.get('assign_category');});
+        	console.log(_x);
+        	debugger;
          	var _assign_categories = _.without(_.uniq(_x),"") || null;                                           
 			var _y = $('#filter-assignments-select').val();	                
             var template = _.template($('#gradebook-interface-template').html());
@@ -87,12 +90,14 @@ function($,Backbone,_,CourseGradebook, StudentList, AssignmentList, CellList, St
 						$('#students').append(view.render().el);                     
             		});                           		
             		var y = self.assignments.where({
-                		gbid: parseInt(this.model.get('id'))
+                		gbid: parseInt(this.course.get('id'))
             		});
             		y = _.sortBy(y,function(assign){ return assign.get('assign_order');});
             		_.each(y, function(assignment) {
-                		var view = new AN.Views.AssignmentView({
-                    		model: assignment
+            			console.log(assignment);
+            			console.log('LLLLL');
+                		var view = new AssignmentView({
+                    		model: assignment, options: self.options
                 	});
                 		$('#students-header tr').append(view.render().el);
             		});
@@ -105,9 +110,6 @@ function($,Backbone,_,CourseGradebook, StudentList, AssignmentList, CellList, St
                 		var view = new StudentView({model: student, options: self.options});
 						$('#students').append(view.render().el);              		                 
             		});             		            		  
-           			var z = self.assignments.where({
-                		gbid: this.course.get('id')
-            		});
             		var y = self.assignments.where({
                 		gbid: parseInt(this.course.get('id'))
             		});
@@ -116,7 +118,7 @@ function($,Backbone,_,CourseGradebook, StudentList, AssignmentList, CellList, St
             		console.log('hello3');	
             		_.each(y, function(assignment) {
             			console.log('hello4');
-                		var view = new AssignmentView({options: self.options});
+                		var view = new AssignmentView({model: assignment, options: self.options});
                 		console.log('hello2');
                 		$('#students-header tr').append(view.render().el);
             		}); 
@@ -130,18 +132,18 @@ function($,Backbone,_,CourseGradebook, StudentList, AssignmentList, CellList, St
         },     
         filterAssignments: function() {       
         	var _x = $('#filter-assignments-select').val();	
-            var _toHide = AN.GlobalVars.assignments.filter(
+            var _toHide = this.assignments.filter(
 	            function(assign){
                		return assign.get('assign_category') != _x;
             	}
         	);
-            var _toShow = AN.GlobalVars.assignments.filter(
+            var _toShow = this.assignments.filter(
 	            function(assign){
                		return assign.get('assign_category') === _x;
             	}
         	);  
         	if( _x === "-1"){
-        		AN.GlobalVars.assignments.each(function(assign){
+        		this.assignments.each(function(assign){
                 	assign.set({visibility: true});
 				});
         	} else {      	
@@ -156,7 +158,10 @@ function($,Backbone,_,CourseGradebook, StudentList, AssignmentList, CellList, St
         addAssignment: function(ev) {    
             var view = new EditAssignmentView({options: this.options});           
         },    
-        addStudent: function(ev) {       
+        addStudent: function(ev) {  
+        	console.log(ev);
+        	console.log('BT24');
+        	alert('hello');     
             var view = new EditStudentView({options: this.options});      
         },  
         sortByStudent: function(ev) {     		
@@ -165,7 +170,7 @@ function($,Backbone,_,CourseGradebook, StudentList, AssignmentList, CellList, St
            	this.render();                          
         },                      
         sortByAssignment: function(ev) {
-            var x = AN.GlobalVars.cells.where({amid: parseInt(ev.get('id'))});         			
+            var x = this.cells.where({amid: parseInt(ev.get('id'))});         			
 			this.sort_column = _.sortBy(x,function(cell){
 				if (ev.get('sorted')==='asc'){
 					return cell.get('assign_points_earned');

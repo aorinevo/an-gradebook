@@ -3,8 +3,8 @@ function($,Backbone,_,StatisticsView,EditStudentView,DeleteStudentView, CellView
 	var StudentView = Backbone.View.extend({
         tagName: 'tr',
         events: {
-            'click .student': 'selectStudent',
-            'click input[id^=cb-select-]': 'selectStudent',
+           // 'click .student': 'selectStudent',
+           // 'click input[id^=cb-select-]': 'selectStudent',
             'click a.edit-student': 'editStudent',
             'click a.delete-student': 'deleteStudent',
             'click a.student-statistics': 'studentStatistics', 
@@ -22,12 +22,12 @@ function($,Backbone,_,StatisticsView,EditStudentView,DeleteStudentView, CellView
             this.course = this.courses.findWhere({'selected': true});    
         	console.log('hello5');
         	console.log(this.model);
-			//this.listenTo(this.model, 'change:firstname change:lastname', this.render);      
+			this.listenTo(this.model, 'change:firstname change:lastname', this.render);      
 			console.log('hello6');      
-           	//this.listenTo(this.model, 'change:selected', this.selectAllStudents);			
-            //this.listenTo(self.students, 'add remove', this.close);
-            //this.listenTo(self.assignments, 'add remove change:sorted change:assign_order', this.close);            
-            //this.listenTo(self.courses, 'remove change:selected', this.close); 
+           	this.listenTo(this.model, 'change:selected', this.selectAllStudents);			
+            this.listenTo(self.students, 'add remove', this.close);
+            this.listenTo(self.assignments, 'add remove change:sorted change:assign_order', this.close);            
+            this.listenTo(self.courses, 'remove change:selected', this.close); 
             
         },    
         render: function() {
@@ -97,7 +97,7 @@ function($,Backbone,_,StatisticsView,EditStudentView,DeleteStudentView, CellView
         },
         deleteStudent: function(ev){
         	ev.preventDefault();
-        	var view = new DeleteStudentView({model: this.model});              	      	
+        	var view = new DeleteStudentView({model: this.model, options: this.options});              	      	
         },        
         close: function() {
             this.remove();

@@ -24,9 +24,15 @@ function($,Backbone,_){
         },
         render: function() {
         	var self = this;
+        	console.log(this.model);
+        	console.log(this.assignments);
         	var _assignment = this.assignments.findWhere({id : this.model.get('amid')});
-            this.$el.toggleClass('hidden', !_assignment.get('visibility'));           
-            this.$el.html('<div class="view">' + this.model.get('assign_points_earned') + '</div> <input class="edit" type="text" value="' + parseFloat(this.model.get('assign_points_earned')) + '"></input>');
+            if(_assignment){
+            	this.$el.toggleClass('hidden', !_assignment.get('visibility'));           
+            }
+            var template = _.template($('#edit-cell-template').html());
+            var compiled = template({cell: this.model});
+            this.$el.html(compiled);
             this.input = this.$('.edit');
             return this;
         },

@@ -29,7 +29,7 @@ $an_gradebook_student_api = new gradebook_student_API();
 $an_gradebookapi = new AN_GradeBookAPI();
 
 function register_an_gradebook_menu_page(){	
-	add_menu_page( 'an_gradebook', 'GradeBook', 'administrator', 'an_gradebook', 'init_an_gradebook', 'dashicons-analytics', '6.12' ); 		
+	add_menu_page( 'an_gradebook', 'GradeBook', 'administrator', 'an_gradebook', 'init_an_gradebook', 'dashicons-book-alt', '6.12' ); 		
 } 	
 add_action( 'admin_menu', 'register_an_gradebook_menu_page' );	
 	
@@ -58,7 +58,8 @@ add_action( 'admin_enqueue_scripts', 'enqueue_an_gradebook_scripts');
 			include( dirname( __FILE__ ) . '/templates/edit-student-template.php' );	
 			include( dirname( __FILE__ ) . '/templates/delete-student-template.php' );
 			include( dirname( __FILE__ ) . '/templates/edit-assignment-template.php' );
-			include( dirname( __FILE__ ) . '/templates/stats-assignment-template.php' );	
+			include( dirname( __FILE__ ) . '/templates/stats-assignment-template.php' );
+			include( dirname( __FILE__ ) . '/templates/edit-cell-template.php' );				
 			include( dirname( __FILE__ ) . '/templates/stats-student-template.php' );	
 			include( dirname( __FILE__ ) . '/templates/assignment-view-template.php' );		
 			include( dirname( __FILE__ ) . '/templates/course-view-template.php' );			

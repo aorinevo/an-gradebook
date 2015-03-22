@@ -23,7 +23,7 @@ function($,Backbone,_,AssignmentStatisticsView, EditAssignmentView){
             this.course = this.courses.findWhere({'selected': true}); 
             console.log(this.course);
             console.log(this.course.get('id'));
-            this.assignment = this.assignments.findWhere({gbid : parseInt(this.course.get('id'))});               	 
+            this.assignment = this.model;
             console.log(this.assignment);
            	this.render();            	   
 			this.listenTo(this.assignment, 'change:assign_name', this.render);         
@@ -116,18 +116,20 @@ function($,Backbone,_,AssignmentStatisticsView, EditAssignmentView){
         }, 
         editAssignment: function(ev) {
         	ev.preventDefault();                	      
-            var view = new EditAssignmentView({options: this.options});           
+            var view = new EditAssignmentView({model: this.assignment, options: this.options});           
         },               
         deleteAssignment: function(ev) {
 			ev.preventDefault();    
 			var self = this;      
 			this.assignment.destroy({success: 
 				function (model){
-	            	var _x = model.get('assign_order'); 
-	            	var _y = _.max(self.assignments.models, function(assignment){ return assignment.get('assign_order');});                     		
-	            	for( i = _x; i < _y.get('assign_order'); i++){
-	            		var _z = self.assignments.findWhere({assign_order: i+1});
-	            		_z.save({assign_order: i});
+	            	var _x = model.get('assign_order'); 	            
+	            	if(self.assignments.models.length){
+						var _y = _.max(self.assignments.models, function(assignment){ return assignment.get('assign_order');});                     			            	
+	            		for( i = _x; i < _y.get('assign_order'); i++){
+	            			var _z = self.assignments.findWhere({assign_order: i+1});
+	            			_z.save({assign_order: i});
+	            		}
 	            	}	            	
         		}}
             );        

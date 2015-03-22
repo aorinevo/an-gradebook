@@ -9,22 +9,20 @@ function($,Backbone,_,Course){
             'click #edit-course-save': 'submitForm',
             'submit #edit-course-form': 'editSave'
         },
-        initialize: function(){  
+        initialize: function(options){  
+        	console.log(options);
+			this.options = options.options;
+			console.log(this.options);
+           	_(this).extend(this.options.gradebook_state);     
+            this.course = this.model || null;                  	        
             $('body').append(this.render().el);
             return this;                
         },
         render: function() {
-            var self = this;
-            var _course = this.model;       
-            if (_course) {
-                var template = _.template($('#edit-course-template').html());
-                var compiled = template({course: _course});
-                self.$el.html(compiled);                              
-            } else {
-                var template = _.template($('#edit-course-template').html());
-                var compiled = template({course: null});
-                self.$el.html(compiled);                
-            }                        
+            var self = this;  
+            var template = _.template($('#edit-course-template').html());
+            var compiled = template({course: this.course});
+            self.$el.html(compiled);                                                      
             this.$el.modal('show');
 			_.defer(function(){
 				this.inputName = self.$('input[name="name"]');
@@ -57,14 +55,14 @@ function($,Backbone,_,Course){
         editSave: function(ev) {
         	var self = this;
             var courseInformation = $(ev.currentTarget).serializeObject(); //action: "add_course" or action: "update_course" is hidden in the edit-course-template 
-        	if(this.model){            
+        	if(this.course){            
 	        	this.model.save(courseInformation,{wait: true});
 				this.$el.modal('hide');         
 			} else {
 				delete(courseInformation['id']);
             	var toadds = new Course(courseInformation);
             	toadds.save(courseInformation,{success: function(model){
-            		 self.collection.add(model);  
+            		 self.courses.add(model);  
 					 self.$el.modal('hide');                		 
             		}
             	});            				

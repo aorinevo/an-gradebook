@@ -9,22 +9,24 @@ function($,Backbone,_){
             'click #delete-student-delete': 'submitForm',            
             'submit #delete-student-form': 'deleteSave'
         },
-        initialize: function(){     
+        initialize: function(options){   
+        	console.log(options);
+			this.options = options.options;
+			console.log(this.options);
+           	_(this).extend(this.options.gradebook_state);             
             $('body').append(this.render().el);     	
             return this;
         },        
         render: function() {
             var self = this;
             var student = this.model;
-            var gradebook = AN.GlobalVars.courses.findWhere({
+            var gradebook = this.courses.findWhere({
         		selected: true
             });
             if (student) {
-                var template = _.template($('#delete-student-template').html(), {
-                    student: student,
-                    gradebook: gradebook
-                });
-                self.$el.html(template);
+                var template = _.template($('#delete-student-template').html());
+                var compiled = template({student: student, gradebook: gradebook});            
+                this.$el.html(compiled);
             }
             this.$el.modal('show');
             return this;

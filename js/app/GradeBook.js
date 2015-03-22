@@ -1,6 +1,6 @@
 define(['jquery','backbone','underscore','models/CourseList','models/CellList', 'models/StudentList', 'models/AssignmentList',
 	'views/CourseView','views/EditCourseView','views/GradebookView'],
-function($, Backbone, _, CourseList, StudentList, CellList, AssignmentList, CourseView, EditCourseView, GradebookView){
+function($, Backbone, _, CourseList, CellList, StudentList, AssignmentList, CourseView, EditCourseView, GradebookView){
 var App = Backbone.View.extend({
         events: {
             'click button#add-course': 'editCourse',            
@@ -41,11 +41,11 @@ var App = Backbone.View.extend({
             	}
             }       
             console.log(this.courses);
-            var view = new EditCourseView({collection: this.courses});
+            var view = new EditCourseView({options: this.options});
             return false;
         },
         addCourse: function(course) {
-            var view = new CourseView({model: course, collection: this.courses});
+            var view = new CourseView({model: course, options: this.options});
             $('#courses').append(view.render().el);
         }
     });
