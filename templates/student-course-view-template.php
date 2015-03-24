@@ -4,6 +4,5 @@
 	<td><%= course.get("school") %></td>
 	<td><%= course.get("semester") %></td>
 	<td><%= course.get("year") %></td>	
-</script>      
-    
+</script>  
     

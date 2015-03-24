@@ -1,5 +1,5 @@
-(function(AN){
-	AN.Models.Course = AN.Models.Base.extend({
+define(['backbone'],function(Backbone){ 
+	var StudentCourse = Backbone.Model.extend({
         defaults: {
             name: 'Calculus I',
             school: 'Bergen',
@@ -15,4 +15,5 @@
         	}
         }
 	});
-})(AN || {});
+	return StudentCourse;
+});

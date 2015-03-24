@@ -1,39 +1,39 @@
-(function($) {
-    AN.GlobalVars.cells = new AN.Collections.Cells([]);
-	AN.GlobalVars.assignments = new AN.Collections.Assignments([]); 
-    AN.GlobalVars.students = new AN.Collections.Students([]);    
-    AN.GlobalVars.courses = new AN.Collections.Courses([]);    
-    AN.GlobalVars.courseGradebook = new AN.Models.CourseGradebook();
-    
-    
-    AN.Views.App = AN.Views.Base.extend({
-        el: '#an-gradebooks',
+define(['jquery','backbone','underscore','models/StudentCourseList','models/CellList', 'models/StudentList', 'models/AssignmentList',
+	'views/StudentCourseView','views/StudentGradebookView'],
+function($, Backbone, _, StudentCourseList, CellList, StudentList, AssignmentList, StudentCourseView, StudentGradebookView){
+var App = Backbone.View.extend({
         events: {
-            'click .course': 'showGradebook'
+            'click button#add-course': 'editCourse',            
+            'click #an-courses-container' : 'toggleEditDelete'
         },
-        initialize: function() {        
-            template = _.template($('#student-courses-interface-template').html(), {});
-            this.$el.html(template);
-            AN.GlobalVars.courses.fetch();
-            this.listenTo(AN.GlobalVars.courses, 'add', this.addCourse);            
+        initialize: function(options) {	
+        	$('#wpbody-content').append(this.render().el);      
+			this.courses = new StudentCourseList([]);  
+			this.cells = new CellList([]);
+			this.students = new StudentList([]);
+			this.assignments = new AssignmentList([]); 
+			this.options = options || {};               			 	
+			this.options.gradebook_state = { courses: this.courses, students: this.students, assignments: this.assignments, cells: this.cells };			
+            this.courses.fetch();                       
+            this.listenTo(this.courses, 'change:selected', this.showGradebook);
+            this.listenTo(this.courses, 'add', this.addCourse);            
             return this;
         },
-        showGradebook: function() {
-            var x = AN.GlobalVars.courses.findWhere({selected: true});
-            if (x) {
-                var gradebook = new AN.Views.Gradebook({
-                    model: x
-                });
-                $('#an-gradebooks').append(gradebook.render().el);
-            }
+        render: function(){
+            template = _.template($('#student-courses-interface-template').html());
+            this.$el.html(template);
+            return this;        
+        },
+        showGradebook: function(course) {      
+			if (course.get('selected')===true){
+                var gradebook = new StudentGradebookView({options: this.options});          
+            } 
             return this;
         },
         addCourse: function(course) {
-            var view = new AN.Views.StudentCourseView({
-                model: course
-            });
+            var view = new StudentCourseView({model: course, options: this.options});
             $('#courses').append(view.render().el);
-        }
+        }        
     });
-    var app = new AN.Views.App();
-})(jQuery);
+   return App;
+});

@@ -10,8 +10,8 @@ require.config({
 });
 
 
-require(['jquery', '../app/GradeBook'],
-function($,GradeBook){       
+require(['jquery', '../app/GradeBook_student','bootstrap'],
+function($,GradeBook_Student){       
     	$.fn.serializeObject = function() {
         	var o = {};
         	var a = this.serializeArray();
@@ -27,6 +27,6 @@ function($,GradeBook){
         });
         return o;
     }
-    var App = new GradeBook();
+    var App = new GradeBook_Student();
 });
 

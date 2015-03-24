@@ -65,6 +65,7 @@ Version 3.5.6:
 
 * Database upgrade: Users no longer in the database are removed from gradebooks. Deleting users through the Users tab, removes students from gradebooks.
 * Use RequireJS to manage file loading for almost the entire app.  A couple of js files have to be loaded through php.  In particular, the css files for bootstrap and jquery-ui, the require.js file, and the dependent file app.js.
+* Bug Fix: Adding a student that was already in the database, using their user_login, would add the student to the gradebook but the user_login cell would be empty.  If the page was refreshed, the user_login would display.  
 
 
 Version 3.5.5:

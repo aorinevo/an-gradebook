@@ -29,7 +29,11 @@ $an_gradebook_student_api = new gradebook_student_API();
 $an_gradebookapi = new AN_GradeBookAPI();
 
 function register_an_gradebook_menu_page(){	
-	add_menu_page( 'an_gradebook', 'GradeBook', 'administrator', 'an_gradebook', 'init_an_gradebook', 'dashicons-book-alt', '6.12' ); 		
+	if(gradebook_check_user_role('administrator')){		
+		add_menu_page( 'an_gradebook', 'GradeBook', 'administrator', 'an_gradebook', 'init_an_gradebook', 'dashicons-book-alt', '6.12' ); 		
+	} else {
+		add_menu_page( 'an_gradebook', 'GradeBook', 'subscriber', 'an_gradebook', 'init_an_gradebook', 'dashicons-book-alt', '6.12' ); 			
+	}
 } 	
 add_action( 'admin_menu', 'register_an_gradebook_menu_page' );	
 	
@@ -41,11 +45,18 @@ function enqueue_an_gradebook_scripts($hook){
 	wp_register_script( 'requirejs', $app_base.'/../require.js', array(), null, true);					
 	if( $hook == "toplevel_page_an_gradebook" ){					
 		wp_enqueue_style('GradeBook_css');					
-		wp_enqueue_script('requirejs');			
-		wp_localize_script( 'requirejs', 'require', array(
-			'baseUrl' => $app_base,
-			'deps'    => array( $app_base . '/../app.js')
-		));		
+		wp_enqueue_script('requirejs');		
+		if(gradebook_check_user_role('administrator')){			
+			wp_localize_script( 'requirejs', 'require', array(
+				'baseUrl' => $app_base,
+				'deps'    => array( $app_base . '/../app_instructor.js')
+			));
+		} else {
+			wp_localize_script( 'requirejs', 'require', array(
+				'baseUrl' => $app_base,
+				'deps'    => array( $app_base . '/../app_student.js')
+			));		
+		}
 	} else {
 		return;
 	}						
@@ -75,17 +86,13 @@ add_action( 'admin_enqueue_scripts', 'enqueue_an_gradebook_scripts');
 			include( dirname( __FILE__ ) . '/templates/stats-assignment-template.php' );	
 			include( dirname( __FILE__ ) . '/templates/stats-student-template.php' );
 			include( dirname( __FILE__ ) . '/templates/student-student-view-template.php' );
-			include( dirname( __FILE__ ) . '/templates/student-course-view-template.php' );							
+			include( dirname( __FILE__ ) . '/templates/student-course-view-template.php' );	
+			include( dirname( __FILE__ ) . '/templates/student-cell-template.php' );									
 			include( dirname( __FILE__ ) . '/templates/student-assignment-view-template.php' );
 			include( dirname( __FILE__ ) . '/templates/student-details-assignment-template.php' );									
 			include( dirname( __FILE__ ) . '/templates/student-courses-interface-template.php' );
 			include( dirname( __FILE__ ) . '/templates/student-gradebook-interface-template.php' );
-			$mytemplates = ob_get_clean();	
-			echo $mytemplates;		
-			echo '<div class="wrap">
-					<h2>GradeBooks</h2>
-					<div id="an-gradebooks"></div>
-				  </div>';
+			echo ob_get_clean();	
 		} else {	
 			echo 'You do not have premissions to view this GradeBook.';
 		}

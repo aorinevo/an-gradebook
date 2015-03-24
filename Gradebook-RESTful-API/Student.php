@@ -175,6 +175,7 @@ class gradebook_student_API{
 						echo json_encode(array(
 		    	  			'student'=> array('firstname' => $studentDetails -> first_name,
 							'lastname' => $studentDetails -> last_name,
+							'user_login' => $studentDetails -> user_login,
 		    	  			'gbid' => intval($params['gbid']),
 	    	  				'id' => $studentDetails -> ID),
 	  						'assignment' => $assignments,
