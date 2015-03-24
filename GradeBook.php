@@ -13,14 +13,12 @@ define( "AN_GRADEBOOK_VERSION", "3.5.6");
 
 include_once( dirname( __FILE__ ) . '/functions.php' );
 include_once( dirname( __FILE__ ) . '/Gradebook-Database.php' );
-include_once( dirname( __FILE__ ) . '/Gradebook-Scripts.php' );
 include_once( dirname( __FILE__ ) . '/Gradebook-RESTful-API/Assignment.php' );
 include_once( dirname( __FILE__ ) . '/Gradebook-RESTful-API/Course.php' );
 include_once( dirname( __FILE__ ) . '/Gradebook-RESTful-API/Student.php' );
 include_once( dirname( __FILE__ ) . '/Gradebook-RESTful-API/Cell.php' );
 include_once( dirname( __FILE__ ) . '/Gradebook-RESTful-API/Gradebook-API.php' );
 
-//$an_gradebook_scripts = new AN_GradeBook_Scripts();
 $an_gradebook_database = new AN_GradeBook_Database();
 $an_gradebook_course_api = new gradebook_course_API();
 $an_gradebook_assignment_api = new gradebook_assignment_API();
@@ -98,11 +96,11 @@ add_action( 'admin_enqueue_scripts', 'enqueue_an_gradebook_scripts');
 		}
 	}	
 
-function my_delete_user( $user_id ) {
+function an_gradebook_my_delete_user( $user_id ) {
 	global $wpdb;
 	$results1 = $wpdb->delete('an_gradebook',array('uid'=>$user_id));
 	$results2 = $wpdb->delete('an_assignment',array('uid'=>$user_id));
 }
-add_action( 'delete_user', 'my_delete_user' );
+add_action( 'delete_user', 'an_gradebook_my_delete_user' );
 
 ?>
