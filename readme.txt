@@ -3,7 +3,7 @@ Contributors: anevo, jamarparris
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.5
 Tested up to: 4.1.1
-Stable tag: 3.5.5
+Stable tag: 3.5.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -32,12 +32,7 @@ The password will be set to *password*.
 Students are able to:
 
 * View their grades
-* View basic statistics for assignments;  a pie chart corresponding to the grade distribution of a particular assignment is provided when an assignment header cell is selected; a line graph comparing student performance to class average is provided when a row header cell is selected.
-
-**Highlighted features**
-
-* jQuery allows for all the above mentioned functionality without reloading the page
-* Click on any cell to edit students’ grades and press return or click away to save grades
+* View pie charts and line graphs based on student and class performance
 
 == Installation ==
 
@@ -60,6 +55,20 @@ Students are able to:
 * plugin icon: https://www.iconfinder.com/icons/175285/edit_property_icon#size=256
 
 == Changelog ==
+
+Version 3.5.7:
+
+* Bug Fix: On course delete, gradebook would empty its views.  Reclicking the course, rerendered the gradebook correctly.
+* Minified the app into two essential files, app-instructor-min.js and app-student-min.js
+* Added a debugging toggle in GradeBook.php
+* Slight change to views. Rounded corners are now sharp.
+
+Version 3.5.6:
+
+* Database upgrade: Users no longer in the database are removed from gradebooks. Deleting users through the Users tab, removes students from gradebooks.
+* Use RequireJS to manage file loading for almost the entire app.  A couple of js files have to be loaded through php.  In particular, the css files for bootstrap and jquery-ui, the require.js file, and the dependent file app.js.
+* Bug Fix: Adding a student that was already in the database, using their user_login, would add the student to the gradebook but the user_login cell would be empty.  If the page was refreshed, the user_login would display.  
+
 
 Version 3.5.5:
 
