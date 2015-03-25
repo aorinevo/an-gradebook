@@ -54,14 +54,12 @@ function($,Backbone,_){
         	}
         },
         updateOnEnter: function(e) {
-        	console.log('wer');
             if (e.keyCode == 13){                    
             	this.$el.blur();      	              	
             }
         },
         hideInput: function(value) { 
-            var self = this;       
-            console.log(value);              
+            var self = this;               
             if(parseFloat(value) != this.model.get('assign_points_earned')){
             	this.model.save({assign_points_earned: parseFloat(value)},{wait: true, success: function(model,response){					            	
             		self.render();
