@@ -26,7 +26,7 @@ function($,Backbone,_,AssignmentStatisticsView, EditAssignmentView){
             this.listenTo(this.assignment, 'change:visibility', this.visibilityColumnCSS);   
             this.listenTo(this.students, 'add remove', this.close);      
             this.listenTo(this.assignments, 'add remove change:sorted change:assign_order', this.close);                           
-            this.listenTo(this.courses, 'remove change:selected', this.close);            
+            this.listenTo(this.courses, 'remove change:selected', this.close);                      
         },
         mouseEnter: function(){
         	this.$el.addClass('hover');
@@ -129,8 +129,10 @@ function($,Backbone,_,AssignmentStatisticsView, EditAssignmentView){
         		}}
             );        
         },
-        close: function(){     
-			this.remove();			
+        close: function(ev){  
+        	if(ev.get('id') === this.assignment.get('gbid')){ 
+				this.remove();			
+			}  			
         }                     
     });
 	return AssignmentView;

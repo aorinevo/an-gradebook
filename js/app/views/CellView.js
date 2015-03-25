@@ -2,10 +2,10 @@ define(['jquery','backbone','underscore'],
 function($,Backbone,_){
 	var CellView = Backbone.View.extend({
         tagName: 'td',
+        className: 'cell',
         events: {
-            "click .view": "edit",
-            "keypress .edit": "updateOnEnter",
-            "blur .edit": "hideInput"
+            "blur": "edit",
+            "keypress": "updateOnEnter"
         },
         initialize: function(options) { 
 			this.options = options.options;
@@ -22,6 +22,7 @@ function($,Backbone,_){
         },
         render: function() {
         	var self = this;
+        	this.$el.attr('contenteditable','true');
         	var _assignment = this.assignments.findWhere({id : this.model.get('amid')});
             if(_assignment){
             	this.$el.toggleClass('hidden', !_assignment.get('visibility'));           
@@ -29,7 +30,6 @@ function($,Backbone,_){
             var template = _.template($('#edit-cell-template').html());
             var compiled = template({cell: this.model});
             this.$el.html(compiled);
-            this.input = this.$('.edit');
             return this;
         },
         cleanUpAssignmentCells: function(ev){
@@ -42,8 +42,10 @@ function($,Backbone,_){
         		this.cells.remove(this.model.get('id'));
         	}
         },        
-        close: function() {
-        	this.remove();
+        close: function(ev) {
+			if( ev.get('id') === this.model.get('gbid') ){        	
+        		this.remove();
+        	}
         },    
         shiftCell: function(ev){
         	this.remove();         
@@ -52,24 +54,25 @@ function($,Backbone,_){
         	}
         },
         updateOnEnter: function(e) {
-            if (e.keyCode == 13){
-            	this.hideInput();
+        	console.log('wer');
+            if (e.keyCode == 13){                    
+            	this.$el.blur();      	              	
             }
         },
-        hideInput: function() { //this gets called twice.
-            var self = this;          
-            var value = parseFloat(this.input.val());            
-            this.model.save({assign_points_earned: value},{wait: true, success: function(model,response){
-				self.$el.removeClass("editing");  
-            	self.render();
-            }});
+        hideInput: function(value) { 
+            var self = this;       
+            console.log(value);              
+            if(parseFloat(value) != this.model.get('assign_points_earned')){
+            	this.model.save({assign_points_earned: parseFloat(value)},{wait: true, success: function(model,response){					            	
+            		self.render();
+            	}});
+            } else {
+            	this.$el.attr('contenteditable','true');
+            }
         },
         edit: function() {
-            var w = this.$el.width();
-            this.input.css('width', w);
-            this.input.css('margin-right', -w); //I'm not really sure why, but this works??		    
-            this.$el.addClass("editing");
-            this.input.focus();
+        	this.$el.attr('contenteditable','false');
+        	this.hideInput(this.$el.html().trim());
         },
         hoverCell: function(ev) {
             if (this.model.get('amid') === ev.get('id')) {

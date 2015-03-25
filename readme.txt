@@ -3,7 +3,7 @@ Contributors: anevo, jamarparris
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.5
 Tested up to: 4.1.1
-Stable tag: 3.5.6
+Stable tag: 3.5.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -32,12 +32,7 @@ The password will be set to *password*.
 Students are able to:
 
 * View their grades
-* View basic statistics for assignments;  a pie chart corresponding to the grade distribution of a particular assignment is provided when an assignment header cell is selected; a line graph comparing student performance to class average is provided when a row header cell is selected.
-
-**Highlighted features**
-
-* jQuery allows for all the above mentioned functionality without reloading the page
-* Click on any cell to edit students’ grades and press return or click away to save grades
+* View pie charts and line graphs based on student and class performance
 
 == Installation ==
 
@@ -60,6 +55,13 @@ Students are able to:
 * plugin icon: https://www.iconfinder.com/icons/175285/edit_property_icon#size=256
 
 == Changelog ==
+
+Version 3.5.7:
+
+* Bug Fix: On course delete, gradebook would empty its views.  Reclicking the course, rerendered the gradebook correctly.
+* Minified the app into two essential files, app-instructor-min.js and app-student-min.js
+* Added a debugging toggle in GradeBook.php
+* Slight change to views. Rounded corners are now sharp.
 
 Version 3.5.6:
 

@@ -1,16 +1,25 @@
-require.config({
+config = {
     //By default load any module IDs from js/lib
     paths : {
-    	'models' : '../app/models',
-    	'views' : '../app/views'
+    	'models' : 'app/models',
+    	'views' : 'app/views',
+    	'jquery' : 'lib/jquery',
+		'jquery-ui' : 'lib/jquery-ui',    	
+    	'backbone': 'lib/backbone',
+    	'underscore': 'lib/underscore',
+    	'bootstrap': 'lib/bootstrap',
+    	'goog': 'lib/goog',
+		'async': 'lib/async', 
+		'propertyParser' : 'lib/propertyParser'   	
     },
 	shim: {
 		'bootstrap':['jquery']       
     }
-});
+};
 
+require.config(config);
 
-require(['jquery', '../app/GradeBook','bootstrap'],
+require(['jquery', 'app/GradeBook','bootstrap'],
 function($,GradeBook){       
     	$.fn.serializeObject = function() {
         	var o = {};

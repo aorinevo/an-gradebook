@@ -35,7 +35,7 @@ function($,Backbone,_){
 
         	// Instantiate and draw our chart, passing in some options.
 	        var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
-    	     chart.draw(datag, optionsg);
+    	    chart.draw(datag, optionsg);
 		},			
 		displayPieChart: function(){
 			var self = this;
@@ -55,10 +55,9 @@ function($,Backbone,_){
         render: function() {
             var self = this;
             var assignment = this.model;
-            var template = _.template($('#stats-assignment-template').html(), {
-                    assignment: assignment
-            });
-            self.$el.html(template);             
+            var template = _.template($('#stats-assignment-template').html());
+            var compiled = template({assignment: assignment});
+            self.$el.html(compiled);             
             this.displayPieChart();                                            
 			this.$el.modal('show');       
             return this;

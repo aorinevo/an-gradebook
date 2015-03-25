@@ -49,10 +49,9 @@ function($,Backbone,_){
 		},	
         render: function() {
             var self = this;
-            var template = _.template($('#stats-student-template').html(), {
-                    student: self.student
-            });
-            self.$el.html(template);             
+            var template = _.template($('#stats-student-template').html());
+            var compiled = template({student: self.student});
+            self.$el.html(compiled);             
             this.displayLineChart();                                            
 			this.$el.modal('show');        
             return this;

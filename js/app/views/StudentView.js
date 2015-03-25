@@ -17,12 +17,13 @@ function($,Backbone,_,StatisticsView,EditStudentView,DeleteStudentView, CellView
         	var self = this;
 			this.options = options.options;
            	_(this).extend(this.options.gradebook_state);
+           	this.student = this.model;
             this.course = this.courses.findWhere({'selected': true});    
 			this.listenTo(this.model, 'change:firstname change:lastname', this.render);      
            	this.listenTo(this.model, 'change:selected', this.selectAllStudents);			
             this.listenTo(self.students, 'add remove', this.close);
             this.listenTo(self.assignments, 'add remove change:sorted change:assign_order', this.close);            
-            this.listenTo(self.courses, 'remove change:selected', this.close); 
+            this.listenTo(self.courses, 'remove change:selected', this.close);           
             
         },    
         render: function() {
@@ -89,9 +90,11 @@ function($,Backbone,_,StatisticsView,EditStudentView,DeleteStudentView, CellView
         deleteStudent: function(ev){
         	ev.preventDefault();
         	var view = new DeleteStudentView({model: this.model, options: this.options});              	      	
-        },        
-        close: function() {
-            this.remove();
+        },               
+        close: function(ev) {
+        	if(ev.get('id') === this.student.get('gbid')){
+	            this.remove();
+	        }
         }
     });
 	return StudentView;

@@ -1,3 +1,21 @@
+[contenteditable="true"]:active,
+[contenteditable="true"]:focus{
+border:none;
+outline:none;
+}
+
+[contenteditable="true"]:focus {
+  background-color: #fff;
+  border: 3px solid #2ea2cc;
+}
+
+
+.cell{
+	text-align: right;
+	cursor: pointer;
+}
+
+
 .modal {
    z-index: 999999;
 }
