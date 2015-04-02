@@ -19,6 +19,7 @@ function($,Backbone,_,AssignmentStatisticsView, EditAssignmentView){
 			this.options = options.options;
            	_(this).extend(this.options.gradebook_state);   
             this.course = this.courses.findWhere({'selected': true}); 
+            this.role = this.roles.findWhere({'gbid': this.course.get('id')}); 	            
             this.assignment = this.model;
            	this.render();            	   
 			this.listenTo(this.assignment, 'change:assign_name', this.render);         
@@ -67,6 +68,7 @@ function($,Backbone,_,AssignmentStatisticsView, EditAssignmentView){
 			var template = _.template($('#assignment-view-template').html());
 			var compiled = template({
                     assignment: this.assignment,
+                    role: this.role,
                     min: _.min(this.assignments.models, function(assignment){ return assignment.get('assign_order');}),
                     max: _.max(this.assignments.models, function(assignment){ return assignment.get('assign_order');})                
                 });

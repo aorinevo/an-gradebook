@@ -4,10 +4,10 @@ if( defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 
 	global $wpdb;
 
-	$wpdb->query("DROP TABLE IF EXISTS an_gradebooks");
-	$wpdb->query("DROP TABLE IF EXISTS an_gradebook");	
-	$wpdb->query("DROP TABLE IF EXISTS an_assignments");	
-	$wpdb->query("DROP TABLE IF EXISTS an_assignment");		
+	$wpdb->query("DROP TABLE IF EXISTS an_gradebook_courses");
+	$wpdb->query("DROP TABLE IF EXISTS an_gradebook_students");	
+	$wpdb->query("DROP TABLE IF EXISTS an_gradebook_assignments");	
+	$wpdb->query("DROP TABLE IF EXISTS an_gradebook_cells");		
 	$wpdb->query( 
 		$wpdb->prepare( 
 			"DELETE FROM $wpdb->options

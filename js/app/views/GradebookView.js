@@ -1,34 +1,39 @@
-define(['jquery','backbone','underscore', 'models/CourseGradebook', 'models/StudentList', 
+define(['jquery','backbone','underscore', 'models/CourseGradebook', 'models/UserList', 
 	'models/AssignmentList', 'models/CellList', 'views/StudentView', 'views/AssignmentView', 'views/EditStudentView', 
 	'views/EditAssignmentView'],
-function($,Backbone,_,CourseGradebook, StudentList, AssignmentList, CellList, StudentView, 
+function($,Backbone,_, CourseGradebook, UserList, AssignmentList, CellList, StudentView, 
 	AssignmentView, EditStudentView, EditAssignmentView){
       var GradebookView = Backbone.View.extend({
         initialize: function(options) {
             var self = this;   
             this.options = options.options;
            	_(this).extend(this.options.gradebook_state);
-           
-            this.course = this.courses.findWhere({'selected': true});                        
+            this.course = this.courses.findWhere({'selected': true});   
+			this.role = this.roles.findWhere({'gbid': this.course.get('id')});
         	this.sort_key = 'lastname'; 
 			this.sort_column = this.students; 
-			this.courseGradebook = new CourseGradebook(this.course.attributes);	
-            this.xhr = this.courseGradebook.fetch({
-            	success: function(data){  
-            		self.students.reset();   
+			this.gradebook = new CourseGradebook({course: this.course , role: this.role});
+			$('#wpbody-content').append('<div id="loading-students-container"><div class="row"><div id="loading-students-spinner" class="col-md-4 col-md-offset-4"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>loading...</div></div></div>');            
+	
+            this.xhr = this.gradebook.fetch({
+            	success: function(data){    
+            		$('#loading-students-container').remove();		
+            		self.students.reset();
 					self.cells.reset();               		            		
 					self.assignments.reset();          		            							
-                _.each(self.courseGradebook.get('students'), function(student) {
+                _.each(self.gradebook.get('students'), function(student) {
                     self.students.add(student);
                 });
-                _.each(self.courseGradebook.get('assignments'), function(assignment) {
+                _.each(self.gradebook.get('assignments'), function(assignment) {
                     self.assignments.add(assignment);
                 }); 
-                _.each(self.courseGradebook.get('cells'), function(cell) {     	
+                _.each(self.gradebook.get('cells'), function(cell) {     	
                     self.cells.add(cell);
                 });  
-                                                
-                self.render();
+                //self.gradebook.set({'students' : self.students});
+                //self.gradebook.set({'cells' : self.cells});
+                //self.gradebook.set({'assignments' : self.assignments});                                         
+                self.render();              
                 self.listenTo(self.courses, 'add', self.render);
                 self.listenTo(self.students, 'add', self.render);   
             	self.listenTo(self.students, 'add remove', self.sortByStudent);                                  
@@ -38,6 +43,7 @@ function($,Backbone,_,CourseGradebook, StudentList, AssignmentList, CellList, St
             	}
             });
            	this.listenTo(this.course, 'change:selected', this.close);
+
             return this;
         },
         events: {
@@ -66,17 +72,17 @@ function($,Backbone,_,CourseGradebook, StudentList, AssignmentList, CellList, St
          	var _assign_categories = _.without(_.uniq(_x),"") || null;                                           
 			var _y = $('#filter-assignments-select').val();	                
             var template = _.template($('#gradebook-interface-template').html());
-            var compiled = template({assign_categories: _assign_categories});     
-           	$('#wpbody-content').append(self.$el.html(compiled));
+            var compiled = template({assign_categories: _assign_categories, role: this.role});     
+           	$('#an-gradebook').append(self.$el.html(compiled));
             $('#filter-assignments-select').val(_y);                 	
         	switch(this.sort_key){
-        		case 'cell':     
+        		case 'cell':    
         			_.each(this.sort_column, function(cell) {
                 		var view = new StudentView({
                     		model: self.students.get(cell.get('uid')), options: self.options
                 		}); 
 						$('#students').append(view.render().el);                     
-            		});                           		
+            		});                          		
             		var y = self.assignments.where({
                 		gbid: parseInt(this.course.get('id'))
             		});
@@ -146,7 +152,7 @@ function($,Backbone,_,CourseGradebook, StudentList, AssignmentList, CellList, St
            	this.render();                          
         },                      
         sortByAssignment: function(ev) {
-            var x = this.cells.where({amid: parseInt(ev.get('id'))});         			
+            var x = this.cells.where({amid: parseInt(ev.get('id'))});       			
 			this.sort_column = _.sortBy(x,function(cell){
 				if (ev.get('sorted')==='asc'){
 					return cell.get('assign_points_earned');

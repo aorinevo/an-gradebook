@@ -1,5 +1,5 @@
-define(['jquery','backbone','underscore','models/Course','bootstrap'],
-function($,Backbone,_,Course){
+define(['jquery','backbone','underscore','models/User','models/Course','bootstrap'],
+function($,Backbone,_, User, Course){
 	EditCourseView = Backbone.View.extend({
  		id: 'base-modal',
     	className: 'modal fade',
@@ -60,7 +60,10 @@ function($,Backbone,_,Course){
 				delete(courseInformation['id']);
             	var toadds = new Course(courseInformation);
             	toadds.save(courseInformation,{success: function(model){
-            		 self.courses.add(model);  
+            		 var _user = new User(model.get('user'));
+            		 self.roles.add(_user);
+            		 var _course = new Course(model.get('course'));            		 
+            		 self.courses.add(_course);              		 
 					 self.$el.modal('hide');                		 
             		}
             	});            				

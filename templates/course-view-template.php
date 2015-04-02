@@ -1,4 +1,6 @@
 <script id="course-view-template" type="text/template">
+	<% if(role.get('role') === 'instructor'){
+	%>         					
 	<td>
 		<div class="btn-group">
 			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -11,6 +13,9 @@
 			</ul>
 		</div>
 	</td>	
+	<% } else {%>
+	  <td></td>
+	  <%}%> 	
 	<td> <%= course.get("id") %> </td>
 	<td class="course">	<%= course.get("name") %> </td>
 	<td><%= course.get("school") %></td>

@@ -1,6 +1,8 @@
 <script id="gradebook-interface-template" type="text/template">
     <hr/>   
 	<div>  
+    <% if(role.get('role') === 'instructor'){
+	%> 
     	<div class="btn-group">    		
     		<button type="button" id="add-student" class="btn btn-default">Add Student</button>
 	    	<button type="button" id="add-assignment" class="btn btn-default">Add Assignment</button>
@@ -19,7 +21,17 @@
 	    </div>
 	    <div class="btn-group">
 				<button type="button" id="filter-assignments" class="btn btn-default">Filter</button>  	    		   	
-    	</div>
+    	</div>    	
+    <% } %> 
+		<!--<div id="loading-students-container">
+			<div class="row">
+				<div id="loading-students-spinner" class="col-md-4 col-md-offset-4">
+					<span class="glyphicon glyphicon-refresh glyphicon-refresh-animate">
+					</span>
+				loading...
+				</div>
+			</div>
+		</div>-->    		
     	<hr/>
 	    <div>
     		<table id="an-gradebook-container" class="table table-bordered table-striped">  
@@ -27,7 +39,7 @@
       				<tr>
         				<th></th><th><div><span>First Name</span></div></th><th>Last Name</th><th>Login</th>
 	    	  		</tr>
-		    	</thead>
+		    	</thead>		    	
     			<tbody id="students"></tbody>
 	    	</table>
     	</div>

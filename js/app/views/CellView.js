@@ -10,7 +10,8 @@ function($,Backbone,_){
         initialize: function(options) { 
 			this.options = options.options;
            	_(this).extend(this.options.gradebook_state);   
-            this.course = this.courses.findWhere({'selected': true});                  
+            this.course = this.courses.findWhere({'selected': true});    
+            this.role = this.roles.findWhere({'gbid': this.course.get('id')}); 	                     
             this.listenTo(this.assignments, 'change:hover', this.hoverCell);            
             this.listenTo(this.assignments, 'change:assign_order', this.shiftCell);                
             this.listenTo(this.assignments, 'change:visibility', this.visibilityCell);
@@ -22,7 +23,11 @@ function($,Backbone,_){
         },
         render: function() {
         	var self = this;
-        	this.$el.attr('contenteditable','true');
+        	if(this.role.get('role') === 'instructor'){
+        		this.$el.attr('contenteditable','true');
+        	} else {
+        		this.$el.css('cursor','default');
+        	}
         	var _assignment = this.assignments.findWhere({id : this.model.get('amid')});
             if(_assignment){
             	this.$el.toggleClass('hidden', !_assignment.get('visibility'));           

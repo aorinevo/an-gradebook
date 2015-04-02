@@ -13,6 +13,7 @@ function($,Backbone,_,Assignment){
 			this.options = options.options;		
            	_(this).extend(this.options.gradebook_state);            	               
            	this.course = this.courses.findWhere({'selected': true});
+            this.role = this.roles.findWhere({gbid: this.course.get('id')}); 	           	
            	this.assignment = this.model || null;           	
             $('body').append(this.render().el);
             $('#assign-date-datepicker, #assign-due-datepicker').datepicker();
@@ -24,13 +25,9 @@ function($,Backbone,_,Assignment){
             return this;
         },
         render: function() {
-            if(this.assignment){
-                var gradebook = this.courses.findWhere({id : this.assignment.get('gbid')+""});            
-            } else {
-            	var gradebook = this.courses.findWhere({selected: true});            
-            }
+            var gradebook = this.courses.findWhere({selected: true});            
             var template = _.template($('#edit-assignment-template').html());
-            var compiled = template({assignment: this.assignment, gradebook: gradebook});
+            var compiled = template({assignment: this.assignment, gradebook: gradebook, role: this.role});
             this.$el.html(compiled);                 
 			this.$el.modal('show');
 			var self = this;
@@ -68,8 +65,8 @@ function($,Backbone,_,Assignment){
              	delete(assignmentInformation['id']);
             	var toadds = new Assignment(assignmentInformation);
             	toadds.save(assignmentInformation,{success: function(model,response){
-            		self.assignments.add(response['assignmentDetails']); 
-                	_.each(response['assignmentStudents'], function(cell) {
+            		self.assignments.add(response['assignment']); 
+                	_.each(response['cells'], function(cell) {
                     	self.cells.add(cell)
                 	});             		 
             		}

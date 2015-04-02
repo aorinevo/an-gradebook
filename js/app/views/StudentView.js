@@ -19,8 +19,9 @@ function($,Backbone,_,StatisticsView,EditStudentView,DeleteStudentView, CellView
            	_(this).extend(this.options.gradebook_state);
            	this.student = this.model;
             this.course = this.courses.findWhere({'selected': true});    
-			this.listenTo(this.model, 'change:firstname change:lastname', this.render);      
-           	this.listenTo(this.model, 'change:selected', this.selectAllStudents);			
+            this.role = this.roles.findWhere({'gbid': this.course.get('id')}); 	            
+			this.listenTo(this.model, 'change:first_name change:last_name', this.render);      
+           	//this.listenTo(this.model, 'change:selected', this.selectAllStudents);			
             this.listenTo(self.students, 'add remove', this.close);
             this.listenTo(self.assignments, 'add remove change:sorted change:assign_order', this.close);            
             this.listenTo(self.courses, 'remove change:selected', this.close);           
@@ -28,7 +29,7 @@ function($,Backbone,_,StatisticsView,EditStudentView,DeleteStudentView, CellView
         },    
         render: function() {
             var template = _.template($('#student-view-template').html()); 
-            var compiled = template({student: this.model});
+            var compiled = template({student: this.model, role: this.role});
             this.$el.html(compiled);     
             var gbid = parseInt(this.courses.findWhere({selected: true}).get('id')); //anq: why is this not already an integer??
             var x = this.cells.where({

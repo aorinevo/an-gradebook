@@ -13,8 +13,8 @@
     	'async': 'lib/async',
     	'propertyParser': 'lib/propertyParser'  	    	
     },
-    name: 'app_instructor',
-    out: 'app-instructor-min.js',
+    name: 'an-gradebook-app',
+    out: 'an-gradebook-app-min.js',
 	shim: {
 		'bootstrap':['jquery']       
     }

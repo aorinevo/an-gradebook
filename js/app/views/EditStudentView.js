@@ -1,5 +1,5 @@
-define(['jquery','backbone','underscore','models/Student'],
-function($,Backbone,_,Student){
+define(['jquery','backbone','underscore','models/User'],
+function($,Backbone,_,User){
 	var EditStudentView = Backbone.View.extend({
  		id: 'base-modal',
     	className: 'modal fade',
@@ -14,7 +14,7 @@ function($,Backbone,_,Student){
 			this.options = options.options;
            	_(this).extend(this.options.gradebook_state);
             this.course = this.courses.findWhere({'selected': true});     
-            this.student = this.model || null;       	      
+            this.student = this.model || null;       	           
             $('body').append(this.render().el);     	
             return this;
         },        
@@ -26,22 +26,13 @@ function($,Backbone,_,Student){
             self.$el.html(compiled);  
             this.$el.modal('show');            
 			_.defer(function(){
-				self.inputName = self.$('input[name="firstname"]');
+				self.inputName = self.$('input[name="first_name"]');
 				var strLength= self.inputName.val().length;
 				//inputName.focus();				
 				//inputName[0].setSelectionRange(strLength, strLength);
 			}); 					
             return self;
-        },
-        toggleEditDelete: function(){      
-            var x = AN.GlobalVars.students.findWhere({selected: true});
-            if(x){
-              $('#add-student, #edit-student, #delete-student, #add-assignment').attr('disabled',false);
-            }else{           
-              $('#edit-student, #delete-student').attr('disabled',true);
-            }     
-            $('#add-student, #add-assignment').attr('disabled',false);
-        },   
+        },  
  		keyPressHandler: function(e) {
             if (e.keyCode == 27) this.editCancel();
             if (e.keyCode == 13) this.submitForm();
@@ -65,16 +56,17 @@ function($,Backbone,_,Student){
             var studentInformation = $(ev.currentTarget).serializeObject();
             if(this.student){
             	studentInformation.id = parseInt(studentInformation.id);
-            	this.student.save(studentInformation,{wait: true});
+            	this.student.save(studentInformation, {wait: true});
 				this.$el.modal('hide');              	
             } else {
              	delete(studentInformation['id']);
-            	var toadds = new Student(studentInformation);
-            	toadds.save(studentInformation,{success: function(model,response){
-                		_.each(response['assignment'], function(assignment) {
-                  	  		self.cells.add(assignment);
+            	var toadds = new User(studentInformation);
+            	toadds.save(studentInformation,{success: function(model){
+                		_.each(model.get('cells'), function(cell) {
+                  	  		self.cells.add(cell);
               			});
-                		self.students.add(response['student']);                       	 
+              			var _student = new User(model.get('student'));
+                		self.students.add(_student);                       	 
                 		self.$el.modal('hide');   
             		}
             	});            	

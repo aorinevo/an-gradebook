@@ -1,6 +1,6 @@
 <?php
 class AN_GradeBook_Database{
-	const an_gradebook_db_version = 3.1415;
+	const an_gradebook_db_version = 3.14159;
 	public function __construct(){
 		register_activation_hook(__FILE__,array($this,'database_init'));	
 		register_activation_hook(__FILE__,array($this,'database_alter'));			
@@ -62,12 +62,12 @@ class AN_GradeBook_Database{
 					$i++;
 				}				
 			}
-			update_option( "an_gradebook_db_version", self::an_gradebook_db_version );				
+			update_option( "an_gradebook_db_version", 3.14 );				
 		}
 		if(get_site_option( 'an_gradebook_db_version' )==3.14){ 
 			$sql = 'ALTER TABLE an_assignments ADD assign_visibility VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT "Students"';					
 			$wpdb->query($sql);				
-		    update_option( "an_gradebook_db_version", self::an_gradebook_db_version);
+		    update_option( "an_gradebook_db_version", 3.141);
 		}	
 		if(get_site_option( 'an_gradebook_db_version' )==3.141){ 
 			$sql1 = "SELECT uid FROM an_gradebook";					
@@ -79,12 +79,42 @@ class AN_GradeBook_Database{
 			$sql2 = "DELETE FROM an_assignment WHERE uid IN (".implode(',', $uids_to_delete_from_gradebook).")";			
 			$wpdb->query($sql1);
 			$wpdb->query($sql2);			
+		    update_option( "an_gradebook_db_version", 3.1415);
+		}	
+		if(get_site_option( 'an_gradebook_db_version' )==3.1415){ 
+			$sql = "RENAME TABLE an_gradebooks TO an_gradebook_courses, an_gradebook TO an_gradebook_students, an_assignments TO an_gradebook_assignments, an_assignment TO an_gradebook_cells";																
+			$wpdb->query($sql);	
+	  		$db_name = 'an_gradebook_users';
+			if($wpdb->get_var('SHOW TABLES LIKE "'.$db_name.'"') != $db_name){
+				$sql = 'CREATE TABLE ' . $db_name . ' (
+				id int(11) NOT NULL AUTO_INCREMENT,
+				uid int(11) NOT NULL,
+				gbid int(11) NOT NULL,
+				role VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT "student",
+				PRIMARY KEY  (id)  )';
+				require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+				dbDelta($sql);
+			}	
+			
+			$sql = 'INSERT INTO an_gradebook_users (uid, gbid) SELECT uid, gbid FROM an_gradebook_students';
+			$wpdb->query($sql);			
+			$sql = 'SELECT gbid FROM an_gradebook_courses';
+			$gbids = $wpdb -> get_col('SELECT id FROM an_gradebook_courses');
+			$sql_sub = '';
+			foreach($gbids as $gbid){
+				$sql_sub = $sql_sub. "(1,$gbid,'instructor'),";
+			}
+			$sql_sub = rtrim($sql_sub, ',');
+			$sql = 'INSERT INTO an_gradebook_users (uid, gbid, role) VALUES '. $sql_sub;
+			$wpdb -> query($sql);
+			$sql = 'DROP TABLE an_gradebook_students';
+			$wpdb -> query($sql);			
 		    update_option( "an_gradebook_db_version", self::an_gradebook_db_version);
-		}					
+		}								
 	}
 	public function database_init() {
 		global $wpdb;
-	  	$db_name = 'an_gradebooks';
+	  	$db_name = 'an_gradebook_courses';
 		if($wpdb->get_var('SHOW TABLES LIKE "'.$db_name.'"') != $db_name){
 			$sql = 'CREATE TABLE ' . $db_name . ' (
 			id int(11) NOT NULL AUTO_INCREMENT,
@@ -96,18 +126,19 @@ class AN_GradeBook_Database{
 			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 			dbDelta($sql);
 		}
-		$db_name1 = 'an_gradebook';
-		if($wpdb->get_var('SHOW TABLES LIKE "'.$db_name1.'"') != $db_name1){
-			$sql = 'CREATE TABLE ' . $db_name1 . ' (
+	  	$db_name = 'an_gradebook_users';
+		if($wpdb->get_var('SHOW TABLES LIKE "'.$db_name.'"') != $db_name){
+			$sql = 'CREATE TABLE ' . $db_name . ' (
 			id int(11) NOT NULL AUTO_INCREMENT,
 			uid int(11) NOT NULL,
 			gbid int(11) NOT NULL,
-			PRIMARY KEY  (id) )';
-		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-		dbDelta($sql);
-		}
+			role VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT "student",
+			PRIMARY KEY  (id)  )';
+			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+			dbDelta($sql);
+		}		
 		//$db_name2 should be changed to $table_name but we'll stick with this for now
-		$db_name2 = 'an_assignments';
+		$db_name2 = 'an_gradebook_assignments';
 		//The column headings that should be in the an_assignments table are stored in $table_columns
 		$table_columns = array('id','gbid','assign_order','assign_name','assign_category', 'assign_visibility','assign_date','assign_due');
 		$table_columns_specs = array(
@@ -133,14 +164,14 @@ class AN_GradeBook_Database{
 			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 			dbDelta($sql);
 		} else {
-			//Otherwise, check if there is something to upgrade in an_assignments table		
+			//Otherwise, check if there is something to upgrade in an_gradebook_assignments table		
 			//anfixme: this needs to move to the database_alter
 			$an_assignments_columns = $wpdb->get_col( "SELECT column_name FROM information_schema.columns
-				WHERE table_name = 'an_assignments' ORDER BY ordinal_position" );
+				WHERE table_name = 'an_gradebook_assignments' ORDER BY ordinal_position" );
 			$missing_columns = array_diff($table_columns, $an_assignments_columns);
 			if(count($missing_columns)){
 				//add missing columns
-				$sql = 'ALTER TABLE an_assignments ';
+				$sql = 'ALTER TABLE an_gradebook_assignments ';
 				foreach ($missing_columns as $missing_column){
 					$sql = $sql. 'ADD '. $missing_column .' '. $table_columns_specs[$missing_column] .', ';
 				}
@@ -148,7 +179,7 @@ class AN_GradeBook_Database{
 				$wpdb->query($sql);	
 			}				
 		}
- 		$db_name3 = 'an_assignment';
+ 		$db_name3 = 'an_gradebook_cells';
 		if($wpdb->get_var('SHOW TABLES LIKE "'.$db_name3.'"') != $db_name3){
 			$sql = 'CREATE TABLE ' . $db_name3 . ' (
 			id int(11) NOT NULL AUTO_INCREMENT,

@@ -1,7 +1,5 @@
 <?php
 
-//include_once( ABSPATH . 'wp-includes/pluggable.php' );
-
 function build_sorter($key) {
 	return function ($a, $b) use ($key) {
 		return strnatcmp($a[$key], $b[$key]);

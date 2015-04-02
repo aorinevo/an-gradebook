@@ -11,13 +11,13 @@
 				        <input type="hidden" name="id" value="<%= student ? student.get('id') : '' %>"/>         
 				        <label for="firstname" class="col-sm-4 control-label">First Name:</label>
 						<div class="col-sm-6">					        
-				        	<input type="text" class="form-control" id="firstname" name="firstname" value="<%= student ? student.get('firstname') : '' %>"/>
+				        	<input type="text" class="form-control" id="first_name" name="first_name" value="<%= student ? student.get('first_name') : '' %>"/>
 				        </div>	
 				    </div>
 					<div class="form-group"> 				        
 				        <label for="lastname" class="col-sm-4 control-label">Last Name:</label>
 						<div class="col-sm-6">					        
-				        	<input type="text" class="form-control" id="lastname" name="lastname" value="<%= student ? student.get('lastname') : '' %>"/>
+				        	<input type="text" class="form-control" id="last_name" name="last_name" value="<%= student ? student.get('last_name') : '' %>"/>
 				        </div>	
 				    </div>
 				    <% if (!student) { %>

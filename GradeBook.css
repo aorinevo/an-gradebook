@@ -1,3 +1,36 @@
+#loading-students-container {
+	display:absolute;
+}
+
+#loading-courses-spinner, #loading-students-spinner {
+  text-align: center;
+  background-color: #2ea2cc;
+  padding: 4px;
+  font-size: large;
+  color: white;
+}
+
+.glyphicon-refresh-animate {
+    -animation: spin .7s infinite linear;
+    -webkit-animation: spin2 .7s infinite linear;
+}
+
+.glyphicon-refresh:before {
+  color: white;
+  padding: 10px;  
+  font-size: large;
+}
+
+@-webkit-keyframes spin2 {
+    from { -webkit-transform: rotate(0deg);}
+    to { -webkit-transform: rotate(360deg);}
+}
+
+@keyframes spin {
+    from { transform: scale(1) rotate(0deg);}
+    to { transform: scale(1) rotate(360deg);}
+}
+
 [contenteditable="true"]:active,
 [contenteditable="true"]:focus{
 border:none;

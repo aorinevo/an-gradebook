@@ -46,31 +46,35 @@ class gradebook_course_API{
 **************************/
 
 	public function course(){
-  		global $wpdb;
-    	$wpdb->show_errors();  		
-		if (!gradebook_check_user_role('administrator')){	
-			echo json_encode(array("status" => "Not Allowed."));
-			die();
-		}   	
+  		global $wpdb, $an_gradebook_api;
+    	$wpdb->show_errors();  	   		  	
 		$method = (isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'])) ? $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] : $_SERVER['REQUEST_METHOD'];
 		switch ($method){
 			case 'DELETE' : 
 				$id = $_REQUEST['id'];
-				$gbid = $id;		
-	  			$wpdb->delete('an_gradebooks',array('id'=>$id));
-	  			$wpdb->delete('an_gradebook',array('gbid'=>$gbid));  
-	  			$wpdb->delete('an_assignments',array('gbid'=>$gbid));
-	  			$wpdb->delete('an_assignment',array('gbid'=>$gbid));  
+				$gbid = $id;
+				if ( $an_gradebook_api -> an_gradebook_get_user_role($gbid)!='instructor'){	
+					echo json_encode(array("status" => "Not Allowed."));
+					die();
+				} 						
+	  			$wpdb->delete('an_gradebook_courses',array('id'=>$id));
+	  			$wpdb->delete('an_gradebook_assignments',array('gbid'=>$gbid));
+	  			$wpdb->delete('an_gradebook_cells',array('gbid'=>$gbid));  
+	  			$wpdb->delete('an_gradebook_users',array('gbid'=>$gbid));  	  			
 	  			echo json_encode(array('delete_course'=>'Success'));
 	  			break;
 	  		case 'PUT' :
-				$params = json_decode(file_get_contents('php://input'),true);			
-   				$wpdb->update('an_gradebooks', array( 
+				$params = json_decode(file_get_contents('php://input'),true);	  		
+				if ( $an_gradebook_api -> an_gradebook_get_user_role($params['id'])!='instructor'){	
+					echo json_encode(array("status" => "Not Allowed."));
+					die();
+				} 	  					
+   				$wpdb->update('an_gradebook_courses', array( 
    					'name' => $params['name'], 'school' => $params['school'], 'semester' => $params['semester'], 
    					'year' => $params['year']),
 					array('id' => $params['id'])
 				);   
-   				$courseDetails = $wpdb->get_row('SELECT * FROM an_gradebooks WHERE id = '. $params['id'] , ARRAY_A);
+   				$courseDetails = $wpdb->get_row('SELECT * FROM an_gradebook_courses WHERE id = '. $params['id'] , ARRAY_A);
    				echo json_encode($courseDetails);	
 				break;
 	  		case 'UPDATE' :
@@ -83,19 +87,31 @@ class gradebook_course_API{
 				echo json_encode(array("get" => "getting"));	
 				break;
 	  		case 'POST' :
-				$params = json_decode(file_get_contents('php://input'),true);		  		
-    			$wpdb->insert('an_gradebooks', 
-		    		array('name' => $params['name'], 'school' => $params['school'], 'semester' => $params['semester'], 'year' => $params['year']), 
+				$params = json_decode(file_get_contents('php://input'),true);	
+				$user = wp_get_current_user();
+				if ( !gradebook_check_user_role('administrator')){	
+					echo json_encode(array("status" => "Not Allowed."));
+					die();
+				} 						  		
+				$wpdb->insert('an_gradebook_courses', 
+		    		array('name' => $params['name'], 
+		    			'school' => $params['school'], 
+		    			'semester' => $params['semester'], 
+		    			'year' => $params['year']), 
 					array('%s', '%s', '%s', '%d') 
 				);
-				if( !is_wp_error($wpdb->insert_id) ){
-					$courseDetails = $wpdb->get_row("SELECT * FROM an_gradebooks WHERE id = $wpdb->insert_id", ARRAY_A);
-					echo json_encode($courseDetails);
-					die();
-				}else{
-					echo $result->get_error_message();
-					die();
-				}						
+				$gbid = $wpdb -> insert_id;
+    			$wpdb->insert('an_gradebook_users', 
+		    		array('uid' => $user->ID,'gbid' => $gbid, 'role' => 'instructor'), 
+					array('%d', '%d', '%s') 
+				);	
+				global $an_gradebook_api;
+				$user = $an_gradebook_api -> an_gradebook_get_user($user->ID, $gbid);			
+				$course = $wpdb->get_row("SELECT * FROM an_gradebook_courses WHERE id = $gbid", ARRAY_A);
+				$course['id']=intval($course['id']);
+				$course['year']=intval($course['year']);				
+				echo json_encode(array('course'=>$course, 'user'=>$user));
+				die();					
 				break;
 	  	}
 	  	die();

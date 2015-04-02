@@ -10,8 +10,9 @@ function($,Backbone,_, EditCourseView){
         },
         initialize: function(options) {
 			this.options = options.options;
-           	_(this).extend(this.options.gradebook_state);         
-            this.course = this.model;           	
+           	_(this).extend(this.options.gradebook_state);     
+            this.course = this.model;  
+            this.role = this.roles.findWhere({gbid: parseInt(this.course.get('id'))}); 	
 			this.listenTo(this.course, 'change:name change:school change:semester change:year', this.render);
             this.listenTo(this.course, 'change:selected', this.selectCourseCSS);
             this.listenTo(this.course, 'remove', this.close);
@@ -25,6 +26,7 @@ function($,Backbone,_, EditCourseView){
         },
         deleteCourse: function(ev) {
         	ev.preventDefault();
+        	this.model.set({selected: false});
         	this.model.destroy(); 
         },
         editCourse: function() {
@@ -33,11 +35,11 @@ function($,Backbone,_, EditCourseView){
         },             
         render: function() {
             var template = _.template($('#course-view-template').html());
-            var compiled = template({course : this.course});
+            var compiled = template({course : this.course, role: this.role});
             this.$el.html(compiled);            
             return this;
         },
-        selectCourse: function(ev) {
+        selectCourse: function(ev) {    
            var x = this.students.findWhere({
                 selected: true
             });
