@@ -1,14 +1,13 @@
-define(['backbone'],function(Backbone){ 
+define(['backbone','underscore'],function(Backbone,_){ 
 	var Assignment = Backbone.Model.extend({
         defaults: {   
         	assign_category: '',  
-            assign_name: 'assign name',
+            assign_name: '',
             assign_due: '',
             assign_date: '',
             gbid: null,
             sorted: '',
-            visibility: true,
-           // assign_visibility: 'Student',            
+            visibility: true,          
             publish: true,
             selected: false
         },

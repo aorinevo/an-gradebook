@@ -10,9 +10,11 @@ function($,Backbone,_, User, Course){
             'submit #edit-course-form': 'editSave'
         },
         initialize: function(options){  
-			this.options = options.options;
-           	_(this).extend(this.options.gradebook_state);     
-            this.course = this.model || null;                  	        
+			//this.options = options.options;
+            //	_(this).extend(this.options.gradebook_state);     
+            this.course = this.model || null; 
+            console.log(this.collection);  
+            this.courseList = this.collection;               	        
             $('body').append(this.render().el);
             return this;                
         },
@@ -61,9 +63,9 @@ function($,Backbone,_, User, Course){
             	var toadds = new Course(courseInformation);
             	toadds.save(courseInformation,{success: function(model){
             		 var _user = new User(model.get('user'));
-            		 self.roles.add(_user);
+            		 //self.roles.add(_user);
             		 var _course = new Course(model.get('course'));            		 
-            		 self.courses.add(_course);              		 
+            		 self.courseList.add(_course);              		 
 					 self.$el.modal('hide');                		 
             		}
             	});            				

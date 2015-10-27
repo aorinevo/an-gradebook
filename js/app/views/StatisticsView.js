@@ -7,10 +7,8 @@ function($,Backbone,_){
             'hidden.bs.modal' : 'editCancel',  
         },		
 		initialize: function(options){	
-			google.load('visualization', '1.0', {'packages':['corechart']});  
-			this.options = options.options;
-           	_(this).extend(this.options.gradebook_state);   		
-            this.student = this.students.findWhere({selected: true});      
+			google.load('visualization', '1.0', {'packages':['corechart']});  					
+            this.student = this.model;     
             $('body').append(this.render().el);
             return this;   		   
 		},		

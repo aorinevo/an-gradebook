@@ -11,9 +11,8 @@ function($,Backbone,_,Assignment){
         },
         initialize: function(options){  
 			this.options = options.options;		
-           	_(this).extend(this.options.gradebook_state);            	               
-           	this.course = this.courses.findWhere({'selected': true});
-            this.role = this.roles.findWhere({gbid: this.course.get('id')}); 	           	
+			this.gradebook = options.gradebook;
+			this.course = options.course;         	                       	
            	this.assignment = this.model || null;           	
             $('body').append(this.render().el);
             $('#assign-date-datepicker, #assign-due-datepicker').datepicker();
@@ -25,9 +24,9 @@ function($,Backbone,_,Assignment){
             return this;
         },
         render: function() {
-            var gradebook = this.courses.findWhere({selected: true});            
+           // var gradebook = this.courses.findWhere({selected: true});            
             var template = _.template($('#edit-assignment-template').html());
-            var compiled = template({assignment: this.assignment, gradebook: gradebook, role: this.role});
+            var compiled = template({assignment: this.assignment, course: this.course , role: this.role});
             this.$el.html(compiled);                 
 			this.$el.modal('show');
 			var self = this;
@@ -57,17 +56,18 @@ function($,Backbone,_,Assignment){
             ev.preventDefault();
             var self = this;
             var assignmentInformation = $(ev.currentTarget).serializeObject(); 
-			var x = $(ev.currentTarget).serializeObject().id;           
-            var toadd = this.assignments.findWhere({id : parseInt(x)});
+			var x = $(ev.currentTarget).serializeObject().id;  
+			console.log(assignmentInformation);         
+            var toadd = this.gradebook.assignments.findWhere({id : parseInt(x)});
             if(toadd){
             	toadd.save(assignmentInformation,{wait: true});          	
             } else {
              	delete(assignmentInformation['id']);
             	var toadds = new Assignment(assignmentInformation);
             	toadds.save(assignmentInformation,{success: function(model,response){
-            		self.assignments.add(response['assignment']); 
+            		self.gradebook.assignments.add(response['assignment']); 
                 	_.each(response['cells'], function(cell) {
-                    	self.cells.add(cell)
+                    	self.gradebook.cells.add(cell)
                 	});             		 
             		}
             	});            	
