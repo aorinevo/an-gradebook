@@ -2,8 +2,8 @@
 Contributors: anevo, jamarparris
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.5
-Tested up to: 4.1.1
-Stable tag: 3.5.8
+Tested up to: 4.3.1
+Stable tag: 4.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,17 +54,31 @@ Students are able to:
 
 * plugin icon: https://www.iconfinder.com/icons/175285/edit_property_icon#size=256
 
+== Upgrade Notice ==
+
+= 4.0 =
+
+Backwards compatibility has been taken into account but is not guaranteed.  It is recommended that you back up your grade books before upgrading.  This version upgrade contains a lot of changes on the backend.
+
+
 == Changelog ==
 
-Version 3.5.8:
+Version 4.0:
 
-* Renamed database table names to better reflect the data they store: an_gradebook_cells, an_gradebook_assignments, an_gradebook_courses, an_gradebook_users.
+* Added search when adding students to gradebook.  Automatically queries the database as you type and returns a list of users from which to select.
+* Renamed plugin database tables to an_gradebook_cells, an_gradebook_assignments, an_gradebook_courses, an_gradebook_users.
 * Security fix: added a role check when requesting line chart statistics. Otherwise, there’s a potential for a students grades to be exposed however, it would be unlikely that the user would know the link, user id, and gradebook id to successfully do this.
 * Fixed margin-right to prevent gradebook from stretching all the way to the right of the browser window.
 * When gradebook loads courses and students, a loading indicator is displayed.
-* Now there is a single point of entry into the gradebook app.  The main file is app.js.  This file handles both instructor and student views.
 * Only administrators, users with wordpress role set to administrator, are allowed to add courses.  Instructors, with the gradebook role set to instructor, can edit, delete and add students. There is also a student role in gradebook which is automatically assigned to a user added to a gradebook.
 * Bug fix. Seems that the delete course bug wasn’t fixed in v3.5.7.  This occurs when a user deletes a selected gradebook.  Then the view doesn’t remove itself.  
+* Added settings page, where WordPress admin users can select roles that are allowed to administer AN_GradeBook. Users with those roles will be able to create new gradebooks.
+* Reorganized files.  Main changes under the app directory.
+* Added a router.
+* The gradebook view now displays on a separate page, instead of below the course list.  To access the gradebook view, select view item from the dropdown menu.
+* Dropped backwards compatibility up to v2.9
+
+** need to remove screen options from non admin views
 
 Version 3.5.7:
 

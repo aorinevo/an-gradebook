@@ -7,50 +7,32 @@ function($,Backbone,_){
             "blur": "edit",
             "keypress": "updateOnEnter"
         },
-        initialize: function(options) { 
-			this.options = options.options;
-           	_(this).extend(this.options.gradebook_state);   
-            this.course = this.courses.findWhere({'selected': true});    
-            this.role = this.roles.findWhere({'gbid': this.course.get('id')}); 	                     
-            this.listenTo(this.assignments, 'change:hover', this.hoverCell);            
-            this.listenTo(this.assignments, 'change:assign_order', this.shiftCell);                
-            this.listenTo(this.assignments, 'change:visibility', this.visibilityCell);
-            this.listenTo(this.assignments, 'remove', this.cleanUpAssignmentCells); 
-            this.listenTo(this.assignments, 'add remove change:sorted change:assign_order', this.close);
-            this.listenTo(this.students, 'remove', this.cleanUpStudentCells);                                      
-            this.listenTo(this.students, 'add remove', this.close);                                                  
-            this.listenTo(this.courses, 'remove change:selected', this.close);                                                            
+        initialize: function(options) {  
+            this.course = options.course;  
+            this.gradebook = options.gradebook;	                     
+            this.listenTo(this.gradebook.assignments, 'change:hover', this.hoverCell);            
+            this.listenTo(this.gradebook.assignments, 'change:assign_order', this.shiftCell);                
+            this.listenTo(this.gradebook.assignments, 'change:visibility', this.visibilityCell);                                                                                                 
         },
         render: function() {
         	var self = this;
-        	if(this.role.get('role') === 'instructor'){
+        	if(this.gradebook.role === 'instructor'){
         		this.$el.attr('contenteditable','true');
         	} else {
         		this.$el.css('cursor','default');
         	}
-        	var _assignment = this.assignments.findWhere({id : this.model.get('amid')});
+        	var _assignment = this.gradebook.assignments.findWhere({id : this.model.get('amid')});
             if(_assignment){
             	this.$el.toggleClass('hidden', !_assignment.get('visibility'));           
             }
             var template = _.template($('#edit-cell-template').html());
             var compiled = template({cell: this.model});
             this.$el.html(compiled);
-            return this;
-        },
-        cleanUpAssignmentCells: function(ev){
-        	if( ev.get('id') === this.model.get('amid') ){
-	        	this.cells.remove(this.model);
-	        }
-        },
-        cleanUpStudentCells: function(ev){
-        	if( ev.get('id') === this.model.get('uid') ){
-        		this.cells.remove(this.model.get('id'));
-        	}
-        },        
+            return this.el;
+        },       
         close: function(ev) {
-			if( ev.get('id') === this.model.get('gbid') ){        	
-        		this.remove();
-        	}
+			console.log('removing cell view');
+        	this.remove();
         },    
         shiftCell: function(ev){
         	this.remove();         

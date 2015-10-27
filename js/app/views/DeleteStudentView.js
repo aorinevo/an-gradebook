@@ -10,20 +10,17 @@ function($,Backbone,_){
             'submit #delete-student-form': 'deleteSave'
         },
         initialize: function(options){   
-			this.options = options.options;
-           	_(this).extend(this.options.gradebook_state);             
+			this.gradebook = options.gradebook;
+			this.course = options.course;
+			this.student = this.model;           
             $('body').append(this.render().el);     	
             return this;
         },        
         render: function() {
             var self = this;
-            var student = this.model;
-            var gradebook = this.courses.findWhere({
-        		selected: true
-            });
-            if (student) {
+            if (this.student) {
                 var template = _.template($('#delete-student-template').html());
-                var compiled = template({student: student, gradebook: gradebook});            
+                var compiled = template({student: this.student, course: this.course});            
                 this.$el.html(compiled);
             }
             this.$el.modal('show');

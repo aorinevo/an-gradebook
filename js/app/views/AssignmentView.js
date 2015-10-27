@@ -1,11 +1,12 @@
-define(['jquery','backbone','underscore','views/AssignmentStatisticsView','views/EditAssignmentView','jquery-ui'],
-function($,Backbone,_,AssignmentStatisticsView, EditAssignmentView){
+define(['jquery','backbone','underscore','views/AssignmentStatisticsView','views/EditAssignmentView', 'views/DetailsAssignmentView','jquery-ui'],
+function($,Backbone,_,AssignmentStatisticsView, EditAssignmentView, DetailsAssignmentView){
 	var AssignmentView = Backbone.View.extend({
         tagName: 'th',
         className: 'assignment-tools assignment',
         events: {
             'click li.assign-submenu-sort': 'sortColumn',
             'click .dashicons-menu': 'toggleAssignmentMenu',
+            'click li.assign-submenu-details': 'detailsAssignment',
             'click li.assign-submenu-delete' : 'deleteAssignment',
             'click li.assign-submenu-edit' : 'editAssignment',         
             'click li.assign-submenu-left' : 'shiftAssignmentLeft',              
@@ -16,18 +17,15 @@ function($,Backbone,_,AssignmentStatisticsView, EditAssignmentView){
             'mouseleave div.column-frame' : 'mouseLeave'
         },
         initialize: function(options) {
-			this.options = options.options;
-           	_(this).extend(this.options.gradebook_state);   
-            this.course = this.courses.findWhere({'selected': true}); 
-            this.role = this.roles.findWhere({'gbid': this.course.get('id')}); 	            
+			this.gradebook = options.gradebook; 
+			this.course = options.course;     	            
             this.assignment = this.model;
-           	this.render();            	   
 			this.listenTo(this.assignment, 'change:assign_name', this.render);         
             this.listenTo(this.assignment, 'change:sorted', this.sortColumnCSS);
             this.listenTo(this.assignment, 'change:visibility', this.visibilityColumnCSS);   
-            this.listenTo(this.students, 'add remove', this.close);      
-            this.listenTo(this.assignments, 'add remove change:sorted change:assign_order', this.close);                           
-            this.listenTo(this.courses, 'remove change:selected', this.close);                      
+            this.listenTo(this.gradebook.students, 'add remove', this.close);      
+            this.listenTo(this.gradebook.assignments, 'add remove change:sorted change:assign_order', this.close);                                            
+           	this.render();            	                       
         },
         mouseEnter: function(){
         	this.$el.addClass('hover');
@@ -36,16 +34,20 @@ function($,Backbone,_,AssignmentStatisticsView, EditAssignmentView){
         mouseLeave: function(){
         	this.$el.removeClass('hover');	
         	this.assignment.set({hover: false});	
-        },     
+        }, 
+        detailsAssignment: function(ev){
+        	ev.preventDefault();
+            var view = new DetailsAssignmentView({model: this.assignment, course: this.course});
+        },    
         shiftAssignmentLeft: function(ev){
         	ev.preventDefault();          
-        	var x = this.assignments.findWhere({assign_order: this.model.get('assign_order')-1});
+        	var x = this.gradebook.assignments.findWhere({assign_order: this.model.get('assign_order')-1});
         	x.save({assign_order: this.model.get('assign_order')});
 			this.assignment.save({assign_order: this.model.get('assign_order')-1});
         },	
         shiftAssignmentRight: function(ev){
         	ev.preventDefault();          
-        	var x = this.assignments.findWhere({assign_order: this.model.get('assign_order')+1});
+        	var x = this.gradebook.assignments.findWhere({assign_order: this.model.get('assign_order')+1});
         	x.save({assign_order: this.model.get('assign_order')});
 			this.assignment.save({assign_order: this.model.get('assign_order')+1});
         },        
@@ -69,11 +71,11 @@ function($,Backbone,_,AssignmentStatisticsView, EditAssignmentView){
 			var compiled = template({
                     assignment: this.assignment,
                     role: this.role,
-                    min: _.min(this.assignments.models, function(assignment){ return assignment.get('assign_order');}),
-                    max: _.max(this.assignments.models, function(assignment){ return assignment.get('assign_order');})                
+                    min: _.min(this.gradebook.assignments.models, function(assignment){ return assignment.get('assign_order');}),
+                    max: _.max(this.gradebook.assignments.models, function(assignment){ return assignment.get('assign_order');})                
                 });
         	this.$el.html(compiled);         	
-        	return this;
+        	return this.el;
         },
         sortColumn: function(ev){
         	ev.preventDefault();  
@@ -84,7 +86,7 @@ function($,Backbone,_,AssignmentStatisticsView, EditAssignmentView){
                 	this.assignment.set({sorted: 'desc'});            
             	}
             } else {
-                var x = this.assignments.find(function(model){
+                var x = this.gradebook.assignments.find(function(model){
                 	return model.get('sorted').length >0;
                 });
                 x && x.set({ sorted: '' });
@@ -108,23 +110,26 @@ function($,Backbone,_,AssignmentStatisticsView, EditAssignmentView){
             }
         },
         statsAssignment: function(ev){
+        	console.log('hello');
         	ev.preventDefault();  
             var view = new AssignmentStatisticsView({model: this.assignment, options: this.options});           
         }, 
         editAssignment: function(ev) {
         	ev.preventDefault();                	      
-            var view = new EditAssignmentView({model: this.assignment, options: this.options});           
+            var view = new EditAssignmentView({model: this.assignment, gradebook: this.gradebook, course: this.course});           
         },               
         deleteAssignment: function(ev) {
 			ev.preventDefault();    
 			var self = this;      
 			this.assignment.destroy({success: 
 				function (model){
+					var _cells = self.gradebook.cells.where({amid: model.get('id')});					
+					self.gradebook.cells.remove(_cells);									
 	            	var _x = model.get('assign_order'); 	            
-	            	if(self.assignments.models.length){
-						var _y = _.max(self.assignments.models, function(assignment){ return assignment.get('assign_order');});                     			            	
+	            	if(self.gradebook.assignments.models.length){
+						var _y = _.max(self.gradebook.assignments.models, function(assignment){ return assignment.get('assign_order');});                     			            	
 	            		for( i = _x; i < _y.get('assign_order'); i++){
-	            			var _z = self.assignments.findWhere({assign_order: i+1});
+	            			var _z = self.gradebook.assignments.findWhere({assign_order: i+1});
 	            			_z.save({assign_order: i});
 	            		}
 	            	}	            	
@@ -132,9 +137,8 @@ function($,Backbone,_,AssignmentStatisticsView, EditAssignmentView){
             );        
         },
         close: function(ev){  
-        	if(ev.get('id') === this.assignment.get('gbid')){ 
-				this.remove();			
-			}  			
+        	console.log('removing assignment view');
+			this.remove();			
         }                     
     });
 	return AssignmentView;

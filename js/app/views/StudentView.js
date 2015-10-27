@@ -3,8 +3,6 @@ function($,Backbone,_,StatisticsView,EditStudentView,DeleteStudentView, CellView
 	var StudentView = Backbone.View.extend({
         tagName: 'tr',
         events: {
-           // 'click .student': 'selectStudent',
-           // 'click input[id^=cb-select-]': 'selectStudent',
             'click a.edit-student': 'editStudent',
             'click a.delete-student': 'deleteStudent',
             'click a.student-statistics': 'studentStatistics', 
@@ -15,35 +13,39 @@ function($,Backbone,_,StatisticsView,EditStudentView,DeleteStudentView, CellView
         },
         initialize: function(options) {
         	var self = this;
-			this.options = options.options;
-           	_(this).extend(this.options.gradebook_state);
-           	this.student = this.model;
-            this.course = this.courses.findWhere({'selected': true});    
-            this.role = this.roles.findWhere({'gbid': this.course.get('id')}); 	            
-			this.listenTo(this.model, 'change:first_name change:last_name', this.render);      
-           	//this.listenTo(this.model, 'change:selected', this.selectAllStudents);			
-            this.listenTo(self.students, 'add remove', this.close);
-            this.listenTo(self.assignments, 'add remove change:sorted change:assign_order', this.close);            
-            this.listenTo(self.courses, 'remove change:selected', this.close);           
-            
+			this._subviews =[];          	
+			this.gradebook = options.gradebook;
+			this.course = options.course;
+           	this.student = this.model;	                     
+           	this.listenTo(this.model, 'change', this.render);            
         },    
         render: function() {
+			var self = this;
             var template = _.template($('#student-view-template').html()); 
             var compiled = template({student: this.model, role: this.role});
             this.$el.html(compiled);     
-            var gbid = parseInt(this.courses.findWhere({selected: true}).get('id')); //anq: why is this not already an integer??
-            var x = this.cells.where({
+            var gbid = parseInt(self.course.get('id')); //anq: why is this not already an integer??
+            var x = this.gradebook.cells.where({
             	uid: parseInt(this.model.get('id')),		//anq: why is this not already an integer??
             	gbid: gbid
             	});
            	x = _.sortBy(x,function(model){ return model.get('assign_order');});        	
             var self = this;
             _.each(x, function(cell) {
-                var view = new CellView({model: cell, options: self.options});
-                self.$el.append(view.render().el);
+                var view = new CellView({course: self.course, gradebook: self.gradebook, model: cell, options: self.options});
+                self._subviews.push(view);
+                self.$el.append(view.render());
             });
-            return this;
+            return this.el;
         },
+  		clearSubViews : function(){
+  			var self = this;
+  			console.log(self._subviews);
+		  	_.each(self._subviews,function(view){
+		  	   view.close();
+		  	});
+		  	this._subviews = [];    			 
+  		},        
         toggleStudentMenu: function(){
         	var _student_menu = $('#row-student-id-'+this.model.get('id'));
         	if( _student_menu.css('display') === 'none'){
@@ -90,12 +92,12 @@ function($,Backbone,_,StatisticsView,EditStudentView,DeleteStudentView, CellView
         },
         deleteStudent: function(ev){
         	ev.preventDefault();
-        	var view = new DeleteStudentView({model: this.model, options: this.options});              	      	
+        	var view = new DeleteStudentView({model: this.model, gradebook: this.gradebook, course: this.course});              	      	
         },               
-        close: function(ev) {
-        	if(ev.get('id') === this.student.get('gbid')){
-	            this.remove();
-	        }
+        close: function(ev) {        	
+        	console.log('removing student views');
+        	this.clearSubViews();        	
+			this.remove();
         }
     });
 	return StudentView;

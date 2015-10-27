@@ -4,23 +4,26 @@ config = {
     	'models' : 'app/models',
     	'views' : 'app/views',
     	'jquery' : 'lib/jquery',
-		'jquery-ui' : 'lib/jquery-ui',    	
+		'jquery-ui' : 'lib/jquery-ui/jquery-ui.min',    	
     	'backbone': 'lib/backbone',
     	'underscore': 'lib/underscore',
-    	'bootstrap': 'lib/bootstrap',
+    	'bootstrap': 'lib/bootstrap/js/bootstrap.min',
     	'goog': 'lib/goog',
+    	'bootstrap3-typeahead': 'lib/bootstrap3-typeahead/bootstrap3-typeahead',
 		'async': 'lib/async', 
 		'propertyParser' : 'lib/propertyParser'   	
     },
 	shim: {
-		'bootstrap':['jquery']       
+		'bootstrap':{
+			deps: ['jquery']
+		}
     }
 };
 
 require.config(config);
 
-require(['jquery', 'app/GradeBook','bootstrap'],
-function($,GradeBook){       
+require(['jquery','app/router/GradeBookRouter','bootstrap'],
+	function($,GradeBookRouter,bootstrap){       
     	$.fn.serializeObject = function() {
         	var o = {};
         	var a = this.serializeArray();
@@ -35,7 +38,7 @@ function($,GradeBook){
             }
         });
         return o;
-    }
-    var App = new GradeBook();
+    }    
+    var App = new GradeBookRouter();
 });
 

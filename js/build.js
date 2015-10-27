@@ -9,6 +9,7 @@
     	'backbone': 'lib/backbone',
     	'underscore': 'lib/underscore',
     	'bootstrap': 'lib/bootstrap',
+    	'bootstrap3-typeahead': 'lib/bootstrap3-typeahead/bootstrap3-typeahead.min',    	
     	'goog': 'lib/goog',
     	'async': 'lib/async',
     	'propertyParser': 'lib/propertyParser'  	    	

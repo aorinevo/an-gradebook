@@ -8,9 +8,7 @@ function($,Backbone,_){
 			'keyup'  : 'keyPressHandler'
         },		
 		initialize: function(options){			   
-			google.load('visualization', '1.0', {'packages':['corechart']});  		     
-			this.options = options.options;
-           	_(this).extend(this.options.gradebook_state);   			
+			google.load('visualization', '1.0', {'packages':['corechart']});  		     			
             $('body').append(this.render().el);
             return this;   		   
 		},	
