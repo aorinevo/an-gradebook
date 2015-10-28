@@ -3,13 +3,13 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 3.5.8
+Version: 4.0
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
 */
 
-define( "AN_GRADEBOOK_VERSION", "3.5.8");
+define( "AN_GRADEBOOK_VERSION", "4.0");
 
 $database_file_list = glob(dirname( __FILE__ ).'/database/*.php');
 foreach($database_file_list as $database_file){
@@ -39,7 +39,7 @@ function register_an_gradebook_menu_page(){
 add_action( 'admin_menu', 'register_an_gradebook_menu_page' );	
 	
 function enqueue_an_gradebook_scripts($hook){	
-	$an_gradebook_develop = true;
+	$an_gradebook_develop = false;
 	$app_base = plugins_url('js',__FILE__);
 	$current_screen = get_current_screen()->id;
 	wp_register_style( 'jquery_ui_css', $app_base.'/lib/jquery-ui/jquery-ui.css', array(), null, false );	
@@ -69,7 +69,7 @@ add_action( 'admin_enqueue_scripts', 'enqueue_an_gradebook_scripts');
 	
 	function init_an_gradebook_settings(){
 		ob_start();	
-		include( dirname( __FILE__ ) . '/templates/settings-template.php' );	
+		include( dirname( __FILE__ ) . '/js/app/templates/settings-template.php' );	
 		echo ob_get_clean();
 	}
 
