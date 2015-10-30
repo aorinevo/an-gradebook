@@ -5,18 +5,20 @@
     	'models' : 'app/models',
     	'views' : 'app/views',
     	'jquery' : 'lib/jquery',
-		'jquery-ui' : 'lib/jquery-ui',    	
+		'jquery-ui' : 'lib/jquery-ui/jquery-ui.min',    	
     	'backbone': 'lib/backbone',
     	'underscore': 'lib/underscore',
-    	'bootstrap': 'lib/bootstrap',
-    	'bootstrap3-typeahead': 'lib/bootstrap3-typeahead/bootstrap3-typeahead.min',    	
+    	'bootstrap': 'lib/bootstrap/js/bootstrap.min',
     	'goog': 'lib/goog',
-    	'async': 'lib/async',
-    	'propertyParser': 'lib/propertyParser'  	    	
+    	'bootstrap3-typeahead': 'lib/bootstrap3-typeahead/bootstrap3-typeahead',
+		'async': 'lib/async', 
+		'propertyParser' : 'lib/propertyParser'   	
     },
     name: 'an-gradebook-app',
     out: 'an-gradebook-app-min.js',
 	shim: {
-		'bootstrap':['jquery']       
+		'bootstrap':{
+			deps: ['jquery']
+		}
     }
 })

@@ -1,6 +1,6 @@
 <?php
-class AN_GradeBook_Database{
-	const an_gradebook_db_version = 3.14159;
+class ANGB_DATABASE{
+	const an_gradebook_db_version = 3.2;
 	public function __construct(){
 		register_activation_hook(__FILE__,array($this,'database_init'));	
 		register_activation_hook(__FILE__,array($this,'database_alter'));			
@@ -22,8 +22,7 @@ class AN_GradeBook_Database{
 		//    do stuff to tables 
 		//    update_option( "an_gradebook_db_version", self::an_gradebook_db_version);
 		// }
-		//where the constant an_gradebook_db_version should be changed to a larger number.
-				
+		//where the constant an_gradebook_db_version should be changed to a larger number.				
 		global $wpdb;		
 		if(get_site_option( 'an_gradebook_db_version' )==2){
 			$sql = "ALTER TABLE an_gradebooks CHANGE name name MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL, 
@@ -116,8 +115,17 @@ class AN_GradeBook_Database{
 				'author'=>false,
 				'subscriber'=>false
 			));	
+		}	
+		if(get_site_option( 'an_gradebook_db_version' )==3.1415){ 
+			update_option( "an_gradebook_settings", array(
+				'administrator'=>true,
+				'editor'=>false,
+				'contributor'=>false,
+				'author'=>false,
+				'subscriber'=>false
+			));			
 		    update_option( "an_gradebook_db_version", self::an_gradebook_db_version);
-		}								
+		}									
 	}
 	public function database_init() {
 		global $wpdb;

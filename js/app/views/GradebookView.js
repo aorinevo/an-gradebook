@@ -78,6 +78,7 @@ function($,Backbone,_, Course, CourseGradebook, UserList, AssignmentList, CellLi
             		});
             		break;
             	case 'lastname':     
+            		console.log(this.gradebook.sort_column.models);
             		_.each(this.gradebook.sort_column.models, function(student) { 
                 		var view = new StudentView({model: student, course: self.course, gradebook: self.gradebook, options: self.options});
                 		self._subviews.push(view);                		

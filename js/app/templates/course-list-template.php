@@ -1,8 +1,8 @@
 <script id="course-list-template" type="text/template">
 <div class="container-fluid">
     <div class="row">
-    	<div class="col-md-12">
-    		<h2>Courses
+    	<div class="col-md-12 wrap">
+    		<h1>Courses
     			<?php 
     				global $an_gradebook_api;    			
     				if($an_gradebook_api->angb_is_gb_administrator()){
@@ -11,7 +11,7 @@
        				Add new
 	    		</a>   
 	    		<?php } ?>    
-    		</h2>
+    		</h1>
     	</div>	
     </div>   
     <div class="row">

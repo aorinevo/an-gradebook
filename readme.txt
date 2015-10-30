@@ -3,7 +3,7 @@ Contributors: anevo, jamarparris
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.5
 Tested up to: 4.3.1
-Stable tag: 4.0
+Stable tag: 4.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -42,13 +42,10 @@ Students are able to:
 
 == Screenshots ==
 
-1. GradeBook with a few courses.
-2. GradeBook with a course selected and corresponding students displayed.
-3. Line chart for a particular student.
-4. Pie chart for a particular assignment.
-5. Add course modal.
-6. Student view of GradeBook.
-7. Student view of assignment details.
+1. List of courses.
+2. Gradebook view for a particular course.
+3. Pie chart for a particular assignment.
+4. Add student form.
 
 == Credits ==
 
@@ -56,12 +53,23 @@ Students are able to:
 
 == Upgrade Notice ==
 
+= 4.0.1 =
+
+
+
 = 4.0 =
 
 Backwards compatibility has been taken into account but is not guaranteed.  It is recommended that you back up your grade books before upgrading.  This version upgrade contains a lot of changes on the backend.
 
 
 == Changelog ==
+
+Version 4.0.1:
+
+* Plugin had two separate js files that handled the gradebook and settings separately.  The files are now combined into one file.
+* Style page title and fix margin to be consistent with wpcontent styles.
+* Fixed issue where student view of gradebook always used John for first name and Doe for last name.  
+
 
 Version 4.0:
 
@@ -77,8 +85,6 @@ Version 4.0:
 * Added a router.
 * The gradebook view now displays on a separate page, instead of below the course list.  To access the gradebook view, select view item from the dropdown menu.
 * Dropped backwards compatibility up to v2.9
-
-** need to remove screen options from non admin views
 
 Version 3.5.7:
 
