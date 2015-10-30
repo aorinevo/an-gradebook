@@ -1,5 +1,5 @@
 <?php
-class AN_GradeBook_Database{
+class ANGB_DATABASE{
 	const an_gradebook_db_version = 3.2;
 	public function __construct(){
 		register_activation_hook(__FILE__,array($this,'database_init'));	

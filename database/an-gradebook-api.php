@@ -78,8 +78,8 @@ class an_gradebook_api{
 				}		
 				$student = get_userdata( $current_user->ID );
 				$student = array(
-						'firstname' => $student->first_name, 
-						'lastname' => $student->last_name, 
+						'first_name' => $student->first_name, 
+						'last_name' => $student->last_name, 
 						'user_login' => $student->user_login,
 						'id'=>intval($student->ID),
 						'gbid' => intval($gbid)

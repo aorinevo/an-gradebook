@@ -1,4 +1,4 @@
-config = {
+angb_require_config = {
     //By default load any module IDs from js/lib
     paths : {
     	'models' : 'app/models',
@@ -20,7 +20,7 @@ config = {
     }
 };
 
-require.config(config);
+require.config(angb_require_config);
 
 require(['jquery','app/router/GradeBookRouter','bootstrap'],
 	function($,GradeBookRouter,bootstrap){       

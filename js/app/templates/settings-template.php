@@ -1,10 +1,13 @@
 <script id="an-gradebook-settings-template" type="text/template">
-	<div id = "an-gradebook-settings" class="wrap">
-		<h2>Settings</h2>
-			<hr>
-		<div class="container">
+<div id = "an-gradebook-settings" class="wrap">
+	<div class="container-fluid">
+    	<div class="row">
+    		<div class="col-md-12 wrap">
+    			<h1>Settings</h1>
+	    	</div>	
+    	</div>  
 		<div class="row">		
-		<div class="col-sm-5">
+		<div class="col-sm-6">
 		<div class="panel panel-default">
 			<div class="panel-heading">
       			<h3 class="panel-title">GradeBook Administrators:</h3>

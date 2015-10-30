@@ -1,5 +1,9 @@
 define(['jquery','backbone','underscore','models/CourseList','views/EditCourseView','views/CourseView'],
 function($, Backbone, _, CourseList,EditCourseView,CourseView){
+   /**
+    * A module representing a course list view.
+    * @exports views/CourseListView
+    */
 var CourseListView = Backbone.View.extend({
         events: {
             'click a#add-course': 'editCourse'         

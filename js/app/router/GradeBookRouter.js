@@ -1,23 +1,36 @@
-define(['jquery','underscore','backbone','views/CourseListView','views/GradeBookView'],
-function($,_,Backbone,CourseListView,GradeBookView){	
+define(['jquery','underscore','backbone','views/CourseListView','views/GradeBookView','views/SettingsPage'],
+   /**
+    * @exports GradeBookRouter
+    */
+function($,_,Backbone,CourseListView,GradeBookView,SettingsPage){	
 	var GradeBookRouter = Backbone.Router.extend({
 		initialize: function(){
 			this._views = [];
+			var _x = $('a[href$="an_gradebook"]');
+			_x.attr('href',_x.attr('href') + '#courses');
+			var _x = $('a[href$="an_gradebook_settings"]');
+			_x.attr('href',_x.attr('href') + '#settings');
+			
 			Backbone.history.start();	 	
 		},
   		routes: {
-    		"": "home",
-	    	"gradebook/:id" :  "gradebook"      
+    		"courses": "courses",
+	    	"gradebook/:id" :  "gradebook",
+	    	"settings":  "settings"
+  		},
+  		initPage: function(){
+			$('#wpcontent').css('padding-left', '0px');  		
   		},
   		clearViews : function(){
   			var self = this;
+  			this.initPage();
   			console.log(self._views);
 		  	_.each(self._views,function(view){
 		  	   view.close();
 		  	});
 		  	this._views = [];    			 
   		},
-  		home : function() {
+  		courses : function() {
 			this.clearViews();
 		    var homeView = new CourseListView();
 			this._views.push(homeView);
@@ -26,7 +39,12 @@ function($,_,Backbone,CourseListView,GradeBookView){
 			this.clearViews();
     		var gradeBookView = new GradeBookView({gbid : parseInt(id)});
 			this._views.push(gradeBookView);
-  		}
+  		},
+		settings: function(){
+			this.clearViews();
+		    var settingsPage = new SettingsPage();
+			this._views.push(settingsPage);
+		}  		
 	});	  
 	return GradeBookRouter;	
 });

@@ -1,6 +1,8 @@
 define(['jquery','backbone','underscore','views/StatisticsView','views/EditStudentView','views/DeleteStudentView','views/CellView'],
 function($,Backbone,_,StatisticsView,EditStudentView,DeleteStudentView, CellView){
-	var StudentView = Backbone.View.extend({
+	var StudentView = Backbone.View.extend(
+	/** @lends StudentView.prototype */	
+	{	
         tagName: 'tr',
         events: {
             'click a.edit-student': 'editStudent',
@@ -11,6 +13,7 @@ function($,Backbone,_,StatisticsView,EditStudentView,DeleteStudentView, CellView
             'click li.student-submenu-edit' : 'editStudent',         
             'click li.student-submenu-stats' : 'studentStatistics',                         
         },
+        /** @constructs */        
         initialize: function(options) {
         	var self = this;
 			this._subviews =[];          	
@@ -93,7 +96,8 @@ function($,Backbone,_,StatisticsView,EditStudentView,DeleteStudentView, CellView
         deleteStudent: function(ev){
         	ev.preventDefault();
         	var view = new DeleteStudentView({model: this.model, gradebook: this.gradebook, course: this.course});              	      	
-        },               
+        },   
+        /** removes view and any subviews */            
         close: function(ev) {        	
         	console.log('removing student views');
         	this.clearSubViews();        	
