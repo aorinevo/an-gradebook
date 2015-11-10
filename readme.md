@@ -1,4 +1,4 @@
-# ![an-gradebook](https://github.com/aorinevo/an-gradebook/logos/icon-128x128.png) AN_GradeBook
+# ![an-gradebook](https://github.com/aorinevo/an-gradebook/master/logos/icon-128x128.png) AN_GradeBook
 
 AN_GradeBook allows educators to create, maintain, and share grades quickly and efficiently. 
 
@@ -28,25 +28,24 @@ Students are able to:
 * View pie charts and line graphs based on student and class performance
 
 ## Installation
----
+
 1. Download and unzip in the plugins/ directory
 2. Activate the plugin in the installed plugins page of the admin panel
 3. A new admin item menu labeled GradeBook should now be present in the admin dashboard menu
 
 ## Screenshots
----
+
 1. List of courses.
 2. Gradebook view for a particular course.
 3. Pie chart for a particular assignment.
 4. Add student form.
 
 ## Credits
----
 
 * plugin icon: https://www.iconfinder.com/icons/175285/edit_property_icon#size=256
 
 ## Changelog
----
+
 Version 4.0.4:
 
 * Added ajax loading image when retrieving course list and gradebook.
