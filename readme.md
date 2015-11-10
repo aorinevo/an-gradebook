@@ -1,4 +1,4 @@
-# ![an-gradebook](https://github.com/aorinevo/an-gradebook/master/logos/icon-128x128.png) AN_GradeBook
+# ![an-gradebook](https://raw.githubusercontent.com/aorinevo/an-gradebook/master/logos/icon-128x128.png) AN_GradeBook
 
 AN_GradeBook allows educators to create, maintain, and share grades quickly and efficiently. 
 
