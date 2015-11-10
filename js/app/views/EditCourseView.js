@@ -13,7 +13,6 @@ function($,Backbone,_, User, Course){
 			//this.options = options.options;
             //	_(this).extend(this.options.gradebook_state);     
             this.course = this.model || null; 
-            console.log(this.collection);  
             this.courseList = this.collection;               	        
             $('body').append(this.render().el);
             return this;                

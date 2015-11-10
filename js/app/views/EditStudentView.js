@@ -60,7 +60,6 @@ function($,Backbone,_,User,UserList,typeahead){
 					var filtered_user = user.get('data').user_login;
 					return filtered_user;
 				});
-				console.log(users);
 				$('#user_login').typeahead({source: users });			
 			}});
 			}

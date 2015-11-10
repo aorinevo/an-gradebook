@@ -64,7 +64,7 @@ class gradebook_course_API{
 	  			echo json_encode(array('delete_course'=>'Success'));
 	  			break;
 	  		case 'PUT' :
-				$params = json_decode(file_get_contents('php://input'),true);	  		
+				$params = json_decode(file_get_contents('php://input'),true);
 				if ( $an_gradebook_api -> an_gradebook_get_user_role($params['id'])!='instructor'){	
 					echo json_encode(array("status" => "Not Allowed."));
 					die();

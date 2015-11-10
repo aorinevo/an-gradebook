@@ -3,13 +3,13 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 4.0.1
+Version: 4.0.4
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
 */
 
-define( "AN_GRADEBOOK_VERSION", "4.0.1");
+define( "AN_GRADEBOOK_VERSION", "4.0.4");
 
 $database_file_list = glob(dirname( __FILE__ ).'/database/*.php');
 foreach($database_file_list as $database_file){
@@ -26,6 +26,7 @@ $angb_course_list = new ANGB_COURSE_LIST();
 $angb_gradebook = new ANGB_GRADEBOOK();
 $angb_user = new ANGB_USER();
 $angb_user_list = new ANGB_USER_LIST();
+$angb_statistics = new ANGB_STATISTICS();
 
 function register_an_gradebook_menu_page(){	
 		$roles = wp_get_current_user()->roles;

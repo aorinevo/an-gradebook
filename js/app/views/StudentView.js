@@ -43,7 +43,6 @@ function($,Backbone,_,StatisticsView,EditStudentView,DeleteStudentView, CellView
         },
   		clearSubViews : function(){
   			var self = this;
-  			console.log(self._subviews);
 		  	_.each(self._subviews,function(view){
 		  	   view.close();
 		  	});
@@ -99,7 +98,6 @@ function($,Backbone,_,StatisticsView,EditStudentView,DeleteStudentView, CellView
         },   
         /** removes view and any subviews */            
         close: function(ev) {        	
-        	console.log('removing student views');
         	this.clearSubViews();        	
 			this.remove();
         }

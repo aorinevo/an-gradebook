@@ -19,7 +19,12 @@
     	<table class="table table-bordered table-striped table-hover">  
 			<thead>
 				<tr>		
-					<th></th><th>ID</th><th>Course</th><th>School</th><th>Semester</th><th>Year</th>
+					<th></th>
+					<th class="course-column-id">ID</th>
+					<th class="course-column-name">Course</th>
+					<th class="course-column-school">School</th>
+					<th class="course-column-semester">Semester</th>
+					<th class="course-column-year">Year</th>
 				</tr>
 			</thead>
 			<tbody class="angb-course-list-tbody">			

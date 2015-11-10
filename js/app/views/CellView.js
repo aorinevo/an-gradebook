@@ -29,11 +29,7 @@ function($,Backbone,_){
             var compiled = template({cell: this.model});
             this.$el.html(compiled);
             return this.el;
-        },       
-        close: function(ev) {
-			console.log('removing cell view');
-        	this.remove();
-        },    
+        },         
         shiftCell: function(ev){
         	this.remove();         
         	if(ev.get('id') === this.model.get('amid')){    	
@@ -74,7 +70,10 @@ function($,Backbone,_){
                 });
                 this.render();
  			}
-        }       
+        },
+        close: function(ev) {
+        	this.remove();
+        }             
     });
 	return CellView
 });

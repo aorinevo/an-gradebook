@@ -14,28 +14,31 @@ function($,Backbone,_, Course, CourseGradebook, UserList, AssignmentList, CellLi
 			this.course = new Course({id : options.gbid});					
 			this.gradebook = new CourseGradebook({gbid: options.gbid});						
  			_.each([this.course,this.gradebook],function(model){
-				self.listenTo(model,'request',function(){				
+				self.listenTo(model,'request',function(){	
+					if( _request === 0){
+			            $('#wpbody-content').prepend($('#ajax-template').html());							
+			        }
 			   		_request = _request + 1;
 				});
-				self.listenTo(model,'sync',function(){			
+				self.listenTo(model,'sync',function(){							
 			   		_request = _request - 1;
 				   	if(_request === 0 ){
-			    	  	self.render();
+						$('.ajax-loader-container').remove();				   	
 			   		}
 				});	    
 			});	
 			this.xhrs.push(this.course.fetch(),this.gradebook.fetch({success: function(){
-            	self.listenTo(self.gradebook.students, 'add remove', self.sortByStudent);                                  
+            	self.listenTo(self.gradebook.students, 'add remove', self.render);                                  
 				self.listenTo(self.gradebook.cells, 'add remove change:assign_order', self.render);                      
                 self.listenTo(self.gradebook.assignments, 'add remove change:assign_order change:assign_category', self.render);                                   
-            	self.listenTo(self.gradebook.assignments, 'change:sorted', self.sortByAssignment); 				
+            	self.listenTo(self.gradebook.assignments, 'change:sorted', self.sortByAssignment); 
+				self.render();            					
 				}
 			}));
             return this;
         },
   		clearSubViews : function(){
   			var self = this;
-  			console.log(self._subviews);
 		  	_.each(self._subviews,function(view){
 		  	   view.close();
 		  	});
@@ -45,7 +48,7 @@ function($,Backbone,_, Course, CourseGradebook, UserList, AssignmentList, CellLi
             'click button#add-student': 'addStudent',
             'click button#add-assignment': 'addAssignment',
             'click button#filter-assignments': 'filterAssignments',
-            'click #cb-select-all-1': 'selectAllStudents'
+            'click [class^=gradebook-student-column-]' : 'sortGradebookBy',       
         },
         render: function() {
         	var self = this;
@@ -57,7 +60,6 @@ function($,Backbone,_, Course, CourseGradebook, UserList, AssignmentList, CellLi
             var compiled = template({course : self.course, assign_categories: _assign_categories, role: this.role});     
            	$('#wpbody-content').append(self.$el.html(compiled));
             $('#filter-assignments-select').val(this.filter_option);                 	
-            console.log($('#filter-assignments-select').val());
         	switch(this.gradebook.sort_key){
         		case 'cell':    
         			_.each(this.sort_column, function(cell) {
@@ -77,8 +79,7 @@ function($,Backbone,_, Course, CourseGradebook, UserList, AssignmentList, CellLi
                 		$('#students-header tr').append(view.render());
             		});
             		break;
-            	case 'lastname':     
-            		console.log(this.gradebook.sort_column.models);
+            	case 'student':     
             		_.each(this.gradebook.sort_column.models, function(student) { 
                 		var view = new StudentView({model: student, course: self.course, gradebook: self.gradebook, options: self.options});
                 		self._subviews.push(view);                		
@@ -128,12 +129,22 @@ function($,Backbone,_, Course, CourseGradebook, UserList, AssignmentList, CellLi
         addStudent: function(ev) {  
             var view = new EditStudentView({course: this.course, gradebook: this.gradebook}); 
             $('body').append(view.render());                     
-        },  
-        sortByStudent: function(ev) {     		
-			this.sort_key = 'lastname'; 
-			this.sort_column = this.students;                                               
-           	this.render();                          
-        },                      
+        }, 
+        checkStudentSortDirection: function(){
+        	if( this.gradebook.students.sort_direction === 'asc' ){
+        		this.gradebook.students.sort_direction = 'desc';
+        	} else {
+        		this.gradebook.students.sort_direction = 'asc';
+        	}
+        },
+        sortGradebookBy: function(ev){
+	    	var column = ev.target.className.replace('gradebook-student-column-','');    
+			this.gradebook.sort_key = 'student';          			
+			this.gradebook.students.sort_key = column;			
+			this.checkStudentSortDirection();
+			this.gradebook.students.sort();
+			this.render();
+        },                   
         sortByAssignment: function(ev) {
             var x = this.gradebook.cells.where({amid: parseInt(ev.get('id'))});       			
 			this.sort_column = _.sortBy(x,function(cell){
@@ -147,11 +158,8 @@ function($,Backbone,_, Course, CourseGradebook, UserList, AssignmentList, CellLi
            	this.render();                          
         },
         close: function() {
-        	console.log('removing subviews from gradeboook view');
-        	this.clearSubViews();	 
-			console.log('aborting xhrs requests in gradebook view'); 		 			
-		    _.map(this.xhrs,function(xhr){ xhr.abort()});      	
- 		  	console.log('removing gradebook view'); 		
+        	this.clearSubViews();	 		 			
+		    _.map(this.xhrs,function(xhr){ xhr.abort()});      			
  		  	this.remove();        	
         }        
     });
