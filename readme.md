@@ -3,7 +3,7 @@
 AN_GradeBook allows educators to create, maintain, and share grades quickly and efficiently. 
 
 ## Description
----
+
 Administrators are able to
 
 * Add/delete students
