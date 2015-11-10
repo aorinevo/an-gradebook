@@ -2,6 +2,53 @@
 	display:absolute;
 }
 
+.modal-body {
+	overflow: scroll;
+}
+
+
+/* Chart stylings */
+
+.labeled-chart-container {
+    padding-right: 150px;
+    min-height: 180px;
+    position: relative;
+}
+
+.pie-legend, .line-legend {
+    list-style: none;
+    position: absolute;
+    right: 8px;
+    top: 0;
+}
+
+.pie-legend li span, .line-legend li span {
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 20px;
+    height: 100%;
+    border-radius: 5px;
+}
+
+.pie-legend li, .line-legend li {
+    display: block;
+    padding-left: 30px;
+    position: relative;
+    margin-bottom: 4px;
+    border-radius: 5px;
+    padding: 2px 8px 2px 28px;
+    font-size: 14px;
+    cursor: default;
+    -webkit-transition: background-color 200ms ease-in-out;
+    -moz-transition: background-color 200ms ease-in-out;
+    -o-transition: background-color 200ms ease-in-out;
+    transition: background-color 200ms ease-in-out;
+}
+
+
+
 #loading-courses-spinner, #loading-students-spinner {
   text-align: center;
   background-color: #2ea2cc;

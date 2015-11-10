@@ -3,6 +3,7 @@ define(['jquery','underscore','backbone','views/CourseListView','views/GradeBook
     * @exports GradeBookRouter
     */
 function($,_,Backbone,CourseListView,GradeBookView,SettingsPage){	
+	Backbone.emulateHTTP = true;
 	var GradeBookRouter = Backbone.Router.extend({
 		initialize: function(){
 			this._views = [];
@@ -24,7 +25,6 @@ function($,_,Backbone,CourseListView,GradeBookView,SettingsPage){
   		clearViews : function(){
   			var self = this;
   			this.initPage();
-  			console.log(self._views);
 		  	_.each(self._views,function(view){
 		  	   view.close();
 		  	});

@@ -1,64 +1,51 @@
-define(['jquery','backbone','underscore','goog!visualization,1,packages:[corechart]'],
-function($,Backbone,_){
+define(['jquery','backbone','underscore','chart'],
+function($,Backbone,_,Chart){
 	var StatisticsView = Backbone.View.extend({
  		id: 'base-modal',
     	className: 'modal fade',
         events: {
             'hidden.bs.modal' : 'editCancel',  
+            'shown.bs.modal' : 'displayChart',
+			'keyup'  : 'keyPressHandler'                       
         },		
-		initialize: function(options){	
-			google.load('visualization', '1.0', {'packages':['corechart']});  					
-            this.student = this.model;     
-            $('body').append(this.render().el);
-            return this;   		   
-		},		
-		drawLineChart: function(data) {
-			var data = google.visualization.arrayToDataTable(data);
-
-        	var options = {
-				'title': 'Student Grades vs. Class Average',
-          		'width': '700',
-		  		'height': '300',          
-          		'vAxis': {
-          	 		maxValue : 100,
-	          	 	minValue : 0
-    	      	}
-        	};
-
-        	var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-       		chart.draw(data, options);
-		}, 				
-		displayLineChart: function(){	
-			var self = this;	
-			$.get(ajaxurl, { 
-						action: 'get_line_chart',
-						uid : this.model.get('id'),
-						gbid : this.model.get('gbid')
-					},
-					function(data){	
-						if( data.length === 1 ){
-							$('.media-frame-content').html('<div style="padding: 10px;"> There is no content to display </div>');
-						} else {
-							self.drawLineChart(data);							
-						}
-					}, 
-					'json');    	
-			return this;					
-		},	
+		initialize: function(options){	    
+			this.render();
+		},					
+		displayChart: function(){
+			var self = this;
+			$.ajax({
+				url: ajaxurl,
+				data: {
+					action: 'angb_statistics',
+					chart_type: 'line_chart',
+					gbid: this.model.get('gbid'),
+					uid: this.model.get('id')
+				},
+				dataType: 'json',
+				success: function(data){
+					var ctx = $('#myChart').get(0).getContext("2d");
+					var myNewChart = new Chart(ctx).Line(data);
+					$('.labeled-chart-container').append(myNewChart.generateLegend());					
+				}				
+			});					
+		},
         render: function() {
             var self = this;
+            var student = this.model;
             var template = _.template($('#stats-student-template').html());
-            var compiled = template({student: self.student});
-            self.$el.html(compiled);             
-            this.displayLineChart();                                            
-			this.$el.modal('show');        
-            return this;
+            var compiled = template({student: student});
+            $('body').append(self.$el.html(compiled).el);   
+			this.$el.modal('show'); 	
         },
         editCancel: function() {
 			this.$el.data('modal', null);           
             this.remove();            
             return false;
-        }
+        },
+ 		keyPressHandler: function(e) {
+            if (e.keyCode == 27) this.editCancel();
+            return this;
+        }         
     });
 	return StatisticsView;
 });   

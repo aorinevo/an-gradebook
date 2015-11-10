@@ -4,7 +4,7 @@ function(Backbone,AssignmentList,UserList,CellList){
   	url: function(){
   	     	return ajaxurl + '?action=gradebook&gbid=' + parseInt(this.get('gbid'));
   		},
-  	sort_key: 'lastname',
+  	sort_key: 'student',
   	parse: function(response){
   		this.assignments = new AssignmentList(response.assignments);
   		this.cells = new CellList(response.cells);

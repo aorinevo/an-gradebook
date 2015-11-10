@@ -2,6 +2,12 @@
 
 class an_gradebook_api{
 
+	public function build_sorter($key) {
+		return function ($a, $b) use ($key) {
+			return strnatcmp($a[$key], $b[$key]);
+		};
+	}	
+
 	public function an_gradebook_update_user($id,$first_name,$last_name){
 		$user_id = wp_update_user( array ( 
 			'ID' => $id, 
@@ -14,6 +20,107 @@ class an_gradebook_api{
 	    	'id' => $user_id
 	    );
 	}
+	
+	public function get_line_chart($uid, $gbid){
+		global $wpdb;
+		//need to check that user has access to this gradebook.		
+		if (!is_user_logged_in()){	
+			echo json_encode(array("status" => "Not Allowed."));
+			die();
+		} 					  	
+		///$cells = $wpdb->get_results('SELECT * FROM an_gradebook_cells WHERE uid = '. $uid .' AND gbid = '. $gbid, ARRAY_A);	
+		$class_cells = $wpdb->get_results('SELECT * FROM an_gradebook_cells WHERE gbid = '. $gbid, ARRAY_A);
+		$cells = array_map( function($class_cell) use ($uid) {
+			if($class_cell['uid'] == $uid){
+				return $class_cell;
+			}
+		}, $class_cells);	
+		$cells = array_filter($cells);
+		$assignments = $wpdb->get_results('SELECT * FROM an_gradebook_assignments WHERE gbid = '. $gbid, ARRAY_A);
+
+		$cells_points = array();
+		$assignments_names = array();
+		$assignment_averages = array();
+				
+		usort($cells, $this->build_sorter('assign_order'));
+		usort($assignments, $this->build_sorter('assign_order'));		
+	
+		foreach($assignments as $assignment){
+			$assignment_cells_points = array_map( function($class_cell) use ($assignment) {
+				if($class_cell['amid'] == $assignment['id']){
+					return floatval($class_cell['assign_points_earned']);
+				}
+			}, $class_cells);	
+			$assignment_cells_points = array_filter($assignment_cells_points);		
+			$total_points = array_sum($assignment_cells_points);	
+			array_push($assignment_averages, number_format($total_points/ count($assignment_cells_points),2));		
+		}
+		
+		$cells_points = array_map( function($cell){
+			return floatval($cell['assign_points_earned']);
+		}, $cells);
+		
+		$assignments_names = array_map( function($assignment){
+			return $assignment['assign_name'];
+		}, $assignments);
+		
+		return array(
+			'datasets' => array(
+				array(
+					'label' => "Student Grades",
+					'fillColor' => "rgba(220,220,220,0.2)",
+					'strokeColor' => "rgba(220,220,220,1)",
+					'pointColor' => "rgba(220,220,220,1)",
+					'pointStrokeColor' => "#fff",
+					'pointHighlightFill' => "#fff",
+					'pointHighlightStroke' => "rgba(220,220,220,1)",			
+					'data' => $cells_points
+				),
+        		array(
+            		'label' => "Class Average",
+            		'fillColor' => "rgba(151,187,205,0.2)",
+            		'strokeColor' => "rgba(151,187,205,1)",
+					'pointColor'=> "rgba(151,187,205,1)",
+					'pointStrokeColor' => "#fff",
+					'pointHighlightFill' => "#fff",
+					'pointHighlightStroke' => "rgba(151,187,205,1)",
+					'data' => $assignment_averages
+				)				
+			), 
+			'labels' => $assignments_names
+		);	
+	}	
+	
+	public function get_pie_chart($amid){
+		global $wpdb;
+		//need to check that user has access to this assignment.
+		if (!is_user_logged_in()){	
+			echo json_encode(array("status" => "Not Allowed."));
+			die();
+		}  	
+		$pie_chart_data = $wpdb->get_col('SELECT assign_points_earned FROM an_gradebook_cells WHERE amid = '. $amid);	
+	
+		function isA($n){ return ($n>=90 ? true : false); }
+		function isB($n){ return ($n>=80 && $n<90 ? true : false); }
+		function isC($n){ return ($n>=70 && $n<80 ? true : false); }
+		function isD($n){ return ($n>=60 && $n<70 ? true : false); }
+		function isF($n){ return ($n<60 ? true : false); }
+	
+		$is_A = count(array_filter( $pie_chart_data, 'isA'));
+		$is_B = count(array_filter( $pie_chart_data, 'isB'));
+		$is_C = count(array_filter( $pie_chart_data, 'isC'));
+		$is_D = count(array_filter( $pie_chart_data, 'isD'));	
+		$is_F = count(array_filter( $pie_chart_data, 'isF'));	
+	
+		return array(
+			array('value' => $is_A, 'color' => '#F7464A', 'highlight' => '#FF5A5E', 'label' => 'A'),
+			array('value' => $is_B, 'color' => '#46BFBD', 'highlight' => '#5AD3D1', 'label' => 'B'),
+			array('value' => $is_C, 'color' => '#FDB45C', 'highlight' => '#FFC870', 'label' => 'C'),
+			array('value' => $is_D, 'color' => '#949FB1', 'highlight' => '#A8B3C5', 'label' => 'D'),
+			array('value' => $is_F, 'color' => '#4D5360', 'highlight' => '#616774', 'label' => 'F')
+		);												
+			
+	}	
 	
 	public function angb_get_gradebook($gbid, $role, $uid){
 		global $current_user, $wpdb;

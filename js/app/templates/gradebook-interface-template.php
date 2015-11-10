@@ -1,8 +1,8 @@
 <script id="gradebook-interface-template" type="text/template">
 <div class="container-fluid">
     <div class="row">
-    	<div class="col-md-12">
-    		<h2>GradeBook:  <%= course.get('name')%></h2>
+    	<div class="col-md-12 wrap">
+    		<h1>GradeBook:  <%= course.get('name')%></h1>
     	</div>	
     </div>
     <div class="row">
@@ -39,7 +39,10 @@
 				<table id="an-gradebook-container" class="table table-bordered table-striped">  
 					<thead id="students-header">
 						<tr>
-							<th></th><th><div><span>First Name</span></div></th><th>Last Name</th><th>Login</th>
+							<th></th>
+							<th class="gradebook-student-column-first_name">First Name</th>
+							<th class="gradebook-student-column-last_name">Last Name</th>
+							<th class="gradebook-student-column-user_login">Login</th>
 						</tr>
 					</thead>		    	
 					<tbody id="students"></tbody>

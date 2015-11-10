@@ -56,8 +56,7 @@ function($,Backbone,_,Assignment){
             ev.preventDefault();
             var self = this;
             var assignmentInformation = $(ev.currentTarget).serializeObject(); 
-			var x = $(ev.currentTarget).serializeObject().id;  
-			console.log(assignmentInformation);         
+			var x = $(ev.currentTarget).serializeObject().id;        
             var toadd = this.gradebook.assignments.findWhere({id : parseInt(x)});
             if(toadd){
             	toadd.save(assignmentInformation,{wait: true});          	

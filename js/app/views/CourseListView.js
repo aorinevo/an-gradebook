@@ -5,22 +5,51 @@ function($, Backbone, _, CourseList,EditCourseView,CourseView){
     * @exports views/CourseListView
     */
 var CourseListView = Backbone.View.extend({
-        events: {
-            'click a#add-course': 'editCourse'         
-        },
 	    initialize: function(){
 	        var self = this;
+            var _request = 0;                  
 	        this._subviews = [];
 			this.courseList = new CourseList();
-			this.courseList.fetch({success: function(model,response,options){ 
-				self.listenTo(self.courseList, 'add', self.render);
-				self.listenTo(self.courseList, 'remove', self.render);				
-				self.render();
-			}});				       
-	    },   
+			this.listenTo(this.courseList,'request',function(){	
+				if(_request === 0){
+		            $('#wpbody-content').prepend($('#ajax-template').html());						
+		        }
+				_request = _request + 1;
+			});
+			this.listenTo(this.courseList,'sync',function(){			
+				_request = _request - 1;
+				if(_request === 0 ){
+					$('.ajax-loader-container').remove();
+					self.listenTo(self.courseList, 'add', self.render);
+					self.listenTo(self.courseList, 'remove', self.render);				
+					self.render();					
+				}
+			});				
+			this.courseList.fetch();				       
+	    }, 
+	    loadingData: function(){
+        	var self = this;        	    
+	    },
+        events: {
+            'click a#add-course': 'editCourse' ,    
+	    	'click [class^=course-column-]' : 'sortCourseList'                
+        },	
+        checkStudentSortDirection: function(){
+        	if( this.courseList.sort_direction === 'asc' ){
+        		this.courseList.sort_direction = 'desc';
+        	} else {
+        		this.courseList.sort_direction = 'asc';
+        	}
+        },             
+	    sortCourseList: function(ev){
+	    	var column = ev.target.className.replace('course-column-','');
+			this.courseList.sort_key = column;
+			this.checkStudentSortDirection();			
+			this.courseList.sort();
+			this.render();
+	    },
   		clearSubViews : function(){
   			var self = this;
-  			console.log(self._subviews);
 		  	_.each(self._subviews,function(view){
 		  	   view.close();
 		  	});
@@ -45,10 +74,8 @@ var CourseListView = Backbone.View.extend({
             var view = new CourseView({model: course, collection: this.courseList, options: this.options});
             $('#courses').append(view.render().el);
         },
- 		close: function(){
-			console.log('clearing subviews in course list view'); 		 			
- 			this.clearSubViews();
- 		  	console.log('removing course list view'); 		
+ 		close: function(){		 			
+ 			this.clearSubViews();	
  		  	this.remove();
  		}
     });

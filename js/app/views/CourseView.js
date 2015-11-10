@@ -37,7 +37,6 @@ function($,Backbone,_, EditCourseView){
         },    
         /** Edit course. */              
         editCourse: function() {
-        	console.log(this.course);
             var view = new EditCourseView({model: this.course, collection: this.courseList, options: this.options});
             return false;
         },    

@@ -19,7 +19,24 @@ function(Backbone,Course){
 		url: function(){
 			return ajaxurl + '?action=course_list';
 		},
-		comparator: 'year',
+		sort_key : 'year',
+        comparator: function(model1,model2){
+			var _val1 = model1.get(this.sort_key);
+			var _val2 = model2.get(this.sort_key);	          
+			if(this.sort_key != 'year' && this.sort_key != 'id'){  	
+				if( this.sort_direction === 'asc' ){			
+					return _val2.localeCompare(_val1);
+				} else {							
+					return _val1.localeCompare(_val2);
+				}
+			} else {
+				if( this.sort_direction === 'asc' ){			
+					return _val2 - _val1;
+				} else {							
+					return _val1 - _val2;
+				}			
+			}
+        },
 		parse: function(response){
 			return response.course_list;
 		}

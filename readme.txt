@@ -1,9 +1,10 @@
 === AN_GradeBook ===
 Contributors: anevo, jamarparris
+Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=aorinevo%40gmail%2ecom&lc=US&item_name=AN_GradeBook&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.5
 Tested up to: 4.3.1
-Stable tag: 4.0.1
+Stable tag: 4.0.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -51,18 +52,27 @@ Students are able to:
 
 * plugin icon: https://www.iconfinder.com/icons/175285/edit_property_icon#size=256
 
-== Upgrade Notice ==
-
-= 4.0.1 =
-
-
-
-= 4.0 =
-
-Backwards compatibility has been taken into account but is not guaranteed.  It is recommended that you back up your grade books before upgrading.  This version upgrade contains a lot of changes on the backend.
-
-
 == Changelog ==
+
+Version 4.0.4:
+
+* Added ajax loading image when retrieving course list and gradebook.
+* Quick fix for gradebook view, assignment headers were disappearing and new rows failed to render.  This was due to a call to a deprecated function.
+
+Version 4.0.3:
+
+* Added sorting for course list.  Sort by id, name, school, semester, and year.
+* Simplified sorting code for gradebook view.
+* New charts built with Chartjs.
+* Fixed line chart to display student statistics for assignments relative to their order in their gradebook.
+* Cleaned up lib directory
+
+Version 4.0.2:
+
+* Added sorting by user_login, first_name, and last_name.
+* Added support for legacy web servers.  Some web servers do not handle PUT requests as anticipated. 
+* remove misc console.log statements.
+* Added D3js library.  We are moving towards removing dependencies on google charts used in rendering student and assignment statistics.
 
 Version 4.0.1:
 

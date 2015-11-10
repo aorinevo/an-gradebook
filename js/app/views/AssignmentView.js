@@ -110,7 +110,6 @@ function($,Backbone,_,AssignmentStatisticsView, EditAssignmentView, DetailsAssig
             }
         },
         statsAssignment: function(ev){
-        	console.log('hello');
         	ev.preventDefault();  
             var view = new AssignmentStatisticsView({model: this.assignment, options: this.options});           
         }, 
@@ -137,7 +136,6 @@ function($,Backbone,_,AssignmentStatisticsView, EditAssignmentView, DetailsAssig
             );        
         },
         close: function(ev){  
-        	console.log('removing assignment view');
 			this.remove();			
         }                     
     });

@@ -6,7 +6,9 @@
 				<h4 class="modal-title" id="myModalLabel">Student Statistics</h4>
 			</div>
 			<div class="modal-body" style="overflow-x: scroll;">
-					<div id = "chart_div"></div>
+				<div class="labeled-chart-container">
+					<canvas id = "myChart"></canvas>
+				</div>
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

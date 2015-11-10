@@ -4,8 +4,7 @@ define(['backbone'],function(Backbone){
             name: 'Calculus I',
             school: 'Bergen',
             semester: 'Fall',
-            year: '2014',
-            selected: false
+            year: '2014'
         },
         url: function(){        	
         	if(this.get('id')){
