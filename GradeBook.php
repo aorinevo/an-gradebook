@@ -67,6 +67,7 @@ function init_an_gradebook(){
 function init_an_gradebook_settings(){
 	ob_start();	
 	include( dirname( __FILE__ ) . '/js/app/templates/settings-template.php' );	
+	include( dirname( __FILE__ ) . '/js/app/templates/ajax-template.php' );		
 	echo ob_get_clean();
 }
 

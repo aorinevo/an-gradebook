@@ -1,8 +1,6 @@
-define(['jquery','backbone','underscore', 'models/Course','models/CourseGradebook', 'models/UserList', 
-	'models/AssignmentList', 'models/CellList', 'views/StudentView', 'views/AssignmentView', 'views/EditStudentView', 
+define(['jquery','backbone','underscore', 'views/StudentView', 'views/AssignmentView', 'views/EditStudentView', 
 	'views/EditAssignmentView'],
-function($,Backbone,_, Course, CourseGradebook, UserList, AssignmentList, CellList, StudentView, 
-	AssignmentView, EditStudentView, EditAssignmentView){
+function($, Backbone, _, StudentView, AssignmentView, EditStudentView, EditAssignmentView){
       var GradebookView = Backbone.View.extend({
         initialize: function(options) {
             var self = this;  
@@ -11,30 +9,13 @@ function($,Backbone,_, Course, CourseGradebook, UserList, AssignmentList, CellLi
 			this._subviews =[];            
             this.options = options;
             this.filter_option = "-1";	
-			this.course = new Course({id : options.gbid});					
-			this.gradebook = new CourseGradebook({gbid: options.gbid});						
- 			_.each([this.course,this.gradebook],function(model){
-				self.listenTo(model,'request',function(){	
-					if( _request === 0){
-			            $('#wpbody-content').prepend($('#ajax-template').html());							
-			        }
-			   		_request = _request + 1;
-				});
-				self.listenTo(model,'sync',function(){							
-			   		_request = _request - 1;
-				   	if(_request === 0 ){
-						$('.ajax-loader-container').remove();				   	
-			   		}
-				});	    
-			});	
-			this.xhrs.push(this.course.fetch(),this.gradebook.fetch({success: function(){
-            	self.listenTo(self.gradebook.students, 'add remove', self.render);                                  
-				self.listenTo(self.gradebook.cells, 'add remove change:assign_order', self.render);                      
-                self.listenTo(self.gradebook.assignments, 'add remove change:assign_order change:assign_category', self.render);                                   
-            	self.listenTo(self.gradebook.assignments, 'change:sorted', self.sortByAssignment); 
-				self.render();            					
-				}
-			}));
+			this.course = options.course;					
+			this.gradebook = options.gradebook;						
+        	this.listenTo(self.gradebook.students, 'add remove', self.render);                                  
+			this.listenTo(self.gradebook.cells, 'add remove change:assign_order', self.render);                      
+			this.listenTo(self.gradebook.assignments, 'add remove change:assign_order change:assign_category', self.render);                                   
+			this.listenTo(self.gradebook.assignments, 'change:sorted', self.sortByAssignment); 
+			this.render();            					
             return this;
         },
   		clearSubViews : function(){

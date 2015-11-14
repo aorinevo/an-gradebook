@@ -1,31 +1,17 @@
-define(['jquery','backbone','underscore','models/CourseList','views/EditCourseView','views/CourseView'],
-function($, Backbone, _, CourseList,EditCourseView,CourseView){
+define(['jquery','backbone','underscore','views/EditCourseView','views/CourseView'],
+function($, Backbone, _,EditCourseView,CourseView){
    /**
     * A module representing a course list view.
     * @exports views/CourseListView
     */
 var CourseListView = Backbone.View.extend({
 	    initialize: function(){
-	        var self = this;
-            var _request = 0;                  
+	        var self = this;               
 	        this._subviews = [];
-			this.courseList = new CourseList();
-			this.listenTo(this.courseList,'request',function(){	
-				if(_request === 0){
-		            $('#wpbody-content').prepend($('#ajax-template').html());						
-		        }
-				_request = _request + 1;
-			});
-			this.listenTo(this.courseList,'sync',function(){			
-				_request = _request - 1;
-				if(_request === 0 ){
-					$('.ajax-loader-container').remove();
-					self.listenTo(self.courseList, 'add', self.render);
-					self.listenTo(self.courseList, 'remove', self.render);				
-					self.render();					
-				}
-			});				
-			this.courseList.fetch();				       
+			this.courseList = this.collection;	
+			this.listenTo(self.courseList, 'add', self.render);
+			this.listenTo(self.courseList, 'remove', self.render);				
+			this.render();										       
 	    }, 
 	    loadingData: function(){
         	var self = this;        	    

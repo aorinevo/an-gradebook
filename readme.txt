@@ -12,6 +12,8 @@ AN_GradeBook allows educators to create, maintain, and share grades quickly and 
 
 == Description == 
 
+Check out the [plugin website](http://www.angradebook.com).
+
 Administrators are able to
 
 * Add/delete students
@@ -53,6 +55,12 @@ Students are able to:
 * plugin icon: https://www.iconfinder.com/icons/175285/edit_property_icon#size=256
 
 == Changelog ==
+
+Version 4.0.5:
+
+* Populate necessary models and collections before instantiating views.
+* Fixed settings bug.  
+* Removed unnecessary dependancies for certain views.
 
 Version 4.0.4:
 
