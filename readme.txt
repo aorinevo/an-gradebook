@@ -43,13 +43,6 @@ Students are able to:
 2. Activate the plugin in the installed plugins page of the admin panel
 3. A new admin item menu labeled GradeBook should now be present in the admin dashboard menu
 
-== Screenshots ==
-
-1. List of courses.
-2. Gradebook view for a particular course.
-3. Pie chart for a particular assignment.
-4. Add student form.
-
 == Credits ==
 
 * plugin icon: https://www.iconfinder.com/icons/175285/edit_property_icon#size=256

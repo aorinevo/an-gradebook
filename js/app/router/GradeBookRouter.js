@@ -4,6 +4,7 @@ define(['jquery','underscore','backbone', 'views/CourseListView','views/GradeBoo
    /**
     * @exports GradeBookRouter
     */
+
 function($,_,Backbone,CourseListView,GradeBookView,SettingsPage, CourseList, Course, CourseGradebook, Settings){	
 	Backbone.emulateHTTP = true;
 	var GradeBookRouter = Backbone.Router.extend({
@@ -38,7 +39,7 @@ function($,_,Backbone,CourseListView,GradeBookView,SettingsPage, CourseList, Cou
 			this.clearViews();
             var _request = 0;  			
 			this.courseList = new CourseList();		 			
-			this.listenToOnce(this.courseList,'request',function(){	
+			this.listenToOnce(this.courseList,'request',function(){
 				if(_request === 0){
 		            $('#wpbody-content').prepend($('#ajax-template').html());						
 		        }
