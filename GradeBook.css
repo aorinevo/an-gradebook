@@ -48,35 +48,7 @@
 }
 
 
-
-#loading-courses-spinner, #loading-students-spinner {
-  text-align: center;
-  background-color: #2ea2cc;
-  padding: 4px;
-  font-size: large;
-  color: white;
-}
-
-.glyphicon-refresh-animate {
-    -animation: spin .7s infinite linear;
-    -webkit-animation: spin2 .7s infinite linear;
-}
-
-.glyphicon-refresh:before {
-  color: white;
-  padding: 10px;  
-  font-size: large;
-}
-
-@-webkit-keyframes spin2 {
-    from { -webkit-transform: rotate(0deg);}
-    to { -webkit-transform: rotate(360deg);}
-}
-
-@keyframes spin {
-    from { transform: scale(1) rotate(0deg);}
-    to { transform: scale(1) rotate(360deg);}
-}
+/*  Gradebook styles */
 
 [contenteditable="true"]:active,
 [contenteditable="true"]:focus{
@@ -95,7 +67,6 @@ outline:none;
 	cursor: pointer;
 }
 
-
 .modal {
    z-index: 999999;
 }
@@ -107,7 +78,6 @@ outline:none;
 #adminmenuback {
 	z-index: 1;
 }
-
 
 body {
   background-color: #f1f1f1;
@@ -121,6 +91,12 @@ body {
 #chart-container{
 	text-align: center;
 }
+
+
+[class^="course-column-"] {
+	cursor: pointer;
+}
+
 
 td {
 	cursor: default;

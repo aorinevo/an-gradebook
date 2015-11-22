@@ -10,12 +10,11 @@ function($,Backbone,_, EditCourseView){
 	   * @constructs
 	   */
         initialize: function(options) {
-			this.options = options.options;
-           	//_(this).extend(this.options.gradebook_state);     
+			this.options = options.options;   
             this.course = this.model;  
+            console.log(this.course);
             this.courseList = this.collection;
-            this.listenTo(this.model, 'change', this.render);
-            //this.role = this.roles.findWhere({gbid: parseInt(this.course.get('id'))}); 	
+            this.listenTo(this.model, 'change', this.render);	
         },	
         /** @constant {string} */   	
 		tagName: 'tr',

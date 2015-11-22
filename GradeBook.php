@@ -39,19 +39,23 @@ function register_an_gradebook_menu_page(){
 add_action( 'admin_menu', 'register_an_gradebook_menu_page' );	
 
 	
-function enqueue_an_gradebook_scripts(){	
-	$an_gradebook_develop = true;
-	$app_base = plugins_url('js',__FILE__);
-	wp_register_style( 'jquery_ui_css', $app_base.'/lib/jquery-ui/jquery-ui.css', array(), null, false );	
-	wp_register_style( 'GradeBook_css', plugins_url('GradeBook.css',__File__), array('bootstrap_css','jquery_ui_css'), null, false );				
-	wp_register_style( 'bootstrap_css', $app_base.'/lib/bootstrap/css/bootstrap.css', array(), null, false);	
-	wp_register_script( 'requirejs', $app_base.'/require.js', array(), null, true);		
-	wp_enqueue_style('GradeBook_css');								
-	wp_enqueue_script('requirejs');					
-	wp_localize_script( 'requirejs', 'require', array(
-		'baseUrl' => $app_base,				
-		'deps'    => array( $app_base . ($an_gradebook_develop ? '/an-gradebook-app.js' : '/an-gradebook-app-min.js')
-	)));
+function enqueue_an_gradebook_scripts($hook){
+	if( $hook == "toplevel_page_an_gradebook" || $hook=='gradebook_page_an_gradebook_settings'){
+		$an_gradebook_develop = true;
+		$app_base = plugins_url('js',__FILE__);	
+		wp_register_style( 'jquery_ui_css', $app_base.'/lib/jquery-ui/jquery-ui.css', array(), null, false );	
+		wp_register_style( 'GradeBook_css', plugins_url('GradeBook.css',__File__), array('bootstrap_css','jquery_ui_css'), null, false );				
+		wp_register_style( 'bootstrap_css', $app_base.'/lib/bootstrap/css/bootstrap.css', array(), null, false);	
+		wp_register_script( 'requirejs', $app_base.'/require.js', array(), null, true);		
+		wp_enqueue_style('GradeBook_css');								
+		wp_enqueue_script('requirejs');					
+		wp_localize_script( 'requirejs', 'require', array(
+			'baseUrl' => $app_base,				
+			'deps'    => array( $app_base . ($an_gradebook_develop ? '/an-gradebook-app.js' : '/an-gradebook-app-min.js')
+		)));
+	} else {
+		return;
+	}
 			
 }
 add_action( 'admin_enqueue_scripts', 'enqueue_an_gradebook_scripts');
@@ -67,6 +71,7 @@ function init_an_gradebook(){
 function init_an_gradebook_settings(){
 	ob_start();	
 	include( dirname( __FILE__ ) . '/js/app/templates/settings-template.php' );	
+	include( dirname( __FILE__ ) . '/js/app/templates/ajax-template.php' );		
 	echo ob_get_clean();
 }
 
