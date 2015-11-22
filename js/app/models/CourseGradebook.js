@@ -28,10 +28,9 @@ function(Backbone,AssignmentList,UserList,CellList){
       })
       return promise;
     },    
-  	url: function(){
-        console.log('following url');
-  	     	return ajaxurl + '?action=gradebook&gbid=' + parseInt(this.get('gbid'));
-  		},
+  	url: function(){      
+  	 	return ajaxurl + '?action=gradebook&gbid=' + parseInt(this.get('gbid'));
+  	},
   	sort_key: 'student',
   	parse: function(response){      
   		this.assignments = new AssignmentList(response.assignments);
