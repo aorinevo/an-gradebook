@@ -12,6 +12,7 @@ function($,Backbone,_, EditCourseView){
         initialize: function(options) {
 			this.options = options.options;   
             this.course = this.model;  
+            console.log(this.course);
             this.courseList = this.collection;
             this.listenTo(this.model, 'change', this.render);	
         },	

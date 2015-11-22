@@ -9,8 +9,10 @@ function($, Backbone, _, StudentView, AssignmentView, EditStudentView, EditAssig
 			this._subviews =[];            
             this.options = options;
             this.filter_option = "-1";	
-			this.course = options.course;					
+			this.course = options.course;	
+            console.log(this.course);				
 			this.gradebook = options.gradebook;						
+            console.log(this.gradebook);
         	this.listenTo(self.gradebook.students, 'add remove', self.render);                                  
 			this.listenTo(self.gradebook.cells, 'add remove change:assign_order', self.render);                      
 			this.listenTo(self.gradebook.assignments, 'add remove change:assign_order change:assign_category', self.render);                                   

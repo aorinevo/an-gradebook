@@ -15,8 +15,25 @@ function(Backbone,Course){
 		/**
 		 * Specify the URL root to fetch from
 		 * @returns {string}
-		 */		
-		url: function(){
+		 */	
+		fetchCourses: function(){
+			var self = this;		
+			var promise = new Promise(function(resolve,reject){
+				if(self.url()){
+					self.fetch({success: function(){
+						resolve(self);						
+					}});
+				} else {					
+					self.set([
+							{"id":1,"name":"Blah","school":"Blah","semester":"Blah","year":2010},
+							{"id":2,"name":"Calc I","school":"BCC","semester":"Fall","year":2015}
+					]);									
+					resolve(self);
+				}				
+			});
+			return promise;
+		},
+		url: function(){			
 			return ajaxurl + '?action=course_list';
 		},
 		sort_key : 'year',

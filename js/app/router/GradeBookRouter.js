@@ -13,7 +13,9 @@ function($,_,Backbone,CourseListView,GradeBookView,SettingsPage, CourseList, Cou
 			var _x = $('a[href$="an_gradebook"]');
 			_x.attr('href',_x.attr('href') + '#courses');
 			var _x = $('a[href$="an_gradebook_settings"]');
-			_x.attr('href',_x.attr('href') + '#settings');						
+			_x.attr('href',_x.attr('href') + '#settings');		
+			this.courseList = new CourseList();	
+			this.gradebook_administrators = new Settings();   
 			Backbone.history.start();	 	
 		},
   		routes: {
@@ -36,75 +38,38 @@ function($,_,Backbone,CourseListView,GradeBookView,SettingsPage, CourseList, Cou
   		},
   		courses : function() {
   			var self = this;
-			this.clearViews();
-            var _request = 0;  			
-			this.courseList = new CourseList();		 			
-			this.listenToOnce(this.courseList,'request',function(){
-				if(_request === 0){
-		            $('#wpbody-content').prepend($('#ajax-template').html());						
-		        }
-				_request = _request + 1;
-			});
-			this.listenToOnce(this.courseList,'sync',function(){			
-				_request = _request - 1;				
-				if(_request === 0 ){
-					$('.ajax-loader-container').remove();					
-		    		var homeView = new CourseListView({collection: self.courseList});
-					self._views.push(homeView);				
-				}
-			});	
-			this.courseList.fetch();						
+			this.clearViews();			           			
+			$('#wpbody-content').prepend($('#ajax-template').html());
+			this.courseList.fetchCourses().then(function(val){
+				$('.ajax-loader-container').remove();					
+	    		var homeView = new CourseListView({collection: self.courseList});
+				self._views.push(homeView);		
+			});						
 	  	},  
 		"show-gradebook" : function(id) {
 			var self = this;
-			this.clearViews();
-            var _request = 0; 
-			this.xhrs = [];			
+			this.clearViews();            				
 			this.course = new Course({id : parseInt(id)});					
-			this.gradebook = new CourseGradebook({gbid: parseInt(id)});	
- 			_.each([this.course,this.gradebook],function(model){
-				self.listenToOnce(model,'request',function(){	
-					if( _request === 0){
-			            $('#wpbody-content').prepend($('#ajax-template').html());							
-			        }
-			   		_request = _request + 1;
-				});
-				self.listenToOnce(model,'sync',function(){							
-			   		_request = _request - 1;
-				   	if(_request === 0 ){
-						$('.ajax-loader-container').remove();	
-	    				var gradeBookView = new GradeBookView({gradebook: self.gradebook, course: self.course});         					
-			    		self._views.push(gradeBookView);									   	
-			   		}
-				});	    
-			});	
-			this.xhrs.push(this.course.fetch(),this.gradebook.fetch());							
+			this.gradebook = new CourseGradebook({gbid: parseInt(id)});				
+			$('#wpbody-content').prepend($('#ajax-template').html());							
+			Promise.all([this.course.fetchCourse(),this.gradebook.fetchCourseGradebook()]).then(function(values){		
+				$('.ajax-loader-container').remove();					
+				var gradeBookView = new GradeBookView({gradebook: self.gradebook, course: self.course});				
+				self._views.push(gradeBookView);					
+			});							
   		},
 		settings: function(){
 			var self = this;
-			this.clearViews();			
-            var _request = 0;  			
-			this.gradebook_administrators = new Settings();        			    	 			
-			this.listenToOnce(this.gradebook_administrators,'request',function(){
-				console.log(_request);	
-				if(_request === 0){
-		            $('#wpbody-content').prepend($('#ajax-template').html());						
-		        }
-				_request = _request + 1;
-			});
-			this.listenToOnce(this.gradebook_administrators,'sync',function(){			
-				_request = _request - 1;				
-				if(_request === 0 ){
-					$('.ajax-loader-container').remove();		
-		    		var settingsPage = new SettingsPage({gradebook_administrators: self.gradebook_administrators});					
-					self._views.push(settingsPage);		 											
-				}
-			});				
-			this.gradebook_administrators.fetch();		   
+			this.clearViews();			           
+			$('#wpbody-content').prepend($('#ajax-template').html());							
+			this.gradebook_administrators.fetchSettings().then(function(val){
+				$('.ajax-loader-container').remove();		
+	    		var settingsPage = new SettingsPage({gradebook_administrators: self.gradebook_administrators});					
+				self._views.push(settingsPage);			
+			});													   
 		},
 		"edit-student": function(cid,uid){			
 			this.clearViews();
-				console.log("add-student");
 			if(uid){
 			    var editStudentView = new EditStudentView();
 			} else {

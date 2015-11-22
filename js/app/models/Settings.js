@@ -7,6 +7,20 @@ define(['backbone','underscore'],function(Backbone,_){
         	author: false,
     		subscriber: false
     	},	
+        fetchSettings: function(){
+            var self = this;
+            var promise = new Promise(function(resolve,reject){
+                if(self.url()){
+                    self.fetch({success:function(){
+                        resolve(self);
+                    }})
+                } else {
+                    self.set(self.parse({"gradebook_administrators":{"editor":"true","author":"true","administrator":true}}));
+                    resolve(self);
+                }
+            });
+            return promise;          
+        },
         url: function(){
         	if(this.get('action')!=='save'){
         		return ajaxurl + '?action=an_gradebook_get_settings';
