@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=aorin
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.5
 Tested up to: 4.3.1
-Stable tag: 4.0.4
+Stable tag: 4.0.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,6 +61,11 @@ Version 4.0.5:
 * Populate necessary models and collections before instantiating views.
 * Fixed settings bug.  
 * Removed unnecessary dependancies for certain views.
+* Added read.md for github.
+* Update plugin icon credits.
+* Removed ad hock implementation of promises and replaced it with native javascript implementation of promises.
+* Previously set an-gradebook to load on admin_init but this caused conflicts with the version of backbone wp uses.  Now an-gradebook scripts are enqueued only on gradebook pages.
+
 
 Version 4.0.4:
 
