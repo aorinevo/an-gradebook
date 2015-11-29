@@ -9,7 +9,7 @@ Author URI: http://www.aorinevo.com
 License: GPL
 */
 
-define( "AN_GRADEBOOK_VERSION", "4.0.5");
+define( "AN_GRADEBOOK_VERSION", "4.0.6");
 
 $database_file_list = glob(dirname( __FILE__ ).'/database/*.php');
 foreach($database_file_list as $database_file){
@@ -40,9 +40,11 @@ add_action( 'admin_menu', 'register_an_gradebook_menu_page' );
 
 	
 function enqueue_an_gradebook_scripts($hook){
+	$app_base = plugins_url('js',__FILE__);		
+	wp_register_script( 'init_gradebookjs', $app_base.'/init_gradebook.js', array('jquery'), null, true);	
+	wp_enqueue_script('init_gradebookjs');		
 	if( $hook == "toplevel_page_an_gradebook" || $hook=='gradebook_page_an_gradebook_settings'){
 		$an_gradebook_develop = false;
-		$app_base = plugins_url('js',__FILE__);	
 		wp_register_style( 'jquery_ui_css', $app_base.'/lib/jquery-ui/jquery-ui.css', array(), null, false );	
 		wp_register_style( 'GradeBook_css', plugins_url('GradeBook.css',__File__), array('bootstrap_css','jquery_ui_css'), null, false );				
 		wp_register_style( 'bootstrap_css', $app_base.'/lib/bootstrap/css/bootstrap.css', array(), null, false);	
