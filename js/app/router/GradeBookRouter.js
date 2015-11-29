@@ -9,11 +9,7 @@ function($,_,Backbone,CourseListView,GradeBookView,SettingsPage, CourseList, Cou
 	Backbone.emulateHTTP = true;
 	var GradeBookRouter = Backbone.Router.extend({
 		initialize: function(){
-			this._views = [];
-			var _x = $('a[href$="an_gradebook"]');
-			_x.attr('href',_x.attr('href') + '#courses');
-			var _x = $('a[href$="an_gradebook_settings"]');
-			_x.attr('href',_x.attr('href') + '#settings');		
+			this._views = [];	
 			this.courseList = new CourseList();	
 			this.gradebook_administrators = new Settings();   
 			Backbone.history.start();	 	
