@@ -9,7 +9,7 @@ Author URI: http://www.aorinevo.com
 License: GPL
 */
 
-define( "AN_GRADEBOOK_VERSION", "4.0.5");
+define( "AN_GRADEBOOK_VERSION", "4.0.6");
 
 $database_file_list = glob(dirname( __FILE__ ).'/database/*.php');
 foreach($database_file_list as $database_file){
