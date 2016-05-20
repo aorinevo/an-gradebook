@@ -42,13 +42,13 @@ function($,Backbone,_,AssignmentStatisticsView, EditAssignmentView, DetailsAssig
         shiftAssignmentLeft: function(ev){
         	ev.preventDefault();          
         	var x = this.gradebook.assignments.findWhere({assign_order: this.model.get('assign_order')-1});
-        	x.save({assign_order: this.model.get('assign_order')});
+        	x.save({assign_order: this.model.get('assign_order'), assign_visibility_options: x.get('assign_visibility')});
 			this.assignment.save({assign_order: this.model.get('assign_order')-1, assign_visibility_options: this.model.get('assign_visibility')});
         },	
         shiftAssignmentRight: function(ev){
         	ev.preventDefault();          
         	var x = this.gradebook.assignments.findWhere({assign_order: this.model.get('assign_order')+1});            
-        	x.save({assign_order: this.model.get('assign_order')});
+        	x.save({assign_order: this.model.get('assign_order'), assign_visibility_options: x.get('assign_visibility')});
 			this.assignment.save({assign_order: this.model.get('assign_order')+1, assign_visibility_options: this.model.get('assign_visibility')});
         },        
         toggleAssignmentMenu: function(){
