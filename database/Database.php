@@ -1,9 +1,9 @@
 <?php
 class ANGB_DATABASE{
-	const an_gradebook_db_version = 3.2;
-	public function __construct(){
+	const an_gradebook_db_version = 3.2;	
+	public function __construct(){	
 		register_activation_hook(__FILE__,array($this,'database_init'));	
-		register_activation_hook(__FILE__,array($this,'database_alter'));			
+		register_activation_hook(__FILE__,array($this,'database_alter'));
 		//add_action('plugins_loaded', array($this,'an_gradebook_upgrade_db'));	
 	}	
 	public function an_gradebook_upgrade_db(){

@@ -12,6 +12,7 @@ class AN_GradeBookAPI{
 	}
 	
 	public function an_gradebook_get_settings(){
+		wp_cache_delete ( 'alloptions', 'options' );	
 		$settings = get_option('an_gradebook_settings');
 		echo json_encode(array('gradebook_administrators'=>$settings));
 		die();
@@ -20,10 +21,11 @@ class AN_GradeBookAPI{
 	public function an_gradebook_set_settings(){
 		$params = json_decode(file_get_contents('php://input'),true);
 		unset($params['action']);
-		$params['administrator']=true;		
-		update_option('an_gradebook_settings',$params);
-		$settings = get_option('an_gradebook_settings');		
-		echo json_encode(array('gradebook_administrators'=>$settings));
+		$params['administrator']=true;	
+		wp_cache_delete ( 'alloptions', 'options' );		
+		$didupdateQ = update_option('an_gradebook_settings', $params);
+		wp_cache_delete ( 'alloptions', 'options' );		
+		echo json_encode(array('gradebook_administrators'=>get_option('an_gradebook_settings')));
 		die();
 	}	
 	

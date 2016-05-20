@@ -3,13 +3,13 @@
 Plugin Name: GradeBook
 Plugin URI: http://www.aorinevo.com/
 Description: A simple GradeBook plugin
-Version: 4.0.5
+Version: 4.0.7
 Author: Aori Nevo
 Author URI: http://www.aorinevo.com
 License: GPL
 */
 
-define( "AN_GRADEBOOK_VERSION", "4.0.6");
+define( "AN_GRADEBOOK_VERSION", "4.0.7");
 
 $database_file_list = glob(dirname( __FILE__ ).'/database/*.php');
 foreach($database_file_list as $database_file){
@@ -83,5 +83,38 @@ function an_gradebook_my_delete_user( $user_id ) {
 	$results2 = $wpdb->delete('an_gradebook_cells',array('uid'=>$user_id));	
 }
 add_action( 'delete_user', 'an_gradebook_my_delete_user' );
+
+function an_gradebook_ajaxurl() {
+?>
+<script type="text/javascript">
+var ajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>';
+</script>
+<?php
+}
+add_action('wp_head','an_gradebook_ajaxurl');
+
+function an_gradebook_shortcode (){
+	init_an_gradebook();
+	$an_gradebook_develop = false;	
+	$app_base = plugins_url('js',__FILE__);		
+	wp_register_script( 'init_front_end_gradebookjs', $app_base.'/init_front_end_gradebook.js', array('jquery'), null, true);	
+	wp_enqueue_script('init_front_end_gradebookjs');		
+	if( 1==1){
+		wp_register_style( 'jquery_ui_css', $app_base.'/lib/jquery-ui/jquery-ui.css', array(), null, false );	
+		wp_register_style( 'GradeBook_css', plugins_url('GradeBook.css',__File__), array('bootstrap_css','jquery_ui_css'), null, false );				
+		wp_register_style( 'bootstrap_css', $app_base.'/lib/bootstrap/css/bootstrap.css', array(), null, false);	
+		wp_register_script( 'requirejs', $app_base.'/require.js', array(), null, true);		
+		wp_enqueue_style('GradeBook_css');								
+		wp_enqueue_script('requirejs');					
+		wp_localize_script( 'requirejs', 'require', array(
+			'baseUrl' => $app_base,				
+			'deps'    => array( $app_base . ($an_gradebook_develop ? '/an-gradebook-app.js' : '/an-gradebook-app-min.js')
+		)));
+	} else {
+		return;
+	}
+	return '<div id="wpbody-content"></div>';
+}
+add_shortcode('an_gradebook', 'an_gradebook_shortcode');
 
 ?>

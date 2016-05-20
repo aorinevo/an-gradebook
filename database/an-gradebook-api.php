@@ -169,6 +169,7 @@ class an_gradebook_api{
 			   	);
 			case 'student' :
 				$assignments = $wpdb->get_results('SELECT * FROM an_gradebook_assignments WHERE assign_visibility = "Students" AND gbid = '. $gbid, ARRAY_A);
+				$assignments2=$assignments;
 				foreach($assignments as &$assignment){
 					$assignment['id'] = intval($assignment['id']);
 					$assignment['gbid'] = intval($assignment['gbid']);    	
@@ -204,7 +205,8 @@ class an_gradebook_api{
 					"assignments"=>$assignments, 
 					"cells" => $cells, 
 					"students"=>array($student),
-					"role"=>"student"
+					"role"=>"student",
+					"test"=>$assignments2
 			   );		
 			}
 	}

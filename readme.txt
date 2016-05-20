@@ -1,10 +1,10 @@
 === AN_GradeBook ===
 Contributors: anevo, jamarparris
-Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=aorinevo%40gmail%2ecom&lc=US&item_name=AN_GradeBook&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
+Donate link: https://www.paypal.me/aorinevo
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.5
 Tested up to: 4.3.1
-Stable tag: 4.0.6
+Stable tag: 4.0.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -55,6 +55,15 @@ Students are able to:
 * plugin icon: https://www.iconfinder.com/icons/175285/edit_property_icon#size=256
 
 == Changelog ==
+
+Version 4.0.8:
+
+* Fixed shift left/right bug which unintentionally toggled the visibility of assignments.  The update prevents this from happening but for effected assignments, instuctors need to manually set the visibility again by editing the assignment and selecting the appropriate visibility.
+* Fixed settings bug.  Select alternate roles to administer gradebook did not survive page reload.
+
+Version 4.0.7:
+
+* Fixed issue where database tables where not being added on install.
 
 Version 4.0.6:
 
