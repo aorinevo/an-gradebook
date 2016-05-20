@@ -3,8 +3,8 @@ Contributors: anevo, jamarparris
 Donate link: https://www.paypal.me/aorinevo
 Tags: GradeBook, Course Management, Education, Grades
 Requires at least: 3.5
-Tested up to: 4.3.1
-Stable tag: 4.0.7
+Tested up to: 4.5.2
+Stable tag: 4.0.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
